@@ -1,16 +1,15 @@
 import {useEffect, useState} from 'react';
 import {GraphQL} from '../..';
-import {Supplier, SuppliersOverviewParams} from '../../../../types/graphql/supplierTypes';
+import {GetSupplier, Supplier, SuppliersType} from '../../../../types/graphql/supplierTypes';
+import useAppContext from '../../../../context/useAppContext';
 
-const useGetSuppliers = ({id, search, page, size}: SuppliersOverviewParams) => {
+const useGetSuppliers = ({id, search}: GetSupplier) => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const {fetch, graphql} = useAppContext();
   const fetchSuppliers = async () => {
-    setLoading(true);
-
-    const response = await GraphQL.getSuppliers({id, search, page, size});
-    setSuppliers(response.items as Supplier[]);
+    const response: SuppliersType['get'] = await fetch(graphql.getSuppliersOverview, {id, search});
+    setSuppliers(response.suppliers_Overview.items as Supplier[]);
     setLoading(false);
   };
 

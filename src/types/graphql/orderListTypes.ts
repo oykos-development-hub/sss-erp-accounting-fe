@@ -1,5 +1,6 @@
-import {DropdownDataString} from '../dropdownData';
+import {DropdownDataNumber, DropdownDataString} from '../dropdownData';
 import {OrderListArticleInsert, OrderListArticleType} from './articleTypes';
+import {DeleteResponse, DetailsResponse, GetResponse} from './response';
 export interface OrderListItem {
   id?: number;
   date_order?: string;
@@ -46,51 +47,12 @@ export interface OrderListMovementParams {
   user_profile_id: number;
 }
 
-export interface OrderListResponse {
-  data: {
-    orderList_Overview: {
-      status?: string;
-      message?: string;
-      total?: number;
-      items?: OrderListItem[];
-    };
-  };
-}
-
-export interface OrderProcurementAvailableArticlesResponse {
-  data: {
-    orderProcurementAvailableList_Overview: {
-      status?: string;
-      message?: string;
-      items?: OrderListArticleType[];
-    };
-  };
-}
-
-export interface OrderListReceiveResponse {
-  data: {
-    orderList_Receive: {
-      status?: string;
-      message?: string;
-    };
-  };
-}
-
 export interface OrderListInsertResponse {
   data: {
     orderList_Insert: {
       status?: string;
       message?: string;
       item: OrderListItem;
-    };
-  };
-}
-
-export interface OrderListMovementResponse {
-  data: {
-    orderList_Movement: {
-      status?: string;
-      message?: string;
     };
   };
 }
@@ -104,11 +66,35 @@ export interface OrderListDeleteResponse {
   };
 }
 
-export interface OrderListReceiveDeleteResponse {
-  data: {
-    orderListReceive_Delete: {
-      status?: string;
-      message?: string;
-    };
+export interface OrderListType {
+  delete: {
+    orderList_Delete: DeleteResponse;
+  };
+  get: {
+    orderList_Overview: GetResponse<OrderListItem>;
+  };
+  insert: {
+    orderList_Insert: DetailsResponse<OrderListItem>;
+  };
+  movement: {
+    orderList_Movement: DeleteResponse;
+  };
+  receive: {
+    orderList_Receive: DeleteResponse;
+  };
+  receive_delete: {
+    orderListReceive_Delete: DeleteResponse;
+  };
+}
+
+export interface OrderProcurementAvailableArticlesType {
+  get: {
+    orderProcurementAvailableList_Overview: GetResponse<OrderListArticleType>;
+  };
+}
+
+export interface RecipientUsersType {
+  get: {
+    recipientUsers_Overview: GetResponse<DropdownDataNumber>;
   };
 }

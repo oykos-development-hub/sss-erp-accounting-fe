@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {GetResponse} from './response';
 
 export interface OfficesOfOrganizationUnits {
   id: number;
@@ -12,14 +13,8 @@ export interface OfficesOfOrganizationUnits {
   color: string;
   icon: ReactNode;
 }
-
-export interface OfficesOfOrganizationUnitsOverviewResponse {
-  data: {
-    officesOfOrganizationUnits_Overview: {
-      status?: string;
-      message?: string;
-      total?: string;
-      items?: OfficesOfOrganizationUnits[];
-    };
+export interface OfficesOfOrganizationUnitsTypeResponse {
+  get: {
+    officesOfOrganizationUnits_Overview: GetResponse<OfficesOfOrganizationUnits>;
   };
 }

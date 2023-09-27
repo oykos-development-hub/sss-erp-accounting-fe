@@ -1,21 +1,26 @@
 import {useState} from 'react';
 import {GraphQL} from '../..';
 import {REQUEST_STATUSES} from '../../../constants';
-import {OrderListMovementParams} from '../../../../types/graphql/orderListTypes';
+import {OrderListMovementParams, OrderListType} from '../../../../types/graphql/orderListTypes';
+import useAppContext from '../../../../context/useAppContext';
 
 const useOrderListMovement = () => {
   const [loading, setLoading] = useState(false);
-
+  const {fetch} = useAppContext();
   const orderListMovement = async (data: OrderListMovementParams, onSuccess?: () => void, onError?: () => void) => {
     setLoading(true);
-
-    const response = await GraphQL.orderListMovement(data);
-    if (response.status === REQUEST_STATUSES.success) {
-      onSuccess && onSuccess();
-    } else {
+    try {
+      const response: OrderListType['movement'] = await fetch(GraphQL.orderListMovement, {data});
+      if (response?.orderList_Movement.status === REQUEST_STATUSES.success) {
+        onSuccess && onSuccess();
+      } else {
+        onError && onError();
+      }
+    } catch (error) {
       onError && onError();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return {loading, mutate: orderListMovement};

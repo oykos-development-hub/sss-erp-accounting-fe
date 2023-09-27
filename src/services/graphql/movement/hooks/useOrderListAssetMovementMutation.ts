@@ -1,25 +1,36 @@
 import {useState} from 'react';
 import {GraphQL} from '../..';
 import {REQUEST_STATUSES} from '../../../constants';
-import {OrderListAssetMovementParams} from '../../../../types/graphql/OrderListAssetMovementTypes';
+import {
+  OrderListAssetMovementParams,
+  OrderListAssetMovementTypeResponse,
+} from '../../../../types/graphql/OrderListAssetMovementTypes';
+import useAppContext from '../../../../context/useAppContext';
 
 const useOrderListAssetMovementMutation = () => {
   const [loading, setLoading] = useState(false);
-
+  const {fetch} = useAppContext();
   const OrderListAssetMovementMutation = async (
     data: OrderListAssetMovementParams,
     onSuccess?: () => void,
     onError?: () => void,
   ) => {
     setLoading(true);
-
-    const response = await GraphQL.OrderListAssetMovementMutation(data);
-    if (response.status === REQUEST_STATUSES.success) {
-      onSuccess && onSuccess();
-    } else {
+    try {
+      const response: OrderListAssetMovementTypeResponse['insert'] = await fetch(
+        GraphQL.OrderListAssetMovementMutation,
+        {data},
+      );
+      if (response.orderList_Movement.status === REQUEST_STATUSES.success) {
+        onSuccess && onSuccess();
+      } else {
+        onError && onError();
+      }
+    } catch (error) {
       onError && onError();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return {loading, mutate: OrderListAssetMovementMutation};

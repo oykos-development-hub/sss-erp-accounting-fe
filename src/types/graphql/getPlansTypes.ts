@@ -1,9 +1,4 @@
-export interface PlanOverviewResponse {
-  status: string;
-  message: string;
-  total: number;
-  items: PlanItem[];
-}
+import {GetResponse} from './response';
 
 export interface PlanItem {
   id: number;
@@ -41,6 +36,12 @@ export interface PlanItem {
     file_id: string;
     articles: Article[];
   }[];
+}
+
+export interface PlanResponseType {
+  get: {
+    publicProcurementPlans_Overview: GetResponse<PlanItem>;
+  };
 }
 
 export interface PreBudgetPlan {

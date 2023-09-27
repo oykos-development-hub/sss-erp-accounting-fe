@@ -1,23 +1,15 @@
+import {DeleteResponse, DetailsResponse} from './response';
+
 export interface OrderListAssetMovementParams {
   order_id: number;
   office_id: number;
   recipient_user_id: number;
 }
-
-export interface OrderListAssetMovementResponse {
-  data: {
-    orderList_Movement: {
-      status?: string;
-      message?: string;
-    };
+export interface OrderListAssetMovementTypeResponse {
+  insert: {
+    orderList_Movement: DetailsResponse<OrderListAssetMovementParams>;
   };
-}
-
-export interface OrderListAssetMovementDeleteResponse {
-  data: {
-    orderListAssetMovement_Delete: {
-      status?: string;
-      message?: string;
-    };
+  delete: {
+    orderListAssetMovement_Delete: DeleteResponse;
   };
 }

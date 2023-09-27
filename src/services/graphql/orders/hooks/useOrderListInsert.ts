@@ -1,7 +1,8 @@
 import {useState} from 'react';
 import {GraphQL} from '../..';
 import {REQUEST_STATUSES} from '../../../constants';
-import {OrderListInsertParams} from '../../../../types/graphql/orderListTypes';
+import {OrderListInsertParams, OrderListType} from '../../../../types/graphql/orderListTypes';
+import useAppContext from '../../../../context/useAppContext';
 
 const useOrderListInsert = () => {
   const [loading, setLoading] = useState(false);
@@ -12,15 +13,19 @@ const useOrderListInsert = () => {
     onError?: () => void,
   ) => {
     setLoading(true);
-
-    const response = await GraphQL.orderListInsert(data);
-    if (response.status === REQUEST_STATUSES.success) {
-      onSuccess && onSuccess(response?.item?.id);
-    } else {
+    const {fetch} = useAppContext();
+    try {
+      const response: OrderListType['insert'] = await fetch(GraphQL.orderListInsert, {data});
+      if (response?.orderList_Insert?.status === REQUEST_STATUSES.success) {
+        onSuccess && onSuccess(response?.orderList_Insert?.item?.id);
+      } else {
+        onError && onError();
+      }
+    } catch (error) {
       onError && onError();
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return {loading, mutate: orderListInsert};

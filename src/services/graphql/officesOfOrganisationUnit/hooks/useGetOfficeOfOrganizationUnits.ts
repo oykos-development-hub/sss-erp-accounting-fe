@@ -1,17 +1,23 @@
 import {useEffect, useState} from 'react';
 import {GraphQL} from '../..';
-import {OfficesOfOrganizationUnits} from '../../../../types/graphql/officesOfOrganizationUnitsOverviewTypes';
+import {
+  OfficesOfOrganizationUnits,
+  OfficesOfOrganizationUnitsTypeResponse,
+} from '../../../../types/graphql/officesOfOrganizationUnitsOverviewTypes';
+import useAppContext from '../../../../context/useAppContext';
 
 const useGetOfficesOfOrganizationUnits = () => {
   const [officesOfOrganizationUnits, setOfficesOfOrganizationUnits] = useState<OfficesOfOrganizationUnits[]>();
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const {fetch, graphql} = useAppContext();
   const fetchOfficesOfOrganizationUnits = async (id: number, organization_unit_id: number, search: string) => {
-    setLoading(true);
-
-    const response = await GraphQL.getOfficesOfOrganizationUnits(id, organization_unit_id, search);
+    const response: OfficesOfOrganizationUnitsTypeResponse['get'] = await fetch(graphql.getOffices, {
+      id,
+      organization_unit_id,
+      search,
+    });
     if (response) {
-      const items = response.items;
+      const items = response.officesOfOrganizationUnits_Overview.items;
       setOfficesOfOrganizationUnits(items);
     }
     setLoading(false);

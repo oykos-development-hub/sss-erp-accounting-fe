@@ -1,14 +1,4 @@
-import {GraphQL} from '../..';
-import {GetPlansOverviewParams, PlanOverviewResponse} from '../../../../types/graphql/getPlansTypes';
-
-const getPlans = async ({
-  status,
-  year,
-  page,
-  size,
-  is_pre_budget,
-}: GetPlansOverviewParams): Promise<PlanOverviewResponse> => {
-  const query = `query PlansOverview($status: String, $year: String, $page: Int!, $size: Int!, $is_pre_budget: Boolean) {
+const getPlans = `query PlansOverview($status: String, $year: String, $page: Int!, $size: Int!, $is_pre_budget: Boolean) {
     publicProcurementPlans_Overview(status: $status, year: $year, page: $page, size: $size, is_pre_budget: $is_pre_budget) {
         status 
         message
@@ -69,9 +59,5 @@ const getPlans = async ({
         }
     }
 }`;
-
-  const response = await GraphQL.fetch(query, {status, year, page, size, is_pre_budget});
-  return response?.data?.publicProcurementPlans_Overview || {};
-};
 
 export default getPlans;

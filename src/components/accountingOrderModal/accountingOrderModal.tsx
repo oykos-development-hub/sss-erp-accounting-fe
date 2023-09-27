@@ -39,22 +39,21 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({
     year: '',
   });
 
-  console.log(plansData, 'aaaa');
   const procurementID = watch('public_procurement_id')?.id;
 
   const {mutate: orderListInsert} = useOrderListInsert();
 
-  // const plansOptions = useMemo(() => {
-  //   return plansData?.map(item => {
-  //     return {
-  //       id: Number(item.id),
-  //       title: item.title.toString(),
-  //     };
-  //   });
-  // }, [plansData]);
+  const plansOptions = useMemo(() => {
+    return plansData?.map(item => {
+      return {
+        id: Number(item.id),
+        title: item.title.toString(),
+      };
+    });
+  }, [plansData]);
 
   const handlePlanSelect = (value: any) => {
-    setSelectedPlan(plansData?.find((item: any) => item.id === value?.id) || null);
+    setSelectedPlan(plansOptions?.find((item: any) => item.id === value?.id) || null);
   };
   let procurements: any = [];
   if (selectedPlan) {
@@ -101,7 +100,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({
               value={selectedPlan}
               name="plan"
               label="PLAN:"
-              options={plansData || []}
+              options={plansOptions || []}
             />
           </Row>
           <Controller
