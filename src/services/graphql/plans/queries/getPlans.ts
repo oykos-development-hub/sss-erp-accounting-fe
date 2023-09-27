@@ -8,15 +8,8 @@ const getPlans = async ({
   size,
   is_pre_budget,
 }: GetPlansOverviewParams): Promise<PlanOverviewResponse> => {
-  let dataString = `status: "${status || ''}", year: "${year}", page: ${page}, size: ${size}`;
-
-  if (is_pre_budget === true || is_pre_budget === false) {
-    dataString += `, is_pre_budget: ${is_pre_budget}`;
-  }
-
-  const response = await GraphQL.fetch(
-    `query {
-    publicProcurementPlans_Overview(${dataString}) {
+  const query = `query PlansOverview($status: String, $year: String, $page: Int!, $size: Int!, $is_pre_budget: Boolean) {
+    publicProcurementPlans_Overview(status: $status, year: $year, page: $page, size: $size, is_pre_budget: $is_pre_budget) {
         status 
         message
         total 
@@ -30,9 +23,8 @@ const getPlans = async ({
             active
             year
             title
-            status
+            status 
             serial_number
-            status
             date_of_publishing
             date_of_closing
             created_at
@@ -76,9 +68,9 @@ const getPlans = async ({
             }
         }
     }
-}`,
-  );
+}`;
 
+  const response = await GraphQL.fetch(query, {status, year, page, size, is_pre_budget});
   return response?.data?.publicProcurementPlans_Overview || {};
 };
 

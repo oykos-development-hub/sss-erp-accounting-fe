@@ -13,13 +13,13 @@ import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, Tabl
 
 export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   const [showModal, setShowModal] = useState(false);
-  const isAdmin = context?.contextMain?.role_id === 123;
+  // const isAdmin = context?.contextMain?.role_id === 123;
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [page, setPage] = useState(1);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const {data: suppliers} = useGetSuppliers({id: 0, search: ''});
+  const {data: suppliers} = useGetSuppliers({id: 0, search: '', page: 1, size: 100});
 
   const [form, setForm] = useState<any>({
     supplier: {id: 0, title: ''},
@@ -33,11 +33,11 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   };
 
   const suppliersOptions = useMemo(() => {
-    const options = suppliers.map((supplier: Supplier) => ({
+    const options = suppliers?.map((supplier: Supplier) => ({
       id: supplier.id,
       title: supplier.title,
     }));
-    options.unshift({id: 0, title: 'Sve'});
+    options?.unshift({id: 0, title: 'Sve'});
     return options;
   }, [suppliers]);
 
@@ -114,20 +114,21 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
               isSearchable={true}
             />
           </FiltersWrapper>
-          {isAdmin && (
-            <ButtonWrapper>
-              <Button
-                variant="secondary"
-                content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
-                onClick={handleAdd}
-              />
-            </ButtonWrapper>
-          )}
+          {/* {isAdmin && ( */}
+          <ButtonWrapper>
+            <Button
+              variant="secondary"
+              content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
+              onClick={handleAdd}
+            />
+          </ButtonWrapper>
+          {/* )} */}
         </TableHeader>
 
         <div>
           <Table
-            tableHeads={isAdmin ? tableHeads : tableHeads.filter(item => item.accessor !== 'TABLE_ACTIONS')}
+            // tableHeads={isAdmin ? tableHeads : tableHeads.filter(item => item.accessor !== 'TABLE_ACTIONS')}
+            tableHeads={tableHeads}
             data={(orders as any) || []}
             onRowClick={row => {
               context.navigation.navigate(

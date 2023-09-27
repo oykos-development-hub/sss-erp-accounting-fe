@@ -8,18 +8,14 @@ const useOrderListMovement = () => {
 
   const orderListMovement = async (data: OrderListMovementParams, onSuccess?: () => void, onError?: () => void) => {
     setLoading(true);
-    try {
-      const response = await GraphQL.orderListMovement(data);
-      if (response.status === REQUEST_STATUSES.success) {
-        onSuccess && onSuccess();
-      } else {
-        onError && onError();
-      }
-    } catch (error) {
+
+    const response = await GraphQL.orderListMovement(data);
+    if (response.status === REQUEST_STATUSES.success) {
+      onSuccess && onSuccess();
+    } else {
       onError && onError();
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return {loading, mutate: orderListMovement};

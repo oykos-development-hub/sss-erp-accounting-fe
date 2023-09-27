@@ -12,9 +12,10 @@ const useGetOrderList = (
 ) => {
   const [totalNumOfOrders, setTotalNumOfOrders] = useState<number>(0);
   const [orders, setOrders] = useState<OrderListItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchOrders = async () => {
+    setLoading(true);
     const response = await GraphQL.getOrderList(page, size, id, supplier_id, status, search);
     const numOfOrders = response?.total;
     setTotalNumOfOrders(numOfOrders as number);

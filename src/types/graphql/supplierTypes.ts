@@ -8,11 +8,12 @@ export interface Supplier {
   folder_id?: number;
 }
 
-export interface GetSupplier {
+export interface SuppliersOverviewParams {
   id: number;
   search?: string;
+  page: number;
+  size: number;
 }
-
 export interface SuppliersOverviewResponse {
   data: {
     suppliers_Overview: {

@@ -106,7 +106,7 @@ export interface OrderListDeleteResponse {
 
 export interface OrderListReceiveDeleteResponse {
   data: {
-    orderListReceiveDelete_Delete: {
+    orderListReceive_Delete: {
       status?: string;
       message?: string;
     };

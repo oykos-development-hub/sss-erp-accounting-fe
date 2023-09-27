@@ -12,17 +12,14 @@ import getOfficesOfOrganizationUnits from './officesOfOrganisationUnit/queries/g
 import OrderListAssetMovementMutation from './movement/mutations/orderListMovement';
 import getRecipientUsersOverview from './recipientUsersOverview/queries/getRecipientUsersOverview';
 import deleteOrderListAssetMovement from './movement/mutations/orderListMovementDelete';
-import deleteOrderListReceive from './orders/mutations/orderListReveiveDelete';
+import deleteOrderListReceive from './orders/mutations/orderListReceiveDelete';
 
 export const GraphQL = {
-  fetch: (query: string): Promise<any> => {
+  fetch: (query: string, variables?: any): Promise<any> => {
     return fetch(BFF_URL[getEnvironment()], {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer sss',
-      },
-      body: JSON.stringify({query}),
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({query, variables}),
     })
       .then(response => response.json())
       .catch(error => console.error(error));

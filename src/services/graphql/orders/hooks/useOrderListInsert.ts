@@ -12,18 +12,15 @@ const useOrderListInsert = () => {
     onError?: () => void,
   ) => {
     setLoading(true);
-    try {
-      const response = await GraphQL.orderListInsert(data);
-      if (response.status === REQUEST_STATUSES.success) {
-        onSuccess && onSuccess(response?.item?.id);
-      } else {
-        onError && onError();
-      }
-    } catch (error) {
+
+    const response = await GraphQL.orderListInsert(data);
+    if (response.status === REQUEST_STATUSES.success) {
+      onSuccess && onSuccess(response?.item?.id);
+    } else {
       onError && onError();
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return {loading, mutate: orderListInsert};

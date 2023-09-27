@@ -8,7 +8,6 @@ const useDeleteOrderListReceive = () => {
   const deleteOrderListReceive = async (id: number, onSuccess?: () => void, onError?: () => void) => {
     setLoading(true);
     const response = await GraphQL.deleteOrderList(id);
-
     if (response.status === REQUEST_STATUSES.success) {
       onSuccess && onSuccess();
     } else {

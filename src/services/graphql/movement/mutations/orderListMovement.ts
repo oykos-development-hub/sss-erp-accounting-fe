@@ -7,17 +7,14 @@ import {
 const OrderListAssetMovementMutation = async (
   data: OrderListAssetMovementParams,
 ): Promise<OrderListAssetMovementResponse['data']['orderList_Movement']> => {
-  const response = await GraphQL.fetch(`mutation {
-    orderList_Movement(data:  {
-      order_id: ${data?.order_id},
-      office_id: ${data?.office_id},
-      recipient_user_id: ${data?.recipient_user_id}
+  const mutation = `mutation($data: OrderListAssetMovementMutation!) {
+    orderList_Movement(data: $data) {
+        status 
+        message 
     }
-      ) {
-        message
-        status
-      }
-    }`);
+}`;
+
+  const response = await GraphQL.fetch(mutation, {data});
   return response?.data?.orderList_Movement || {};
 };
 

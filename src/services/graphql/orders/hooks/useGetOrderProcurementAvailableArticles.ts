@@ -4,9 +4,10 @@ import {OrderListArticleType} from '../../../../types/graphql/articleTypes';
 
 const useGetOrderProcurementAvailableArticles = (public_procurement_id: number) => {
   const [articles, setArticles] = useState<OrderListArticleType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchOrderProcurementArticles = async () => {
+    setLoading(true);
     const response = await GraphQL.getOrderProcurementAvailableArticles(public_procurement_id);
     const items = response?.items;
     setArticles(items || []);

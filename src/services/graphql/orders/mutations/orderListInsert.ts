@@ -4,22 +4,11 @@ import {OrderListInsertParams, OrderListInsertResponse} from '../../../../types/
 const orderListInsert = async (
   data: OrderListInsertParams,
 ): Promise<OrderListInsertResponse['data']['orderList_Insert']> => {
-  const arr = data.articles.map(
-    item => `{
-      id: ${item.id},
-      amount: ${item.amount}
-    }`,
-  );
-  const response = await GraphQL.fetch(`mutation {
-    orderList_Insert(data: {
-        id: ${data.id},
-        date_order: "${data.date_order}",
-        public_procurement_id: ${data.public_procurement_id},
-        articles: [${arr}]
-      }
-      ) {
+  const mutation = `mutation($data: OrderListInsertMutation!) {
+    orderList_Insert(data: $data) {
         status 
-        message 
+        message
+        data
         item {
             id
             date_order
@@ -44,8 +33,9 @@ const orderListInsert = async (
                 total_price
             }
         }
-      }
-    }`);
+    }
+}`;
+  const response = await GraphQL.fetch(mutation, {data});
   return response?.data?.orderList_Insert || {};
 };
 

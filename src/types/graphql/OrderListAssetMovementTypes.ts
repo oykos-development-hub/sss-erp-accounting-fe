@@ -15,7 +15,7 @@ export interface OrderListAssetMovementResponse {
 
 export interface OrderListAssetMovementDeleteResponse {
   data: {
-    orderListAssetMovementDelete_Delete: {
+    orderListAssetMovement_Delete: {
       status?: string;
       message?: string;
     };

@@ -190,7 +190,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               content="Kreiraj prijemnicu"
               size="sm"
               variant="secondary"
-              disabled={orders[0]?.invoice_date !== '' || false}
+              // disabled={orders[0]?.invoice_date !== '' || false}
               onClick={handleAddReceiveItems}
             />
           </div>

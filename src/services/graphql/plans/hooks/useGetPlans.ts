@@ -4,9 +4,11 @@ import {GetPlansOverviewParams, PlanItem} from '../../../../types/graphql/getPla
 
 const useGetPlans = ({status, year, page, size, is_pre_budget}: GetPlansOverviewParams) => {
   const [getPlans, setgetPlans] = useState<PlanItem[]>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const GetPlans = async () => {
+    setLoading(true);
+
     const response = await GraphQL.getPlans({status, year, page, size, is_pre_budget});
     const plans = response?.items;
 
