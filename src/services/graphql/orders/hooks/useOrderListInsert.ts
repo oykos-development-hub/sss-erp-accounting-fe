@@ -6,6 +6,7 @@ import useAppContext from '../../../../context/useAppContext';
 
 const useOrderListInsert = () => {
   const [loading, setLoading] = useState(false);
+  const {fetch} = useAppContext();
 
   const orderListInsert = async (
     data: OrderListInsertParams,
@@ -13,7 +14,6 @@ const useOrderListInsert = () => {
     onError?: () => void,
   ) => {
     setLoading(true);
-    const {fetch} = useAppContext();
     try {
       const response: OrderListType['insert'] = await fetch(GraphQL.orderListInsert, {data});
       if (response?.orderList_Insert?.status === REQUEST_STATUSES.success) {

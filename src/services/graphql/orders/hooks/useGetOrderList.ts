@@ -25,9 +25,9 @@ const useGetOrderList = (
       status,
       search,
     });
-    const numOfOrders = response?.orderList_Overview.total;
+    const numOfOrders = response?.orderList_Overview?.total;
     setTotalNumOfOrders(numOfOrders as number);
-    const items = response?.orderList_Overview.items;
+    const items = response?.orderList_Overview?.items;
     setOrders(items || []);
     setLoading(false);
   };

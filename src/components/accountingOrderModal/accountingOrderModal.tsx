@@ -15,13 +15,7 @@ const initialValues = {
   articles: [],
 };
 
-export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({
-  open,
-  onClose,
-  navigate,
-  fetch,
-  alert,
-}) => {
+export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({open, onClose, navigate, alert}) => {
   const [selectedPlan, setSelectedPlan] = useState<DropdownDataNumber | null>(null);
 
   const {
@@ -73,7 +67,6 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({
       };
 
       orderListInsert(payload, async orderID => {
-        fetch();
         alert.success('Uspješno ste dodali narudzbenicu.');
         onClose();
         navigate(`/accounting/${procurementID}/order-form/${orderID}`);

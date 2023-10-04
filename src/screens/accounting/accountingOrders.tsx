@@ -10,10 +10,11 @@ import {Supplier} from '../../types/graphql/supplierTypes';
 import {ScreenProps} from '../../types/screen-props';
 import {tableHeads} from './constants';
 import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, TableHeader} from './styles';
+import {useDebounce} from '../../utils/useDebounce';
 
 export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   const [showModal, setShowModal] = useState(false);
-  const isAdmin = context?.contextMain?.role_id === 123;
+  const isAdmin = context?.contextMain?.role_id === 1;
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [page, setPage] = useState(1);
 
@@ -24,6 +25,8 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   const [form, setForm] = useState<any>({
     supplier: {id: 0, title: ''},
   });
+
+  const debouncedForm = useDebounce(form, 500);
 
   const handleChange = (value: any, name: string) => {
     setForm((prevState: any) => ({
@@ -95,7 +98,7 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
 
   useEffect(() => {
     fetch();
-  }, [form]);
+  }, [debouncedForm]);
 
   return (
     <ScreenWrapper context={context}>
@@ -164,7 +167,6 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
         {showModal && (
           <AccountingOrderModal
             alert={context.alert}
-            fetch={fetch}
             open={showModal}
             onClose={closeModal}
             selectedItem={selectedItem}
