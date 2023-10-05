@@ -182,7 +182,6 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                       width="15px"
                       height="8px"
                       onClick={(e: any) => {
-                        e.stopPropagation();
                         openAccordion(orders[0]?.id || 0);
                       }}
                     />
@@ -190,8 +189,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                     <MoreVerticalIcon
                       width="5px"
                       height="16px"
-                      onClick={(e: any) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         showMenuHandler();
                       }}
                       style={{padding: '10px'}}
@@ -202,7 +200,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                       <Typography
                         content="Kreiraj otpremnicu"
                         variant="bodyMedium"
-                        onClick={(e: any) => {
+                        onClick={() => {
                           handleAddMovement();
                           setShowMenu(prevState => !prevState);
                         }}
@@ -212,7 +210,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                       <Typography
                         content="Obriši"
                         variant="bodyMedium"
-                        onClick={(e: any) => {
+                        onClick={() => {
                           handleDeleteIconClick();
                           setShowMenu(prevState => !prevState);
                         }}
