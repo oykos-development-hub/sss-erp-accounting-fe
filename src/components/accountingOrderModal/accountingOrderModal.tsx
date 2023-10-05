@@ -71,7 +71,6 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
       };
 
       orderListInsert(payload, async orderID => {
-        fetch();
         alert.success('Uspješno sačuvano.');
         onClose();
         navigate(`/accounting/${procurementID}/order-form/${orderID}`);
