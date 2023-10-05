@@ -159,7 +159,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
       accessor: 'total_price',
       type: 'custom',
       renderContents: (total_price: number) => {
-        return <Typography variant="bodyMedium" content={parseFloat(total_price.toFixed(2))} />;
+        return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
       },
     },
   ];
