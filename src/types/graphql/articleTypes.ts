@@ -5,7 +5,7 @@ export interface OrderListArticleType {
   manufacturer: string;
   unit: string;
   amount: number;
-  total_price: string;
+  total_price: number;
   available?: number;
 }
 

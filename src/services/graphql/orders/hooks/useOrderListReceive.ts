@@ -9,18 +9,13 @@ const useOrderListReceive = () => {
   const {fetch} = useAppContext();
   const orderListReceive = async (data: OrderListReceiveParams, onSuccess?: () => void, onError?: () => void) => {
     setLoading(true);
-    try {
-      const response: OrderListType['receive'] = await fetch(GraphQL.orderListReceive, {data});
-      if (response.orderList_Receive.status === REQUEST_STATUSES.success) {
-        onSuccess && onSuccess();
-      } else {
-        onError && onError();
-      }
-    } catch (error) {
+    const response: OrderListType['receive'] = await fetch(GraphQL.receiveOrderList, {data});
+    if (response.orderList_Receive.status === REQUEST_STATUSES.success) {
+      onSuccess && onSuccess();
+    } else {
       onError && onError();
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return {loading, mutate: orderListReceive};

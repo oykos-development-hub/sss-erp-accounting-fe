@@ -8,13 +8,16 @@ export const tableHeads: TableHead[] = [
     accessor: 'date_order',
     type: 'custom',
     renderContents: (date_order: string) => {
-      return <Typography variant="bodyMedium" content={date_order ? parseDate(date_order, true) : ''} />;
+      return <Typography variant="bodyMedium" content={date_order ? parseDate(date_order) : ''} />;
     },
   },
   {
     title: 'Ukupna cijena',
     accessor: 'total_price',
-    type: 'text',
+    type: 'custom',
+    renderContents: (total_price: number) => {
+      return <Typography variant="bodyMedium" content={parseFloat(total_price.toFixed(2))} />;
+    },
   },
   {
     title: 'Nabavka',

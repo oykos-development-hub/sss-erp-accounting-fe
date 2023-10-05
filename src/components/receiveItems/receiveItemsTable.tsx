@@ -9,6 +9,7 @@ interface ReceiveItemsTableProps {
   data: any;
   context: MicroserviceProps;
   fetch: () => any;
+  loading: boolean;
 }
 
 const tableHeads: TableHead[] = [
@@ -22,7 +23,7 @@ const tableHeads: TableHead[] = [
     accessor: 'date_system',
     type: 'custom',
     renderContents: (date_system: string) => {
-      return <Typography variant="bodySmall" content={date_system ? parseDate(date_system, true) : ''} />;
+      return <Typography variant="bodySmall" content={date_system ? parseDate(date_system) : ''} />;
     },
   },
   {
@@ -35,18 +36,21 @@ const tableHeads: TableHead[] = [
     accessor: 'invoice_date',
     type: 'custom',
     renderContents: (invoice_date: string) => {
-      return <Typography variant="bodySmall" content={invoice_date ? parseDate(invoice_date, true) : ''} />;
+      return <Typography variant="bodySmall" content={invoice_date ? parseDate(invoice_date) : ''} />;
     },
   },
   {
     title: 'Ukupna vrijednost',
     accessor: 'total_price',
-    type: 'text',
+    type: 'custom',
+    renderContents: (total_price: number) => {
+      return <Typography variant="bodyMedium" content={parseFloat(total_price.toFixed(2))} />;
+    },
   },
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
 
-export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, context, fetch}) => {
+export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, context, fetch, loading}) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
 
@@ -72,6 +76,7 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, conte
       <Table
         tableHeads={tableHeads}
         data={[data] || []}
+        isLoading={loading}
         tableActions={[
           {
             name: 'Izmijeni',

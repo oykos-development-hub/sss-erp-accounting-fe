@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import useOrderListAssetMovementMutation from '../../services/graphql/movement/hooks/useOrderListAssetMovementMutation';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
-import useGetRecipientUsersOverview from '../../services/graphql/recipientUsersOverview/hooks/useGetRecipientUsersOverview';
+import useGetRecipientUsersOverview from '../../services/graphql/recipientUsersOverview/hooks/useGetRecipientUsers';
 import {Row} from './styles';
 import {AssetMovementModalProps} from './types';
 
@@ -18,7 +18,7 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
 
   const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits();
   const {recipientUsers} = useGetRecipientUsersOverview();
-  const {mutate: orderListAssetMovementMutation} = useOrderListAssetMovementMutation();
+  const {mutate: orderListAssetMovementMutation, loading: isSaving} = useOrderListAssetMovementMutation();
 
   const officesDropdownData = useMemo(() => {
     if (officesOfOrganizationUnits) {
@@ -33,22 +33,24 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
   }, [recipientUsers]);
 
   const onSubmit = (values: any) => {
+    if (isSaving) return;
+
     const payload = {
-      ...values,
       order_id: selectedItem,
-      office_id: values?.office?.id || 0,
-      recipient_user_id: values?.recipient?.id || 0,
+      office_id: values?.office?.id,
+      recipient_user_id: values?.recipient?.id,
     };
+
     orderListAssetMovementMutation(
       payload,
       () => {
         onClose(true);
         fetch();
-        context?.alert.success('Otpremnica je uspješno sačuvana!');
+        context?.alert.success('Uspješno sačuvano.');
       },
       () => {
         onClose(false);
-        context?.alert?.error('Greška prilikom čuvanja otpremnice!');
+        context?.alert?.error('Greška. Promjene nisu sačuvane.');
       },
     );
   };
@@ -64,6 +66,7 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
       rightButtonText="Proslijedi"
       rightButtonOnClick={handleSubmit(onSubmit)}
       leftButtonOnClick={onClose}
+      buttonLoading={isSaving}
       content={
         <div>
           <Row>

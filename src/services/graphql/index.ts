@@ -1,15 +1,14 @@
 import getPlans from './plans/queries/getPlans';
 import orderListMovement from './orders/mutations/orderListMovement';
-import orderListInsert from './orders/mutations/orderListInsert';
-import orderListReceive from './orders/mutations/orderListReceive';
+import insertOrderList from './orders/mutations/insertOrderList';
+import receiveOrderList from './orders/mutations/receiveOrderList';
 import getOrderList from './orders/queries/getOrderList';
 import getOrderProcurementAvailableArticles from './orders/queries/getOrderProcurementAvailableArticles';
-import deleteOrderList from './orders/mutations/orderListDelete';
+import deleteOrderList from './orders/mutations/deleteOrderList';
 import OrderListAssetMovementMutation from './movement/mutations/orderListMovement';
-import getRecipientUsersOverview from './recipientUsersOverview/queries/getRecipientUsersOverview';
-import deleteOrderListAssetMovement from './movement/mutations/orderListMovementDelete';
-import deleteOrderListReceive from './orders/mutations/orderListReveiveDelete';
-import useAppContext from '../../context/useAppContext';
+import getRecipientUsers from './recipientUsersOverview/queries/getRecipientUsers';
+import deleteOrderListAssetMovement from './movement/mutations/deleteOrderListMovement';
+import deleteOrderListReceive from './orders/mutations/deleteOrderListReceive';
 
 export const GraphQL = {
   // getAccountingOverview: getAccountingOverview,
@@ -17,11 +16,11 @@ export const GraphQL = {
   getOrderList: getOrderList,
   getOrderProcurementAvailableArticles: getOrderProcurementAvailableArticles,
   orderListMovement: orderListMovement,
-  orderListInsert: orderListInsert,
-  orderListReceive: orderListReceive,
+  insertOrderList: insertOrderList,
+  receiveOrderList: receiveOrderList,
   deleteOrderList: deleteOrderList,
   OrderListAssetMovementMutation: OrderListAssetMovementMutation,
-  getRecipientUsersOverview: getRecipientUsersOverview,
+  getRecipientUsers: getRecipientUsers,
   deleteOrderListAssetMovement: deleteOrderListAssetMovement,
   deleteOrderListReceive: deleteOrderListReceive,
 };

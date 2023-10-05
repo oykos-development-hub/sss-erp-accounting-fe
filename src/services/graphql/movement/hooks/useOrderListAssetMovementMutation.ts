@@ -16,21 +16,15 @@ const useOrderListAssetMovementMutation = () => {
     onError?: () => void,
   ) => {
     setLoading(true);
-    try {
-      const response: OrderListAssetMovementTypeResponse['insert'] = await fetch(
-        GraphQL.OrderListAssetMovementMutation,
-        {data},
-      );
-      if (response.orderList_Movement.status === REQUEST_STATUSES.success) {
-        onSuccess && onSuccess();
-      } else {
-        onError && onError();
-      }
-    } catch (error) {
+    const response: OrderListAssetMovementTypeResponse['insert'] = await fetch(GraphQL.OrderListAssetMovementMutation, {
+      data,
+    });
+    if (response.orderList_Movement.status === REQUEST_STATUSES.success) {
+      onSuccess && onSuccess();
+    } else {
       onError && onError();
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return {loading, mutate: OrderListAssetMovementMutation};

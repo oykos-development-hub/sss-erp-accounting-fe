@@ -8,8 +8,8 @@ const useGetOrderList = (
   size: number,
   id: number,
   supplier_id: number,
-  status: string,
-  search: string,
+  status: null | string,
+  search: null | string,
 ) => {
   const [totalNumOfOrders, setTotalNumOfOrders] = useState<number>(0);
   const [orders, setOrders] = useState<OrderListItem[]>([]);
@@ -34,7 +34,7 @@ const useGetOrderList = (
 
   useEffect(() => {
     fetchOrders();
-  }, [id]);
+  }, [page, size, id, supplier_id, status, search]);
 
   return {orders, loading, total: totalNumOfOrders, fetch: fetchOrders};
 };
