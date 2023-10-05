@@ -177,11 +177,12 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               customHeader={
                 <AccordionHeader>
                   <Typography variant="bodyMedium" content={`Prijemnica - ${orders[0].id}`} style={{fontWeight: 600}} />
-                  <AccordionIconsWrapper isOpen={false}>
+                  <AccordionIconsWrapper isOpen={isOpen === orders[0]?.id}>
                     <ChevronDownIcon
                       width="15px"
                       height="8px"
                       onClick={(e: any) => {
+                        e.stopPropagation();
                         openAccordion(orders[0]?.id || 0);
                       }}
                     />
@@ -189,7 +190,8 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                     <MoreVerticalIcon
                       width="5px"
                       height="16px"
-                      onClick={() => {
+                      onClick={(e: any) => {
+                        e.stopPropagation();
                         showMenuHandler();
                       }}
                       style={{padding: '10px'}}
