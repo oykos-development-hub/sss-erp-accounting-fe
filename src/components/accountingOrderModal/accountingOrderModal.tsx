@@ -15,13 +15,7 @@ const initialValues = {
   articles: [],
 };
 
-export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({
-  open,
-  onClose,
-  navigate,
-  fetch,
-  alert,
-}) => {
+export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({open, onClose, navigate, alert}) => {
   const [selectedPlan, setSelectedPlan] = useState<DropdownDataNumber | null>(null);
 
   const {
