@@ -8,7 +8,7 @@ const useGetOrderList = (
   size: number,
   id: number,
   supplier_id: number,
-  status: undefined | string,
+  status: null | string,
   search: null | string,
 ) => {
   const [totalNumOfOrders, setTotalNumOfOrders] = useState<number>(0);
@@ -22,8 +22,8 @@ const useGetOrderList = (
       size,
       id,
       supplier_id,
-      search,
       status,
+      search,
     });
     const numOfOrders = response?.orderList_Overview?.total;
     setTotalNumOfOrders(numOfOrders as number);

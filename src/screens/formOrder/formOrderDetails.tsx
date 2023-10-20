@@ -20,7 +20,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID);
 
-  const {orders} = useGetOrderList(1, 10, orderId, 0, undefined, null);
+  const {orders} = useGetOrderList(1, 10, orderId, 0, '', '');
   const supplier = orders[0]?.supplier;
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
 

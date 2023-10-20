@@ -58,9 +58,10 @@ export interface Article {
 }
 
 export interface GetPlansOverviewParams {
-  status?: string;
+  status: string | undefined;
   year: string;
   page: number;
   size: number;
   is_pre_budget: boolean;
+  contract: boolean;
 }

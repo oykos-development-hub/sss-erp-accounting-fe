@@ -49,7 +49,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
   const orderId = Number(url?.split('/').at(-2));
   const procurementID = Number(url?.split('/').at(-4));
 
-  const {orders, loading, fetch} = useGetOrderList(1, 10, orderId, 0, undefined, '');
+  const {orders, loading, fetch} = useGetOrderList(1, 10, orderId, 0, '', '');
   const {mutate: deleteOrderListReceive} = useDeleteOrderListReceive();
 
   const supplier = orders[0]?.supplier;

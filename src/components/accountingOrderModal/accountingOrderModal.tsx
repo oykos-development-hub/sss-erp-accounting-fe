@@ -29,8 +29,9 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
     page: 1,
     size: 100,
     status: undefined,
-    is_pre_budget: false,
+    is_pre_budget: true,
     year: '',
+    contract: true,
   });
 
   const procurementID = watch('public_procurement_id')?.id;

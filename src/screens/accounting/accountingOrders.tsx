@@ -45,10 +45,10 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
 
   const {orders, total, fetch, loading} = useGetOrderList(
     page,
-    1000,
+    10,
     0,
     form?.supplier?.id ? form.supplier.id : null,
-    undefined,
+    null,
     null,
   );
   const {mutate: deleteOrder} = useDeleteOrderList();
