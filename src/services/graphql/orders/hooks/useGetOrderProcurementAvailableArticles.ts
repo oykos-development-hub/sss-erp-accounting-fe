@@ -9,14 +9,10 @@ const useGetOrderProcurementAvailableArticles = (public_procurement_id: number) 
   const [loading, setLoading] = useState(true);
   const {fetch} = useAppContext();
   const fetchOrderProcurementArticles = async () => {
-    const response: OrderProcurementAvailableArticlesType['get'] = await fetch(
-      GraphQL.getOrderProcurementAvailableArticles,
-      {
-        public_procurement_id,
-      },
-    );
-
-    const items = response?.orderProcurementAvailableList_Overview?.items;
+    const response: OrderProcurementAvailableArticlesType['get'] = fetch(GraphQL.getOrderProcurementAvailableArticles, {
+      public_procurement_id,
+    });
+    const items = response?.orderProcurementAvailableList_Overview.items;
     setArticles(items || []);
     setLoading(false);
   };

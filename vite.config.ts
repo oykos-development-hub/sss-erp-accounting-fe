@@ -7,7 +7,22 @@ export default ({mode}) => {
 
   return defineConfig({
     base: '/',
-    plugins: [],
+    plugins: [
+      react({
+        babel: {
+          plugins: [
+            [
+              'babel-plugin-styled-components',
+              {
+                displayName: true,
+                fileName: false,
+                namespace: 'procurements',
+              },
+            ],
+          ],
+        },
+      }),
+    ],
     server: {
       port: process.env.VITE_PORT,
     },

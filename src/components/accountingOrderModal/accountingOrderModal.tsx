@@ -1,12 +1,12 @@
-import {Dropdown, Modal} from 'client-library';
 import React, {useMemo, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
-import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
-import useGetPlans from '../../services/graphql/plans/hooks/useGetPlans';
-import {DropdownDataNumber} from '../../types/dropdownData';
-import {parseDateForBackend} from '../../utils/dateUtils';
+import {Dropdown, Modal} from 'client-library';
 import {FormWrapper, Row} from './styles';
 import {ProcurementContractModalProps} from './types';
+import {DropdownDataNumber} from '../../types/dropdownData';
+import useGetPlans from '../../services/graphql/plans/hooks/useGetPlans';
+import {Controller, useForm} from 'react-hook-form';
+import useOrderListInsert from '../../services/graphql/orders/hooks/useOrderListInsert';
+import {parseDate} from '../../utils/dateUtils';
 
 const initialValues = {
   id: 0,
@@ -28,14 +28,14 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
   const {data: plansData} = useGetPlans({
     page: 1,
     size: 100,
-    status: '',
+    status: undefined,
     is_pre_budget: false,
     year: '',
   });
 
   const procurementID = watch('public_procurement_id')?.id;
 
-  const {loading: isSaving, mutate: orderListInsert} = useOrderListInsert();
+  const {mutate: orderListInsert} = useOrderListInsert();
 
   const plansOptions = useMemo(() => {
     return plansData?.map(item => {
@@ -49,9 +49,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
   const handlePlanSelect = (value: any) => {
     setSelectedPlan(plansOptions?.find((item: any) => item.id === value?.id) || null);
   };
-
   let procurements: any = [];
-
   if (selectedPlan) {
     procurements = plansData
       ?.find((plan: any) => plan.id === selectedPlan?.id)
@@ -61,22 +59,20 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
   }
 
   const onSubmit = async (values: any) => {
-    if (isSaving) return;
-
     try {
       const payload = {
         ...values,
         public_procurement_id: values?.public_procurement_id?.id,
-        date_order: parseDateForBackend(new Date()),
+        date_order: parseDate(new Date(), true),
       };
 
       orderListInsert(payload, async orderID => {
-        alert.success('Uspješno sačuvano.');
+        alert.success('Uspješno ste dodali narudzbenicu.');
         onClose();
         navigate(`/accounting/${procurementID}/order-form/${orderID}`);
       });
     } catch (e) {
-      alert.error('Greška. Promjene nisu sačuvane.');
+      console.log(e);
     }
   };
 
@@ -87,7 +83,6 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
       leftButtonText="Otkaži"
       rightButtonText="Nastavi"
       rightButtonOnClick={handleSubmit(onSubmit)}
-      buttonLoading={isSaving}
       content={
         <FormWrapper>
           <Row>

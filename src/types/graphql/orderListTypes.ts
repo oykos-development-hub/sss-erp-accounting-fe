@@ -4,8 +4,7 @@ import {DeleteResponse, DetailsResponse, GetResponse} from './response';
 export interface OrderListItem {
   id?: number;
   date_order?: string;
-  total_price?: number;
-  total_neto: number;
+  total_price?: string;
   public_procurement?: DropdownDataString;
   supplier?: DropdownDataString;
   status?: string;
@@ -46,6 +45,25 @@ export interface OrderListMovementParams {
   order_id: number;
   organization_unit_id: number;
   user_profile_id: number;
+}
+
+export interface OrderListInsertResponse {
+  data: {
+    orderList_Insert: {
+      status?: string;
+      message?: string;
+      item: OrderListItem;
+    };
+  };
+}
+
+export interface OrderListDeleteResponse {
+  data: {
+    orderList_Delete: {
+      status?: string;
+      message?: string;
+    };
+  };
 }
 
 export interface OrderListType {

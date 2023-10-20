@@ -22,10 +22,6 @@ const getPlans = `query PlansOverview($status: String, $year: String, $page: Int
             file_id
             items {
                 id
-                budget_indent {
-                    id
-                    title
-                }
                 plan {
                     id
                     title
@@ -42,10 +38,6 @@ const getPlans = `query PlansOverview($status: String, $year: String, $page: Int
                 file_id
                 articles {
                     id
-                    budget_indent {
-                        id
-                        title
-                    }
                     public_procurement {
                         id
                         title

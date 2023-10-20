@@ -14,12 +14,13 @@ import {useDebounce} from '../../utils/useDebounce';
 
 export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   const [showModal, setShowModal] = useState(false);
+  const isAdmin = context?.contextMain?.role_id === 1;
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [page, setPage] = useState(1);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const {suppliers} = useGetSuppliers({id: 0, search: null, page: 1, size: 100});
+  const {data: suppliers} = useGetSuppliers({id: 0, search: ''});
 
   const [form, setForm] = useState<any>({
     supplier: {id: 0, title: ''},
@@ -39,18 +40,11 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
       id: supplier.id,
       title: supplier.title,
     }));
-    options.unshift({id: null, title: 'Sve'});
+    options.unshift({id: 0, title: 'Sve'});
     return options;
   }, [suppliers]);
 
-  const {orders, total, fetch, loading} = useGetOrderList(
-    page,
-    10,
-    0,
-    form?.supplier?.id ? form.supplier.id : null,
-    null,
-    null,
-  );
+  const {orders, total, fetch} = useGetOrderList(page, 10, 0, form?.supplier?.id, '', '');
   const {mutate: deleteOrder} = useDeleteOrderList();
 
   const selectedItem = useMemo(() => {
@@ -81,13 +75,13 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
       deleteOrder(
         selectedItemId,
         () => {
-          fetch();
           setShowDeleteModal(false);
-          context.alert.success('Uspješno obrisano.');
+          fetch();
+          context.alert.success('Uspješno obrisano');
         },
         () => {
           setShowDeleteModal(false);
-          context.alert.success('Došlo je do greške pri brisanju.');
+          context.alert.success('Došlo je do greške pri brisanju');
         },
       );
     }
@@ -123,20 +117,21 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
               isSearchable={true}
             />
           </FiltersWrapper>
-          <ButtonWrapper>
-            <Button
-              variant="secondary"
-              content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
-              onClick={handleAdd}
-            />
-          </ButtonWrapper>
+          {isAdmin && (
+            <ButtonWrapper>
+              <Button
+                variant="secondary"
+                content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
+                onClick={handleAdd}
+              />
+            </ButtonWrapper>
+          )}
         </TableHeader>
 
         <div>
           <Table
-            tableHeads={tableHeads}
+            tableHeads={isAdmin ? tableHeads : tableHeads.filter(item => item.accessor !== 'TABLE_ACTIONS')}
             data={(orders as any) || []}
-            isLoading={loading}
             onRowClick={row => {
               context.navigation.navigate(
                 `/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`,
@@ -153,7 +148,7 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
                 icon: <TrashIcon stroke={Theme?.palette?.gray800} />,
               },
               {
-                name: 'Štampaj',
+                name: 'Stampaj',
                 onClick: item => handlePrintIconClick(item.id),
                 icon: <PrinterIcon stroke={Theme?.palette?.gray800} />,
               },
@@ -165,9 +160,10 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
           onChange={onPageChange}
           variant="filled"
           itemsPerPage={2}
+          previousLabel="Prethodna"
+          nextLabel="Sledeća"
           pageRangeDisplayed={3}
         />
-
         {showModal && (
           <AccountingOrderModal
             alert={context.alert}
@@ -177,12 +173,11 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
             navigate={context.navigation.navigate}
           />
         )}
-
         <NotificationsModal
           open={!!showDeleteModal}
           onClose={handleCloseDeleteModal}
           handleLeftButtomClick={handleDelete}
-          subTitle={'Ovaj fajl ce biti trajno izbrisan iz sistema.'}
+          subTitle={'Ovaj fajl ce biti trajno izbrisan iz sistema'}
         />
       </Container>
     </ScreenWrapper>

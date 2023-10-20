@@ -1,7 +1,7 @@
 import {GetResponse} from './response';
 
 export interface Supplier {
-  id: number | null;
+  id: number;
   title?: string;
   abbreviation?: string;
   description?: string;
@@ -10,15 +10,24 @@ export interface Supplier {
   folder_id?: number;
 }
 
-export interface GetSupplierParams {
+export interface GetSupplier {
   id: number;
-  search?: string | null;
-  page: number;
-  size: number;
+  search?: string;
 }
 
-export interface SuppliersResponse {
+export interface SuppliersType {
   get: {
     suppliers_Overview: GetResponse<Supplier>;
+  };
+}
+
+export interface SupplierInsertResponse {
+  data: {
+    suppliers_Insert: {
+      status?: string;
+      message?: string;
+      total?: string;
+      item?: Supplier;
+    };
   };
 }

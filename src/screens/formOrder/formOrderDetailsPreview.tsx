@@ -2,6 +2,7 @@ import {
   Button,
   MicroserviceProps,
   Table,
+  TableHead,
   Typography,
   Accordion,
   ChevronDownIcon,
@@ -31,7 +32,6 @@ import {AssetMovementModal} from '../../components/assetMovement/assetMovementMo
 import {parseDate} from '../../utils/dateUtils';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import useDeleteOrderListReceive from '../../services/graphql/orders/hooks/useDeleteOrderListReceive';
-import {tableHeads} from './constants';
 
 interface FormOrderDetailsPageProps {
   context: MicroserviceProps;
@@ -49,7 +49,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
   const orderId = Number(url?.split('/').at(-2));
   const procurementID = Number(url?.split('/').at(-4));
 
-  const {orders, loading, fetch} = useGetOrderList(1, 10, orderId, 0, '', '');
+  const {orders, fetch} = useGetOrderList(1, 10, orderId, 0, '', '');
   const {mutate: deleteOrderListReceive} = useDeleteOrderListReceive();
 
   const supplier = orders[0]?.supplier;
@@ -57,7 +57,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
 
   if (dateOrder) {
     const convertDate = new Date(dateOrder);
-    date = parseDate(convertDate);
+    date = parseDate(convertDate, true);
   }
 
   const mappedOrder = useMemo(() => {
@@ -88,6 +88,45 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
   const closeModalMovement = () => {
     setShowModalMovement(false);
   };
+
+  const tableHeads: TableHead[] = [
+    {
+      title: 'Naziv',
+      accessor: 'title',
+      type: 'text',
+    },
+    {
+      title: 'Bitne karakteristike',
+      accessor: 'description',
+      type: 'text',
+    },
+    {
+      title: 'Proizvođač',
+      accessor: 'manufacturer',
+      type: 'text',
+    },
+    {
+      title: 'Jedinica mjere',
+      accessor: 'unit',
+      type: 'text',
+    },
+    {
+      title: 'Količina',
+      accessor: 'amount',
+      type: 'text',
+    },
+
+    {
+      title: 'Narudžbenica',
+      accessor: 'order_id',
+      type: 'text',
+    },
+    {
+      title: 'Ukupna vrijednost (sa PDV-OM):',
+      accessor: 'total_price',
+      type: 'text',
+    },
+  ];
 
   const openAccordion = (id: number) => {
     setIsOpen(prevState => (prevState === id ? 0 : id));
@@ -151,21 +190,21 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               content="Kreiraj prijemnicu"
               size="sm"
               variant="secondary"
-              disabled={!!orders[0]?.invoice_date}
+              disabled={orders[0]?.invoice_date !== '' || false}
               onClick={handleAddReceiveItems}
             />
           </div>
         </OrderInfo>
 
-        <Table tableHeads={tableHeads} data={mappedOrder || []} isLoading={loading} />
+        <Table tableHeads={tableHeads} data={mappedOrder || []} />
         <Totals>
           <Row>
             <SubTitle variant="bodySmall" content="UKUPNA NETO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${orders[0]?.total_neto?.toFixed(2) || '0'}`} />
+            <Typography variant="bodySmall" content={`${orders[0]?.total_price || '0'}`} />
           </Row>
           <Row>
             <SubTitle variant="bodySmall" content="UKUPNA BRUTO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${orders[0]?.total_price?.toFixed(2) || '0'}`} />
+            <Typography variant="bodySmall" content={`${orders[0]?.total_price || '0'}`} />
           </Row>
         </Totals>
 
@@ -177,7 +216,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               customHeader={
                 <AccordionHeader>
                   <Typography variant="bodyMedium" content={`Prijemnica - ${orders[0].id}`} style={{fontWeight: 600}} />
-                  <AccordionIconsWrapper isOpen={isOpen === orders[0]?.id}>
+                  <AccordionIconsWrapper isOpen={false}>
                     <ChevronDownIcon
                       width="15px"
                       height="8px"
@@ -186,7 +225,6 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                         openAccordion(orders[0]?.id || 0);
                       }}
                     />
-
                     <MoreVerticalIcon
                       width="5px"
                       height="16px"
@@ -202,7 +240,8 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                       <Typography
                         content="Kreiraj otpremnicu"
                         variant="bodyMedium"
-                        onClick={() => {
+                        onClick={(e: any) => {
+                          e.stopPropagation();
                           handleAddMovement();
                           setShowMenu(prevState => !prevState);
                         }}
@@ -212,7 +251,8 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                       <Typography
                         content="Obriši"
                         variant="bodyMedium"
-                        onClick={() => {
+                        onClick={(e: any) => {
+                          e.stopPropagation();
                           handleDeleteIconClick();
                           setShowMenu(prevState => !prevState);
                         }}
@@ -223,14 +263,12 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               }
               content={
                 <>
-                  <ReceiveItemsTable data={orders[0]} context={context} fetch={fetch} loading={loading} />
-                  {orders[0]?.recipient_user?.id && orders[0]?.office?.id ? (
+                  <ReceiveItemsTable data={orders[0]} context={context} fetch={fetch} />
+                  {orders[0]?.recipient_user?.id && orders[0]?.office?.id && (
                     <MovementTableContainer>
                       <TableTitle variant="bodyMedium" content="OTPREMNICA" />
-                      <AssetMovementTable data={orders[0]} context={context} fetch={fetch} loading={loading} />
+                      <AssetMovementTable data={orders[0]} context={context} fetch={fetch} />
                     </MovementTableContainer>
-                  ) : (
-                    []
                   )}
                 </>
               }
@@ -250,11 +288,9 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
             />
           </FormControls>
         </FormFooter>
-
         {showModal && (
           <ReceiveItemsModal open={showModal} onClose={closeModal} fetch={fetch} data={orders} alert={context?.alert} />
         )}
-
         {showModalMovement && (
           <AssetMovementModal
             open={showModalMovement}
@@ -264,7 +300,6 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
             fetch={fetch}
           />
         )}
-
         <NotificationsModal
           open={!!showDeleteModal}
           onClose={handleCloseDeleteModal}

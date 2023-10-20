@@ -9,14 +9,18 @@ const useOrderListMovement = () => {
   const {fetch} = useAppContext();
   const orderListMovement = async (data: OrderListMovementParams, onSuccess?: () => void, onError?: () => void) => {
     setLoading(true);
-
-    const response: OrderListType['movement'] = await fetch(GraphQL.orderListMovement, {data});
-    if (response?.orderList_Movement.status === REQUEST_STATUSES.success) {
-      onSuccess && onSuccess();
-    } else {
+    try {
+      const response: OrderListType['movement'] = await fetch(GraphQL.orderListMovement, {data});
+      if (response?.orderList_Movement.status === REQUEST_STATUSES.success) {
+        onSuccess && onSuccess();
+      } else {
+        onError && onError();
+      }
+    } catch (error) {
       onError && onError();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return {loading, mutate: orderListMovement};

@@ -1,11 +1,10 @@
-export const parseDate = (date: Date | string | null) => {
-  if (!date) return '';
-  const dateObj = new Date(date);
-  const day = dateObj.toLocaleDateString('sr-latn-SR', {day: '2-digit'});
-  const month = dateObj.toLocaleDateString('sr-latn-SR', {month: '2-digit'});
-  const year = dateObj.toLocaleDateString('sr-latn-SR', {year: 'numeric'}).replace('.', '');
+export const parseDate = (date: Date | string, parseForBFF?: boolean) => {
+  const datum = new Date(date);
+  const dan = datum.toLocaleDateString('sr-latn-SR', {day: '2-digit'});
+  const mjesec = datum.toLocaleDateString('sr-latn-SR', {month: '2-digit'});
+  const godina = datum.toLocaleDateString('sr-latn-SR', {year: 'numeric'}).replace('.', '');
 
-  return `${day}/${month}/${year}`;
+  return parseForBFF ? `${godina}-${mjesec}-${dan}` : `${dan}/${mjesec}/${godina}`;
 };
 
 export const calculateExperience = (startDate: Date | string, endDate: Date | string) => {
@@ -14,13 +13,4 @@ export const calculateExperience = (startDate: Date | string, endDate: Date | st
   const diffInMonths = end.getMonth() - start.getMonth() + 12 * (end.getFullYear() - start.getFullYear());
 
   return diffInMonths;
-};
-
-export const parseDateForBackend = (date: Date | null) => {
-  if (!date) return null;
-
-  const pickedDate = new Date(date);
-  pickedDate.setMinutes(pickedDate.getMinutes() - pickedDate.getTimezoneOffset());
-
-  return pickedDate.toISOString();
 };

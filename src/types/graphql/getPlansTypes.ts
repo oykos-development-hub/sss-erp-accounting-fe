@@ -16,10 +16,6 @@ export interface PlanItem {
   status: string;
   items: {
     id: string;
-    budget_indent: {
-      id: string;
-      title: string;
-    };
     plan: {
       id: string;
       title: string;
@@ -51,10 +47,6 @@ export interface PreBudgetPlan {
 
 export interface Article {
   id: string;
-  budget_indent: {
-    id: string;
-    title: string;
-  };
   public_procurement: {
     id: string;
     title: string;
@@ -66,7 +58,7 @@ export interface Article {
 }
 
 export interface GetPlansOverviewParams {
-  status: string;
+  status?: string;
   year: string;
   page: number;
   size: number;

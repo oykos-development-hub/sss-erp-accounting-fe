@@ -9,9 +9,9 @@ import useAppContext from '../../../../context/useAppContext';
 const useGetOfficesOfOrganizationUnits = () => {
   const [officesOfOrganizationUnits, setOfficesOfOrganizationUnits] = useState<OfficesOfOrganizationUnits[]>();
   const [loading, setLoading] = useState(true);
-  const {fetch, graphQl} = useAppContext();
+  const {fetch, graphql} = useAppContext();
   const fetchOfficesOfOrganizationUnits = async (id: number, organization_unit_id: number, search: string) => {
-    const response: OfficesOfOrganizationUnitsTypeResponse['get'] = await fetch(graphQl.getOffices, {
+    const response: OfficesOfOrganizationUnitsTypeResponse['get'] = await fetch(graphql.getOffices, {
       id,
       organization_unit_id,
       search,
