@@ -1,5 +1,4 @@
 export interface ProcurementContractModalProps {
-  //add types here
   alert: any;
   selectedItem?: any;
   open: boolean;

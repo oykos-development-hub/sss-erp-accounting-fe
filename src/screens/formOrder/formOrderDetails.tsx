@@ -2,7 +2,7 @@ import {Button, MicroserviceProps, Table, TableHead, Typography} from 'client-li
 import React, {useEffect, useMemo, useState} from 'react';
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
-import useOrderListInsert from '../../services/graphql/orders/hooks/useOrderListInsert';
+import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import {ScreenWrapper} from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox, SubTitle} from '../../shared/styles';
 import {AmountInput, FormControls, FormFooter, OrderInfo, Totals} from './styles';
@@ -16,15 +16,17 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
   const url = context?.navigation.location.pathname;
   const orderId = Number(url?.split('/').at(-1));
   const procurementID = Number(url?.split('/').at(-3));
-
+  const [touchedFields, setTouchedFields] = useState<any>({});
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
-
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID);
+
+  const {orders} = useGetOrderList(1, 10, orderId, 0, undefined, null);
+  const supplier = orders[0]?.supplier;
+  const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
     const {value} = event.target;
     const updatedArticles = [...filteredArticles];
-
     const index = updatedArticles.findIndex(item => item.id === row.id);
 
     if (index !== -1) {
@@ -34,35 +36,61 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
     }
   };
 
-  const {orders} = useGetOrderList(1, 10, orderId, 0, '', '');
-  const supplier = orders[0]?.supplier;
-  const {mutate: orderListInsert} = useOrderListInsert();
+  const handleBlurInput = (itemId: number) => {
+    setTouchedFields({...touchedFields, [itemId]: true});
+    const touchedItem = filteredArticles.find(item => item.id === itemId);
+
+    if (touchedItem && touchedItem.amount > touchedItem.available) {
+      const updatedArticles = filteredArticles.map(item => {
+        if (item.id === itemId) {
+          return {...item, error: 'Količina ne može biti veća od dostupne.'};
+        }
+        return item;
+      });
+      setFilteredArticles(updatedArticles);
+    } else {
+      const updatedArticles = filteredArticles.map(item => {
+        if (item.id === itemId) {
+          return {...item, error: ''};
+        }
+        return item;
+      });
+
+      setFilteredArticles(updatedArticles);
+    }
+  };
 
   const handleSaveOrder = () => {
+    if (isSaving) return;
+
     const insertArticles = filteredArticles.map((article: any) => {
       return {
         id: article?.id,
         amount: article?.amount,
       };
     });
-    try {
-      const payload = {
-        id: orderId,
-        date_order: orders[0]?.date_order,
-        public_procurement_id: Number(procurementID),
-        articles: insertArticles,
-      };
-      orderListInsert(payload as any, () => {
-        context.alert.success('Uspješno ste dodali narudzbenicu.');
+
+    const payload = {
+      id: orderId,
+      date_order: orders[0]?.date_order,
+      public_procurement_id: Number(procurementID),
+      articles: insertArticles,
+    };
+
+    orderListInsert(
+      payload as any,
+      () => {
+        context.alert.success('Uspješno sačuvano.');
         context.navigation.navigate(`/accounting/${procurementID}/order-form/${orderId}/order-details`);
         context.breadcrumbs.add({
           name: `Detalji narudžbenice - ${orderId}`,
           to: `/accounting/${procurementID}/order-form/${orderId}/order-details`,
         });
-      });
-    } catch (e) {
-      console.log(e);
-    }
+      },
+      () => {
+        context.alert.error('Greška. Promjene nisu sačuvane.');
+      },
+    );
   };
 
   const mappedArticles = useMemo(() => {
@@ -106,11 +134,19 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
       type: 'text',
     },
     {
-      title: 'Poruci',
+      title: 'Poruči',
       accessor: 'amount',
       type: 'custom',
       renderContents: (_, row) => {
-        return <AmountInput type="number" value={row.amount} onChange={event => handleInputChange(event, row)} />;
+        return (
+          <AmountInput
+            type="number"
+            value={row.amount}
+            onChange={event => handleInputChange(event, row)}
+            onBlur={() => handleBlurInput(row.id)}
+            error={touchedFields[row.id] ? row.error : ''}
+          />
+        );
       },
     },
     {
@@ -121,7 +157,10 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
     {
       title: 'Ukupna vrijednost (sa PDV-OM):',
       accessor: 'total_price',
-      type: 'text',
+      type: 'custom',
+      renderContents: (total_price: number) => {
+        return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
+      },
     },
   ];
 
@@ -163,14 +202,6 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
 
         <FormFooter>
           <FormControls>
-            <Button
-              content="Nazad"
-              variant="secondary"
-              onClick={() => {
-                context.navigation.navigate('/accounting');
-                context.breadcrumbs.remove();
-              }}
-            />
             <Button content="Sačuvaj" variant="primary" onClick={handleSaveOrder} />
           </FormControls>
         </FormFooter>

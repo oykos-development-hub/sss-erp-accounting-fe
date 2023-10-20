@@ -10,6 +10,7 @@ interface ReceiveItemsTableProps {
   data: any;
   context: MicroserviceProps;
   fetch: () => any;
+  loading: boolean;
 }
 
 const tableHeads: TableHead[] = [
@@ -23,7 +24,7 @@ const tableHeads: TableHead[] = [
     accessor: 'date_system',
     type: 'custom',
     renderContents: (date_system: string) => {
-      return <Typography variant="bodySmall" content={date_system ? parseDate(date_system, true) : ''} />;
+      return <Typography variant="bodySmall" content={date_system ? parseDate(date_system) : ''} />;
     },
   },
   {
@@ -45,7 +46,7 @@ const tableHeads: TableHead[] = [
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
 
-export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, context, fetch}) => {
+export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, context, fetch, loading}) => {
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -68,11 +69,11 @@ export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, cont
         () => {
           setShowDeleteModal(false);
           fetch();
-          context.alert.success('Uspješno obrisano');
+          context.alert.success('Uspješno obrisano.');
         },
         () => {
           setShowDeleteModal(false);
-          context.alert.success('Došlo je do greške pri brisanju');
+          context.alert.success('Greška. Brisanje nije moguće.');
         },
       );
     }
@@ -88,9 +89,10 @@ export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, cont
       <Table
         tableHeads={tableHeads}
         data={[data] || []}
+        isLoading={loading}
         tableActions={[
           {
-            name: 'Stampaj',
+            name: 'Štampaj',
             onClick: item => handlePrintIconClick(item.id),
             icon: <PrinterIcon stroke={Theme?.palette?.gray800} />,
           },

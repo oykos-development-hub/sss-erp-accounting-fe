@@ -1,15 +1,15 @@
-import {Datepicker, Input, Modal, Table, TableHead} from 'client-library';
+import {Datepicker, Input, Modal, Table, TableHead, Typography} from 'client-library';
 import React, {useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import useOrderListReceive from '../../services/graphql/orders/hooks/useOrderListReceive';
-import {parseDate} from '../../utils/dateUtils';
+import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
 import {DatepickersWrapper, FormWrapper, HeaderSection, Row, StyledInput, Title} from './styles';
 
 const initialValues = {
   invoice_date: '',
   date_system: '',
-  description: '',
   invoice_number: '',
+  description: '',
 };
 
 interface ReceiveItemsModalProps {
@@ -34,7 +34,14 @@ export const tableHeads: TableHead[] = [
 
   {title: 'Poručeno', accessor: 'amount', type: 'text'},
 
-  {title: 'Ukupna vrijednost(sa PDV-om)', accessor: 'total_price', type: 'text'},
+  {
+    title: 'Ukupna vrijednost(sa PDV-om)',
+    accessor: 'total_price',
+    type: 'custom',
+    renderContents: (total_price: number) => {
+      return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
+    },
+  },
 ];
 
 export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open, onClose, alert, fetch}) => {
@@ -46,7 +53,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     reset,
   } = useForm({defaultValues: initialValues});
 
-  const {mutate: orderListReceive} = useOrderListReceive();
+  const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
 
   const totalPrice = [data[0]]?.reduce((sum: any, article: any) => {
     const price = parseFloat(article?.total_price);
@@ -54,27 +61,34 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     return sum + price;
   }, 0);
 
+  const totalNeto = [data[0]]?.reduce((sum: any, article: any) => {
+    const price = parseFloat(article?.total_neto?.toFixed(2));
+
+    return sum + price;
+  }, 0);
   const onSubmit = (values: any) => {
-    try {
-      const payload = {
-        ...values,
-        order_id: data[0]?.id,
-        invoice_date: parseDate(values?.invoice_date, true) || '',
-        date_order: parseDate(values?.date_order, true) || '',
-        invoice_number: values?.invoice_number || '',
-        description: values?.description || '',
-      };
+    if (isSaving) return;
 
-      orderListReceive(payload, () => {
+    const payload = {
+      order_id: data[0]?.id,
+      invoice_date: parseDateForBackend(values?.invoice_date) || '',
+      invoice_number: values?.invoice_number || '',
+      description: values?.description,
+      date_system: parseDateForBackend(values?.date_order) || '',
+    };
+
+    orderListReceive(
+      payload,
+      () => {
         fetch();
-        alert.success('Uspješno ste dodali prijemnicu.');
+        alert.success('Uspješno sačuvano.');
         onClose();
-      });
-    } catch (e) {
-      console.log(e);
-    }
+      },
+      () => {
+        alert.error('Greška. Promjene nisu sačuvane.');
+      },
+    );
   };
-
   useEffect(() => {
     if (data[0]) {
       reset({
@@ -96,6 +110,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       leftButtonText="Otkaži"
       rightButtonText="Dodaj"
       rightButtonOnClick={handleSubmit(onSubmit)}
+      buttonLoading={isSaving}
       width={870}
       content={
         <FormWrapper>
@@ -151,8 +166,8 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
           </HeaderSection>
           <Table tableHeads={tableHeads} data={data[0]?.articles || []} />
           <Row>
+            <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />
             <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):" value={totalPrice} disabled={true} />
-            <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalPrice} disabled={true} />
           </Row>
         </FormWrapper>
       }
