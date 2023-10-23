@@ -95,7 +95,7 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   };
 
   const handlePrintIconClick = (id: number) => {
-    console.log('Handle print', id);
+    console.log(id);
   };
 
   const onPageChange = (page: number) => {
