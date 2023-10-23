@@ -29,7 +29,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
     page: 1,
     size: 100,
     status: undefined,
-    is_pre_budget: true,
+    is_pre_budget: false,
     year: '',
     contract: true,
   });
@@ -39,12 +39,16 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
   const {loading: isSaving, mutate: orderListInsert} = useOrderListInsert();
 
   const plansOptions = useMemo(() => {
-    return plansData?.map(item => {
-      return {
-        id: Number(item.id),
-        title: item.title.toString(),
-      };
-    });
+    if (plansData) {
+      return plansData
+        .filter(item => item.status === 'Objavljen')
+        .map(item => ({
+          id: Number(item.id),
+          title: item.title.toString(),
+        }));
+    } else {
+      return [];
+    }
   }, [plansData]);
 
   const handlePlanSelect = (value: any) => {
@@ -99,7 +103,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
               value={selectedPlan}
               name="plan"
               label="PLAN:"
-              options={plansOptions || []}
+              options={plansOptions as any}
             />
           </Row>
           <Controller
