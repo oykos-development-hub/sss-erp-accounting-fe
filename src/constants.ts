@@ -48,3 +48,10 @@ export const dropdownProcurementStatusOptions: DropdownDataNumber[] = [
   {id: 2, title: 'Odobreno'},
   {id: 3, title: 'Odbijeno'},
 ];
+
+export enum PlanStatus {
+  POSLAT = 'Poslat',
+  ZAKLJUCEN = 'Zaključen',
+  OBJAVLJEN = 'Objavljen',
+  KONTVERTOVAN = 'Konvertovan',
+}

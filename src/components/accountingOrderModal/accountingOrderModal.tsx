@@ -7,6 +7,7 @@ import {DropdownDataNumber} from '../../types/dropdownData';
 import {parseDateForBackend} from '../../utils/dateUtils';
 import {FormWrapper, Row} from './styles';
 import {ProcurementContractModalProps} from './types';
+import {PlanStatus} from '../../constants';
 
 const initialValues = {
   id: 0,
@@ -41,7 +42,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
   const plansOptions = useMemo(() => {
     if (plansData) {
       return plansData
-        .filter(item => item.status === 'Objavljen')
+        .filter(item => item.status === PlanStatus.OBJAVLJEN)
         .map(item => ({
           id: Number(item.id),
           title: item.title.toString(),
