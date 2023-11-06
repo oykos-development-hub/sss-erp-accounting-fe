@@ -4,7 +4,7 @@ import {DeleteResponse, DetailsResponse, GetResponse} from './response';
 export interface OrderListItem {
   id?: number;
   date_order?: string;
-  total_price?: number;
+  total_bruto?: number;
   total_neto: number;
   public_procurement?: DropdownDataString;
   supplier?: DropdownDataString;
@@ -16,6 +16,7 @@ export interface OrderListItem {
   description?: string;
   recipient_user?: DropdownDataString;
   office?: DropdownDataString;
+  price?: number;
 }
 
 export interface GetOrderListParams {

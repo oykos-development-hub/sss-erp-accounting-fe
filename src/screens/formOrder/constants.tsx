@@ -12,11 +12,6 @@ export const tableHeads: TableHead[] = [
     type: 'text',
   },
   {
-    title: 'Proizvođač',
-    accessor: 'manufacturer',
-    type: 'text',
-  },
-  {
     title: 'Jedinica mjere',
     accessor: 'unit',
     type: 'text',
@@ -24,20 +19,25 @@ export const tableHeads: TableHead[] = [
   {
     title: 'Količina',
     accessor: 'amount',
-    type: 'text',
+    type: 'custom',
+    renderContents: (amount: number) => {
+      return <Typography variant="bodyMedium" content={amount ? parseFloat(amount?.toFixed(2)) : 0} />;
+    },
   },
-
   {
-    title: 'Narudžbenica',
-    accessor: 'order_id',
-    type: 'text',
+    title: 'Jedinična cijena (sa PDV-OM):',
+    accessor: 'price',
+    type: 'custom',
+    renderContents: (price: number) => {
+      return <Typography variant="bodyMedium" content={price ? parseFloat(price?.toFixed(2)) : 0} />;
+    },
   },
   {
     title: 'Ukupna vrijednost (sa PDV-OM):',
     accessor: 'total_price',
     type: 'custom',
     renderContents: (total_price: number) => {
-      return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price?.toFixed(2)) : ''} />;
+      return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price?.toFixed(2)) : 0} />;
     },
   },
 ];

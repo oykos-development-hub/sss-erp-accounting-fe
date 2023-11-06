@@ -13,10 +13,10 @@ export const tableHeads: TableHead[] = [
   },
   {
     title: 'Ukupna cijena',
-    accessor: 'total_price',
+    accessor: 'total_bruto',
     type: 'custom',
-    renderContents: (total_price: number) => {
-      return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price?.toFixed(2)) : ''} />;
+    renderContents: (total_bruto: number) => {
+      return <Typography variant="bodyMedium" content={total_bruto ? parseFloat(total_bruto?.toFixed(2)) : 0.0} />;
     },
   },
   {

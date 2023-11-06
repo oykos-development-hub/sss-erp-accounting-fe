@@ -6,7 +6,8 @@ const insertOrderList = `mutation($data: OrderListInsertMutation!) {
       item {
           id
           date_order
-          total_price
+          total_bruto
+          total_neto
           public_procurement {
               id
               title
@@ -24,7 +25,7 @@ const insertOrderList = `mutation($data: OrderListInsertMutation!) {
               unit
               available
               amount
-              total_price
+              vat_percentage
           }
       }
   }

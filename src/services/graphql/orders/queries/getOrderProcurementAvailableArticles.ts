@@ -10,7 +10,8 @@ const getOrderProcurementAvailableArticles = `query OrderProcurementAvailableLis
           manufacturer
           unit
           available
-          total_price
+          price
+          vat_percentage
       }
   }
 }`;

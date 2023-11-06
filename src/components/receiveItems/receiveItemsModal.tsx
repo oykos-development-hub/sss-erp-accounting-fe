@@ -56,7 +56,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
   const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
 
   const totalPrice = [data[0]]?.reduce((sum: any, article: any) => {
-    const price = parseFloat(article?.total_price);
+    const price = parseFloat(article?.total_bruto);
 
     return sum + price;
   }, 0);
@@ -140,7 +140,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                       label="DATUM FAKTURE:"
                       name={name}
                       value={value ? parseDate(value) : ''}
-                      error={errors.invoice_number?.message as string}
+                      error={errors.invoice_date?.message as string}
                     />
                   )}
                 />

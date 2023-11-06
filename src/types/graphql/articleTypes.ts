@@ -5,8 +5,9 @@ export interface OrderListArticleType {
   manufacturer: string;
   unit: string;
   amount: number;
-  total_price: number;
+  total_price?: number;
   available?: number;
+  price?: number;
 }
 
 export type OrderListArticleInsert = {

@@ -6,7 +6,7 @@ const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, 
       items {
           id
           date_order
-          total_price
+          total_bruto
           total_neto
           public_procurement {
               id
@@ -25,6 +25,7 @@ const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, 
               unit
               amount
               total_price
+              price
           }
           invoice_date
           invoice_number

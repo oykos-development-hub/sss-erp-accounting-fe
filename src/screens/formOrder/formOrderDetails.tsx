@@ -21,7 +21,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID);
 
   const {orders} = useGetOrderList(1, 10, orderId, 0, '', '');
-  const supplier = orders[0]?.supplier;
+
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
@@ -98,7 +98,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
       return articles.map((article: any) => {
         return {
           ...article,
-          amount: article?.amount || 0,
+          amount: article?.amount,
           order_id: orderId,
         };
       });
@@ -116,11 +116,6 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
     {
       title: 'Bitne karakteristike',
       accessor: 'description',
-      type: 'text',
-    },
-    {
-      title: 'Proizvođač',
-      accessor: 'supplier',
       type: 'text',
     },
     {
@@ -150,16 +145,19 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
       },
     },
     {
-      title: 'Narudžbenica',
-      accessor: 'order_id',
-      type: 'text',
+      title: 'Jedinična cijena (sa PDV-OM):',
+      accessor: 'price',
+      type: 'custom',
+      renderContents: price => {
+        return <Typography variant="bodyMedium" content={price.toFixed(2)} />;
+      },
     },
     {
       title: 'Ukupna vrijednost (sa PDV-OM):',
-      accessor: 'total_price',
+      accessor: '',
       type: 'custom',
-      renderContents: (total_price: number) => {
-        return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
+      renderContents: (_, row) => {
+        return <Typography variant="bodyMedium" content={row.amount ? (row.amount * row.price).toFixed(2) : 0} />;
       },
     },
   ];
@@ -170,6 +168,34 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
     }
   }, [mappedArticles]);
 
+  const calculateTotalValues = (items: any) => {
+    let totalNetValue = 0;
+    let totalGrossValue = 0;
+
+    items.forEach((item: any) => {
+      const price = item.price;
+      const vatPercentage = item.vat_percentage;
+
+      const netValue = item.amount ? (price - price * (vatPercentage / 100)) * item.amount : 0;
+
+      const grossValue = item.amount ? price * item.amount : 0;
+
+      totalNetValue += netValue;
+      totalGrossValue += grossValue;
+    });
+
+    return {totalNetValue, totalGrossValue};
+  };
+
+  const {totalNetValue, totalGrossValue} = calculateTotalValues(filteredArticles);
+
+  const [totals, setTotals] = useState({totalNetValue, totalGrossValue});
+
+  useEffect(() => {
+    const {totalNetValue, totalGrossValue} = calculateTotalValues(filteredArticles);
+    setTotals({totalNetValue, totalGrossValue});
+  }, [filteredArticles]);
+
   return (
     <ScreenWrapper context={context}>
       <SectionBox>
@@ -179,11 +205,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
           <div>
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
-              <Typography variant="bodySmall" content={`${procurementID}`} />
-            </Row>
-            <Row>
-              <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DOBAVLJAČ:'} />
-              <Typography variant="bodySmall" content={`${supplier?.title}`} />
+              <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
             </Row>
           </div>
         </OrderInfo>
@@ -192,11 +214,11 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
         <Totals>
           <Row>
             <SubTitle variant="bodySmall" content="UKUPNA NETO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content="1.000,00 KM" />
+            <Typography variant="bodySmall" content={`${totalNetValue.toFixed(2)}`} />
           </Row>
           <Row>
             <SubTitle variant="bodySmall" content="UKUPNA BRUTO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content="1.000,00 KM" />
+            <Typography variant="bodySmall" content={totalGrossValue.toFixed(2)} />
           </Row>
         </Totals>
 

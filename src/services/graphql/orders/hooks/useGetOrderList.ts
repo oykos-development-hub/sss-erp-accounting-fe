@@ -7,7 +7,7 @@ const useGetOrderList = (
   page: number,
   size: number,
   id: number,
-  supplier_id: number,
+  supplier_id: number | null,
   status: null | string,
   search: null | string,
 ) => {

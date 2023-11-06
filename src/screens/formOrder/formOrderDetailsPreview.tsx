@@ -47,7 +47,6 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
   let date = '';
   const url = context?.navigation.location.pathname;
   const orderId = Number(url?.split('/').at(-2));
-  const procurementID = Number(url?.split('/').at(-4));
 
   const {orders, loading, fetch} = useGetOrderList(1, 10, orderId, 0, '', '');
   const {mutate: deleteOrderListReceive} = useDeleteOrderListReceive();
@@ -133,7 +132,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
           <div>
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
-              <Typography variant="bodySmall" content={`${procurementID}`} />
+              <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
             </Row>
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DOBAVLJAČ:'} />
@@ -161,11 +160,11 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
         <Totals>
           <Row>
             <SubTitle variant="bodySmall" content="UKUPNA NETO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${orders[0]?.total_neto?.toFixed(2) || '0'}`} />
+            <Typography variant="bodySmall" content={`${orders[0]?.total_neto?.toFixed(2) || 0.0}`} />
           </Row>
           <Row>
             <SubTitle variant="bodySmall" content="UKUPNA BRUTO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${orders[0]?.total_price?.toFixed(2) || '0'}`} />
+            <Typography variant="bodySmall" content={`${orders[0]?.total_bruto?.toFixed(2) || 0.0}`} />
           </Row>
         </Totals>
 
