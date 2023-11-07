@@ -66,6 +66,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
 
     return sum + price;
   }, 0);
+
   const onSubmit = (values: any) => {
     if (isSaving) return;
 
@@ -167,7 +168,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
           <Table tableHeads={tableHeads} data={data[0]?.articles || []} />
           <Row>
             <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />
-            <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):" value={totalPrice} disabled={true} />
+            <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):" value={totalPrice.toFixed(2)} disabled={true} />
           </Row>
         </FormWrapper>
       }

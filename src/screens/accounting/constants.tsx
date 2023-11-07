@@ -2,7 +2,6 @@ import {TableHead, Typography} from 'client-library';
 import {parseDate} from '../../utils/dateUtils';
 
 export const tableHeads: TableHead[] = [
-  {title: 'ID', accessor: 'id', type: 'text'},
   {
     title: 'Datum narudžbenice',
     accessor: 'date_order',

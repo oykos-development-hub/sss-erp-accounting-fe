@@ -15,11 +15,6 @@ interface ReceiveItemsTableProps {
 
 const tableHeads: TableHead[] = [
   {
-    title: 'ID',
-    accessor: 'id',
-    type: 'text',
-  },
-  {
     title: 'Datum prijema robe',
     accessor: 'date_system',
     type: 'custom',
