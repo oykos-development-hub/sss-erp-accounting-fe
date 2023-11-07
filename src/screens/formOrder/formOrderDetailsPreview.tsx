@@ -243,7 +243,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               content="Nazad"
               variant="secondary"
               onClick={() => {
-                context.navigation.navigate('/accounting');
+                context.navigation.navigate('/accounting/order-form');
                 context.breadcrumbs.remove();
               }}
             />
