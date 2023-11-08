@@ -108,3 +108,25 @@ export const TableTitle = styled(Typography)`
   margin-left: 20px;
   padding-top: 10px;
 `;
+
+export const FileUploadWrapper = styled.div`
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+  > div > div {
+    display: flex;
+    width: 100%;
+
+    & div > p > p {
+      font-weight: 600;
+      line-height: 20px;
+    }
+  }
+`;
+
+export const ErrorText = styled.span`
+  color: ${Theme.palette.error500};
+  font-size: 12px;
+`;

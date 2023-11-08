@@ -79,6 +79,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
         ...values,
         public_procurement_id: values?.public_procurement_id?.id,
         date_order: parseDateForBackend(new Date()),
+        order_file: values?.order_file?.id || null,
       };
 
       orderListInsert(payload, async orderID => {

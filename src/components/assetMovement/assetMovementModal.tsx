@@ -39,6 +39,7 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
       order_id: selectedItem,
       office_id: values?.office?.id,
       recipient_user_id: values?.recipient?.id,
+      movement_file: values?.movement_file?.id || null,
     };
 
     orderListAssetMovementMutation(

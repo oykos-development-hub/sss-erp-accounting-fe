@@ -76,6 +76,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       invoice_number: values?.invoice_number || '',
       description: values?.description,
       date_system: parseDateForBackend(values?.date_order) || '',
+      receive_file: values?.receive_file?.id || null,
     };
 
     orderListReceive(

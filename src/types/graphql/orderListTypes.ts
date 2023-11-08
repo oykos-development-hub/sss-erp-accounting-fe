@@ -17,6 +17,21 @@ export interface OrderListItem {
   recipient_user?: DropdownDataString;
   office?: DropdownDataString;
   price?: number;
+  order_file?: {
+    id: number;
+    name: string;
+    type: string;
+  };
+  receive_file?: {
+    id: number;
+    name: string;
+    type: string;
+  };
+  movement_file?: {
+    id: number;
+    name: string;
+    type: string;
+  };
 }
 
 export interface GetOrderListParams {
@@ -33,6 +48,7 @@ export interface OrderListReceiveParams {
   invoice_date: string;
   invoice_number: string;
   description: string;
+  receive_file?: number;
 }
 
 export interface OrderListInsertParams {
@@ -41,12 +57,14 @@ export interface OrderListInsertParams {
   public_procurement_id: number;
   supplier_id: number;
   articles: OrderListArticleInsert[];
+  order_file?: number;
 }
 
 export interface OrderListMovementParams {
   order_id: number;
   organization_unit_id: number;
   user_profile_id: number;
+  movement_file?: number;
 }
 
 export interface OrderListType {
