@@ -15,8 +15,10 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
   fetch,
 }) => {
   const {control, handleSubmit} = useForm({});
+  const organisationUnitId = context?.contextMain?.organization_unit?.id;
 
-  const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits();
+  const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
+
   const {recipientUsers} = useGetRecipientUsersOverview();
   const {mutate: orderListAssetMovementMutation, loading: isSaving} = useOrderListAssetMovementMutation();
 

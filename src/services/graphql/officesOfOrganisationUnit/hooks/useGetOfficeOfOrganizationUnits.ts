@@ -6,10 +6,11 @@ import {
 } from '../../../../types/graphql/officesOfOrganizationUnitsOverviewTypes';
 import useAppContext from '../../../../context/useAppContext';
 
-const useGetOfficesOfOrganizationUnits = () => {
+const useGetOfficesOfOrganizationUnits = (id: number, organization_unit_id: number, search: string) => {
   const [officesOfOrganizationUnits, setOfficesOfOrganizationUnits] = useState<OfficesOfOrganizationUnits[]>();
   const [loading, setLoading] = useState(true);
   const {fetch, graphQl} = useAppContext();
+
   const fetchOfficesOfOrganizationUnits = async (id: number, organization_unit_id: number, search: string) => {
     const response: OfficesOfOrganizationUnitsTypeResponse['get'] = await fetch(graphQl.getOffices, {
       id,
@@ -24,8 +25,8 @@ const useGetOfficesOfOrganizationUnits = () => {
   };
 
   useEffect(() => {
-    fetchOfficesOfOrganizationUnits(0, 0, '');
-  }, []);
+    fetchOfficesOfOrganizationUnits(id, organization_unit_id, search);
+  }, [id, organization_unit_id, search]);
 
   return {officesOfOrganizationUnits, loading, fetch: fetchOfficesOfOrganizationUnits};
 };
