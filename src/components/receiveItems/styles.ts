@@ -1,5 +1,5 @@
+import {Input, Typography} from 'client-library';
 import styled from 'styled-components';
-import {Input, Typography, Dropdown} from 'client-library';
 
 export const FormWrapper = styled.form`
   display: flex;
@@ -38,4 +38,17 @@ export const DatepickersWrapper = styled.div`
   display: flex;
   flex-direction: row;
   column-gap: 8px;
+  margin-bottom: 25px;
+`;
+
+export const TextareaWrapper = styled.div`
+  height: 100%;
+
+  div {
+    height: 100%;
+  }
+
+  div > div {
+    height: 100%;
+  }
 `;

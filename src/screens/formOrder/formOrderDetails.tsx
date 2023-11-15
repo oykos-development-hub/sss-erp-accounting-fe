@@ -1,11 +1,15 @@
-import {Button, MicroserviceProps, Table, TableHead, Typography} from 'client-library';
+import {Button, MicroserviceProps, Table, TableHead, Typography, FileUpload} from 'client-library';
 import React, {useEffect, useMemo, useState} from 'react';
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import {ScreenWrapper} from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox, SubTitle} from '../../shared/styles';
-import {AmountInput, FormControls, FormFooter, OrderInfo, Totals} from './styles';
+import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo, Totals} from './styles';
+import {useForm} from 'react-hook-form';
+import useAppContext from '../../context/useAppContext';
+import FileList from '../../components/fileList/fileList';
+import {FileItem, FileResponseItem} from '../../types/fileUploadType';
 
 interface FormOrderDetailsPageProps {
   context: MicroserviceProps;
@@ -19,10 +23,22 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
   const [touchedFields, setTouchedFields] = useState<any>({});
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID);
+  const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
 
   const {orders} = useGetOrderList(1, 10, orderId, 0, '', '');
 
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
+
+  const {handleSubmit, clearErrors, setValue} = useForm();
+
+  const {
+    fileService: {uploadFile},
+  } = useAppContext();
+
+  const handleUpload = (files: FileList) => {
+    setUploadedFile(files);
+    clearErrors('receive_file');
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
     const {value} = event.target;
@@ -60,7 +76,26 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
     }
   };
 
-  const handleSaveOrder = () => {
+  const onSubmit = async () => {
+    if (isSaving) return;
+
+    if (uploadedFile) {
+      const formData = new FormData();
+      formData.append('file', uploadedFile[0]);
+
+      await uploadFile(formData, (files: FileResponseItem[]) => {
+        setUploadedFile(null);
+        setValue('receive_file', files[0]);
+        handleSaveOrder(files[0].id);
+      });
+
+      return;
+    } else {
+      handleSaveOrder();
+    }
+  };
+
+  const handleSaveOrder = (files?: number) => {
     if (isSaving) return;
 
     const insertArticles = filteredArticles.map((article: any) => {
@@ -75,6 +110,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
       date_order: orders[0]?.date_order,
       public_procurement_id: Number(procurementID),
       articles: insertArticles,
+      order_file: files,
     };
 
     orderListInsert(
@@ -207,6 +243,20 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
               <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
             </Row>
+
+            <Row>
+              <FileUploadWrapper>
+                <FileUpload
+                  icon={null}
+                  files={uploadedFile}
+                  variant="secondary"
+                  onUpload={handleUpload}
+                  note={<Typography variant="bodySmall" content="Narudžbenica" />}
+                  hint="Fajlovi neće biti učitani dok ne sačuvate narudžbenicu."
+                  buttonText="Učitaj"
+                />
+              </FileUploadWrapper>
+            </Row>
           </div>
         </OrderInfo>
 
@@ -224,7 +274,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
 
         <FormFooter>
           <FormControls>
-            <Button content="Sačuvaj" variant="primary" onClick={handleSaveOrder} />
+            <Button content="Sačuvaj" variant="primary" onClick={handleSubmit(onSubmit)} />
           </FormControls>
         </FormFooter>
       </SectionBox>

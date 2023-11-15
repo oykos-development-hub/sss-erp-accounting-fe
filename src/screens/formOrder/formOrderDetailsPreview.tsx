@@ -6,6 +6,7 @@ import {
   Accordion,
   ChevronDownIcon,
   MoreVerticalIcon,
+  FileUpload,
 } from 'client-library';
 import React, {useMemo, useState} from 'react';
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
@@ -15,6 +16,7 @@ import {
   AccordionHeader,
   AccordionIconsWrapper,
   AccordionWrapper,
+  FileUploadWrapper,
   FormControls,
   FormFooter,
   Menu,
@@ -32,6 +34,7 @@ import {parseDate} from '../../utils/dateUtils';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import useDeleteOrderListReceive from '../../services/graphql/orders/hooks/useDeleteOrderListReceive';
 import {tableHeads} from './constants';
+import FileList from '../../components/fileList/fileList';
 
 interface FormOrderDetailsPageProps {
   context: MicroserviceProps;
@@ -123,6 +126,10 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
     }
   };
 
+  const orderFile = orders[0]?.order_file;
+  const movementFile = orders[0]?.movement_file;
+  const receiveFile = orders[0]?.receive_file;
+
   return (
     <ScreenWrapper context={context}>
       <SectionBox>
@@ -143,6 +150,24 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                 <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM KREIRANJA:'} />
                 <Typography variant="bodySmall" content={`${date || ''}`} />
               </Row>
+              {orderFile?.id !== 0 && (
+                <Row>
+                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'NARUDŽBENICA:'} />
+                  <FileList files={(orderFile && [orderFile]) ?? []} />
+                </Row>
+              )}
+              {receiveFile?.id !== 0 && (
+                <Row>
+                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'PRIJEMNICA:'} />
+                  <FileList files={(receiveFile && [receiveFile]) ?? []} />
+                </Row>
+              )}
+              {movementFile?.id !== 0 && (
+                <Row>
+                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'OTPREMNICA:'} />
+                  <FileList files={(movementFile && [movementFile]) ?? []} />
+                </Row>
+              )}
             </>
           </div>
           <div>

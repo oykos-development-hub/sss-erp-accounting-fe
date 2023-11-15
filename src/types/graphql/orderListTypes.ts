@@ -44,11 +44,11 @@ export interface GetOrderListParams {
 }
 export interface OrderListReceiveParams {
   order_id: number;
-  date_system: string;
-  invoice_date: string;
-  invoice_number: string;
+  date_system: string | null;
+  invoice_date: string | null;
+  invoice_number: string | null;
   description: string;
-  receive_file?: number;
+  receive_file?: number | null;
 }
 
 export interface OrderListInsertParams {

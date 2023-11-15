@@ -1,15 +1,28 @@
-import {Datepicker, Input, Modal, Table, TableHead, Typography} from 'client-library';
-import React, {useEffect} from 'react';
+import {Datepicker, Input, Modal, Table, TableHead, Typography, FileUpload} from 'client-library';
+import React, {useEffect, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import useOrderListReceive from '../../services/graphql/orders/hooks/useOrderListReceive';
 import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
-import {DatepickersWrapper, FormWrapper, HeaderSection, Row, StyledInput, Title} from './styles';
+import {DatepickersWrapper, FormWrapper, HeaderSection, Row, StyledInput, TextareaWrapper, Title} from './styles';
+import {FileUploadWrapper} from '../../screens/formOrder/styles';
+import useAppContext from '../../context/useAppContext';
+import FileList from '../../components/fileList/fileList';
+import {FileItem, FileResponseItem} from '../../types/fileUploadType';
 
-const initialValues = {
+type ReceiveItemForm = {
+  invoice_date: string;
+  date_system: string;
+  invoice_number: string;
+  description: string;
+  receive_file: FileItem | null;
+};
+
+const initialValues: ReceiveItemForm = {
   invoice_date: '',
   date_system: '',
   invoice_number: '',
   description: '',
+  receive_file: null,
 };
 
 interface ReceiveItemsModalProps {
@@ -45,15 +58,36 @@ export const tableHeads: TableHead[] = [
 ];
 
 export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open, onClose, alert, fetch}) => {
+  const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
+  const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
+  const [filesToDelete, setFilesToDelete] = useState<number>();
+
   const {
     register,
     handleSubmit,
     control,
     formState: {errors},
     reset,
+    clearErrors,
+    watch,
+    setValue,
   } = useForm({defaultValues: initialValues});
 
-  const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
+  const receiveFile = watch('receive_file');
+
+  const {
+    fileService: {uploadFile, deleteFile},
+  } = useAppContext();
+
+  const handleUpload = (files: FileList) => {
+    setUploadedFile(files);
+    clearErrors('receive_file');
+  };
+
+  const onDeleteFile = () => {
+    setValue('receive_file', null);
+    setFilesToDelete(receiveFile?.id);
+  };
 
   const totalPrice = [data[0]]?.reduce((sum: any, article: any) => {
     const price = parseFloat(article?.total_bruto);
@@ -67,16 +101,20 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     return sum + price;
   }, 0);
 
-  const onSubmit = (values: any) => {
-    if (isSaving) return;
-
+  const handleReceiveListInsert = (
+    invoiceDate: string | null,
+    invoiceNumber: string,
+    description: string,
+    dateSystem: string | null,
+    receiveFileId?: number,
+  ) => {
     const payload = {
       order_id: data[0]?.id,
-      invoice_date: parseDateForBackend(values?.invoice_date) || '',
-      invoice_number: values?.invoice_number || '',
-      description: values?.description,
-      date_system: parseDateForBackend(values?.date_order) || '',
-      receive_file: values?.receive_file?.id || null,
+      invoice_date: invoiceDate,
+      invoice_number: invoiceNumber,
+      description: description,
+      date_system: dateSystem,
+      receive_file: receiveFileId,
     };
 
     orderListReceive(
@@ -91,6 +129,47 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       },
     );
   };
+
+  const onSubmit = async (values: any) => {
+    if (isSaving) return;
+
+    if (filesToDelete) {
+      await deleteFile(filesToDelete);
+    }
+
+    if (uploadedFile) {
+      const formData = new FormData();
+      formData.append('file', uploadedFile[0]);
+
+      await uploadFile(
+        formData,
+        (files: FileResponseItem[]) => {
+          setUploadedFile(null);
+          setValue('receive_file', files[0]);
+          handleReceiveListInsert(
+            parseDateForBackend(values?.invoice_date),
+            values?.invoice_number,
+            values?.description,
+            parseDateForBackend(values?.date_order),
+            files[0]?.id,
+          );
+        },
+        () => {
+          alert.error('Greška pri čuvanju! Fajlovi nisu učitani.');
+        },
+      );
+
+      return;
+    } else {
+      handleReceiveListInsert(
+        parseDateForBackend(values?.invoice_date),
+        values?.invoice_number,
+        values?.description,
+        parseDateForBackend(values?.date_order),
+      );
+    }
+  };
+
   useEffect(() => {
     if (data[0]) {
       reset({
@@ -99,6 +178,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         date_system: data[0]?.date_system || '',
         invoice_number: data[0]?.invoice_number || '',
         description: data[0]?.description || '',
+        receive_file: data[0]?.receive_file || null,
       });
     }
   }, [data]);
@@ -161,11 +241,26 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                   )}
                 />
               </DatepickersWrapper>
+              <FileUploadWrapper>
+                <FileUpload
+                  icon={null}
+                  files={uploadedFile}
+                  variant="secondary"
+                  onUpload={handleUpload}
+                  note={<Typography variant="bodySmall" content="Prijemnica" />}
+                  hint="Fajlovi neće biti učitani dok ne sačuvate prijemnicu."
+                  buttonText="Učitaj"
+                />
+              </FileUploadWrapper>
+              {receiveFile?.id !== 0 && (
+                <FileList files={receiveFile && [receiveFile]} onDelete={onDeleteFile} isInModal={true} />
+              )}
             </div>
-            <div>
+            <TextareaWrapper>
               <Input {...register('description')} label="NAPOMENA:" textarea={true} />
-            </div>
+            </TextareaWrapper>
           </HeaderSection>
+
           <Table tableHeads={tableHeads} data={data[0]?.articles || []} />
           <Row>
             <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />

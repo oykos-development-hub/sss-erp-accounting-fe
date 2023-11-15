@@ -98,6 +98,7 @@ export const MenuItem = styled.div`
 
 export const MovementTableContainer = styled.div`
   margin-top: 30px;
+
   div {
     margin-top: 0;
   }
@@ -114,16 +115,7 @@ export const FileUploadWrapper = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  margin-top: 10px;
-  > div > div {
-    display: flex;
-    width: 100%;
-
-    & div > p > p {
-      font-weight: 600;
-      line-height: 20px;
-    }
-  }
+  margin-block: 10px;
 `;
 
 export const ErrorText = styled.span`
