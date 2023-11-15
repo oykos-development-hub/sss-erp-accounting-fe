@@ -78,11 +78,6 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, conte
             onClick: item => handleEdit(item.id),
             icon: <EditIconTwo stroke={Theme?.palette?.gray800} />,
           },
-          {
-            name: 'Štampaj',
-            onClick: item => handlePrintIconClick(item.id),
-            icon: <PrinterIcon stroke={Theme?.palette?.gray800} />,
-          },
         ]}
       />
       {showModal && (

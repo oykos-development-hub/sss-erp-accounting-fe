@@ -6,29 +6,24 @@ import {
   Accordion,
   ChevronDownIcon,
   MoreVerticalIcon,
-  FileUpload,
+  TrashIcon,
 } from 'client-library';
 import React, {useMemo, useState} from 'react';
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
 import {ScreenWrapper} from '../../shared/screenWrapper';
-import {CustomDivider, MainTitle, Row, SectionBox, SubTitle} from '../../shared/styles';
+import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {
   AccordionHeader,
   AccordionIconsWrapper,
   AccordionWrapper,
-  FileUploadWrapper,
   FormControls,
   FormFooter,
   Menu,
   MenuItem,
-  MovementTableContainer,
   OrderInfo,
-  TableTitle,
-  Totals,
 } from './styles';
 import {ReceiveItemsModal} from '../../components/receiveItems/receiveItemsModal';
 import {ReceiveItemsTable} from '../../components/receiveItems/receiveItemsTable';
-import {AssetMovementTable} from '../../components/assetMovement/assetMovementTable';
 import {AssetMovementModal} from '../../components/assetMovement/assetMovementModal';
 import {parseDate} from '../../utils/dateUtils';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
@@ -41,11 +36,9 @@ interface FormOrderDetailsPageProps {
 }
 
 export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({context}) => {
-  //fixed for now, will be dynamic
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isOpen, setIsOpen] = useState<number>(0);
-  const [showModalMovement, setShowModalMovement] = useState(false);
 
   let date = '';
   const url = context?.navigation.location.pathname;
@@ -83,22 +76,8 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
     setShowModal(false);
   };
 
-  const handleAddMovement = () => {
-    setShowModalMovement(true);
-  };
-
-  const closeModalMovement = () => {
-    setShowModalMovement(false);
-  };
-
   const openAccordion = (id: number) => {
     setIsOpen(prevState => (prevState === id ? 0 : id));
-  };
-
-  const [showMenu, setShowMenu] = useState<boolean>(false);
-
-  const showMenuHandler = () => {
-    setShowMenu(prevState => !prevState);
   };
 
   const handleDeleteIconClick = () => {
@@ -182,16 +161,6 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
         </OrderInfo>
 
         <Table tableHeads={tableHeads} data={mappedOrder || []} isLoading={loading} />
-        <Totals>
-          <Row>
-            <SubTitle variant="bodySmall" content="UKUPNA NETO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${orders[0]?.total_neto?.toFixed(2) || 0.0}`} />
-          </Row>
-          <Row>
-            <SubTitle variant="bodySmall" content="UKUPNA BRUTO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${orders[0]?.total_bruto?.toFixed(2) || 0.0}`} />
-          </Row>
-        </Totals>
 
         {orders[0]?.invoice_date && orders[0]?.date_system && (
           <AccordionWrapper>
@@ -210,52 +179,18 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
                         openAccordion(orders[0]?.id || 0);
                       }}
                     />
-
-                    <MoreVerticalIcon
-                      width="5px"
-                      height="16px"
-                      onClick={(e: any) => {
-                        e.stopPropagation();
-                        showMenuHandler();
+                    <TrashIcon
+                      onClick={() => {
+                        handleDeleteIconClick();
                       }}
                       style={{padding: '10px'}}
                     />
                   </AccordionIconsWrapper>
-                  <Menu open={showMenu}>
-                    <MenuItem>
-                      <Typography
-                        content="Kreiraj otpremnicu"
-                        variant="bodyMedium"
-                        onClick={() => {
-                          handleAddMovement();
-                          setShowMenu(prevState => !prevState);
-                        }}
-                      />
-                    </MenuItem>
-                    <MenuItem>
-                      <Typography
-                        content="Obriši"
-                        variant="bodyMedium"
-                        onClick={() => {
-                          handleDeleteIconClick();
-                          setShowMenu(prevState => !prevState);
-                        }}
-                      />
-                    </MenuItem>
-                  </Menu>
                 </AccordionHeader>
               }
               content={
                 <>
                   <ReceiveItemsTable data={orders[0]} context={context} fetch={fetch} loading={loading} />
-                  {orders[0]?.recipient_user?.id && orders[0]?.office?.id ? (
-                    <MovementTableContainer>
-                      <TableTitle variant="bodyMedium" content="OTPREMNICA" />
-                      <AssetMovementTable data={orders[0]} context={context} fetch={fetch} loading={loading} />
-                    </MovementTableContainer>
-                  ) : (
-                    []
-                  )}
                 </>
               }
             />
@@ -277,16 +212,6 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
 
         {showModal && (
           <ReceiveItemsModal open={showModal} onClose={closeModal} fetch={fetch} data={orders} alert={context?.alert} />
-        )}
-
-        {showModalMovement && (
-          <AssetMovementModal
-            open={showModalMovement}
-            onClose={closeModalMovement}
-            context={context}
-            selectedItem={orderId}
-            fetch={fetch}
-          />
         )}
 
         <NotificationsModal

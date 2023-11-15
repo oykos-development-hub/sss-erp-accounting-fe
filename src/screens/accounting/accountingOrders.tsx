@@ -152,11 +152,6 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
                 onClick: item => handleDeleteIconClick(item.id),
                 icon: <TrashIcon stroke={Theme?.palette?.gray800} />,
               },
-              {
-                name: 'Štampaj',
-                onClick: item => handlePrintIconClick(item.id),
-                icon: <PrinterIcon stroke={Theme?.palette?.gray800} />,
-              },
             ]}
           />
         </div>

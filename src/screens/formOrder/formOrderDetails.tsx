@@ -8,15 +8,13 @@ import {CustomDivider, MainTitle, Row, SectionBox, SubTitle} from '../../shared/
 import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo, Totals} from './styles';
 import {useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
-import FileList from '../../components/fileList/fileList';
-import {FileItem, FileResponseItem} from '../../types/fileUploadType';
+import {FileResponseItem} from '../../types/fileUploadType';
 
 interface FormOrderDetailsPageProps {
   context: MicroserviceProps;
 }
 
 export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context}) => {
-  //fixed for now, will be dynamic
   const url = context?.navigation.location.pathname;
   const orderId = Number(url?.split('/').at(-1));
   const procurementID = Number(url?.split('/').at(-3));
@@ -180,22 +178,6 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
         );
       },
     },
-    {
-      title: 'Jedinična cijena (sa PDV-OM):',
-      accessor: 'price',
-      type: 'custom',
-      renderContents: price => {
-        return <Typography variant="bodyMedium" content={price.toFixed(2)} />;
-      },
-    },
-    {
-      title: 'Ukupna vrijednost (sa PDV-OM):',
-      accessor: '',
-      type: 'custom',
-      renderContents: (_, row) => {
-        return <Typography variant="bodyMedium" content={row.amount ? (row.amount * row.price).toFixed(2) : 0} />;
-      },
-    },
   ];
 
   useEffect(() => {
@@ -203,34 +185,6 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
       setFilteredArticles(mappedArticles);
     }
   }, [mappedArticles]);
-
-  const calculateTotalValues = (items: any) => {
-    let totalNetValue = 0;
-    let totalGrossValue = 0;
-
-    items.forEach((item: any) => {
-      const price = item.price;
-      const vatPercentage = item.vat_percentage;
-
-      const netValue = item.amount ? (price - price * (vatPercentage / 100)) * item.amount : 0;
-
-      const grossValue = item.amount ? price * item.amount : 0;
-
-      totalNetValue += netValue;
-      totalGrossValue += grossValue;
-    });
-
-    return {totalNetValue, totalGrossValue};
-  };
-
-  const {totalNetValue, totalGrossValue} = calculateTotalValues(filteredArticles);
-
-  const [totals, setTotals] = useState({totalNetValue, totalGrossValue});
-
-  useEffect(() => {
-    const {totalNetValue, totalGrossValue} = calculateTotalValues(filteredArticles);
-    setTotals({totalNetValue, totalGrossValue});
-  }, [filteredArticles]);
 
   return (
     <ScreenWrapper context={context}>
@@ -261,17 +215,6 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
         </OrderInfo>
 
         <Table tableHeads={tableHeads} data={filteredArticles || []} />
-        <Totals>
-          <Row>
-            <SubTitle variant="bodySmall" content="UKUPNA NETO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={`${totalNetValue.toFixed(2)}`} />
-          </Row>
-          <Row>
-            <SubTitle variant="bodySmall" content="UKUPNA BRUTO VRIJEDNOST:" />
-            <Typography variant="bodySmall" content={totalGrossValue.toFixed(2)} />
-          </Row>
-        </Totals>
-
         <FormFooter>
           <FormControls>
             <Button content="Sačuvaj" variant="primary" onClick={handleSubmit(onSubmit)} />

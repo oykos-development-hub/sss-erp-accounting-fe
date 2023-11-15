@@ -24,20 +24,4 @@ export const tableHeads: TableHead[] = [
       return <Typography variant="bodyMedium" content={amount ? parseFloat(amount?.toFixed(2)) : 0} />;
     },
   },
-  {
-    title: 'Jedinična cijena (sa PDV-OM):',
-    accessor: 'price',
-    type: 'custom',
-    renderContents: (price: number) => {
-      return <Typography variant="bodyMedium" content={price ? parseFloat(price?.toFixed(2)) : 0} />;
-    },
-  },
-  {
-    title: 'Ukupna vrijednost (sa PDV-OM):',
-    accessor: 'total_price',
-    type: 'custom',
-    renderContents: (total_price: number) => {
-      return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price?.toFixed(2)) : 0} />;
-    },
-  },
 ];
