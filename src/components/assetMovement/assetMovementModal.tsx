@@ -81,7 +81,6 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
       await uploadFile(
         formData,
         (files: FileResponseItem[]) => {
-          console.log(movementFile);
           setUploadedFile(null);
           setValue('movement_file', files[0]);
 
