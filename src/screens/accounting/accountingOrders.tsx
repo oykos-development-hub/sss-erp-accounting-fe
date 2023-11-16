@@ -11,8 +11,10 @@ import {ScreenProps} from '../../types/screen-props';
 import {tableHeads} from './constants';
 import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, TableHeader} from './styles';
 import {useDebounce} from '../../utils/useDebounce';
+import useAppContext from '../../context/useAppContext';
 
-export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
+export const AccountingOrdersMainPage: React.FC = () => {
+  const {alert, breadcrumbs, navigation} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [page, setPage] = useState(1);
@@ -83,11 +85,11 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
         () => {
           fetch();
           setShowDeleteModal(false);
-          context.alert.success('Uspješno obrisano.');
+          alert.success('Uspješno obrisano.');
         },
         () => {
           setShowDeleteModal(false);
-          context.alert.success('Došlo je do greške pri brisanju.');
+          alert.success('Došlo je do greške pri brisanju.');
         },
       );
     }
@@ -107,7 +109,7 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
   }, [debouncedForm]);
 
   return (
-    <ScreenWrapper context={context}>
+    <ScreenWrapper>
       <Container>
         <MainTitle content="LISTA SVIH NARUDŽBENICA" variant="bodyMedium" />
         <CustomDivider />
@@ -138,10 +140,8 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
             data={(orders as any) || []}
             isLoading={loading}
             onRowClick={row => {
-              context.navigation.navigate(
-                `/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`,
-              );
-              context.breadcrumbs.add({
+              navigation.navigate(`/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`);
+              breadcrumbs.add({
                 name: `Detalji narudžbenice - ${row?.id} `,
                 to: `/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`,
               });
@@ -165,11 +165,11 @@ export const AccountingOrdersMainPage: React.FC<ScreenProps> = ({context}) => {
 
         {showModal && (
           <AccountingOrderModal
-            alert={context.alert}
+            alert={alert}
             open={showModal}
             onClose={closeModal}
             selectedItem={selectedItem}
-            navigate={context.navigation.navigate}
+            navigate={navigation.navigate}
           />
         )}
 

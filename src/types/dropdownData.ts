@@ -10,3 +10,8 @@ export interface DropdownDataNumber {
   id: number;
   title: string;
 }
+export interface DropdownDataBudgetIndent {
+  id: number;
+  title: string;
+  serial_number: string;
+}

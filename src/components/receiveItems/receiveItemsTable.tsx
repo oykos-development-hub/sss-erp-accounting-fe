@@ -4,10 +4,10 @@ import {SectionBox} from '../../shared/styles';
 import {MicroserviceProps} from '../../types/micro-service-props';
 import {parseDate} from '../../utils/dateUtils';
 import {ReceiveItemsModal} from './receiveItemsModal';
+import useAppContext from '../../context/useAppContext';
 
 interface ReceiveItemsTableProps {
   data: any;
-  context: MicroserviceProps;
   fetch: () => any;
   loading: boolean;
 }
@@ -45,7 +45,8 @@ const tableHeads: TableHead[] = [
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
 
-export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, context, fetch, loading}) => {
+export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch, loading}) => {
+  const {alert} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
 
@@ -81,13 +82,7 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, conte
         ]}
       />
       {showModal && (
-        <ReceiveItemsModal
-          open={showModal}
-          onClose={closeModal}
-          fetch={fetch}
-          data={[selectedItem]}
-          alert={context?.alert}
-        />
+        <ReceiveItemsModal open={showModal} onClose={closeModal} fetch={fetch} data={[selectedItem]} alert={alert} />
       )}
     </SectionBox>
   );

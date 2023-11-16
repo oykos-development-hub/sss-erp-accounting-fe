@@ -5,10 +5,10 @@ import {parseDate} from '../../utils/dateUtils';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import {MicroserviceProps} from '../../types/micro-service-props';
 import useDeleteOrderListAssetMovement from '../../services/graphql/movement/hooks/useDeleteOrderListAssetMovement';
+import useAppContext from '../../context/useAppContext';
 
 interface ReceiveItemsTableProps {
   data: any;
-  context: MicroserviceProps;
   fetch: () => any;
   loading: boolean;
 }
@@ -41,7 +41,8 @@ const tableHeads: TableHead[] = [
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
 
-export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, context, fetch, loading}) => {
+export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, fetch, loading}) => {
+  const {alert} = useAppContext();
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -64,11 +65,11 @@ export const AssetMovementTable: React.FC<ReceiveItemsTableProps> = ({data, cont
         () => {
           setShowDeleteModal(false);
           fetch();
-          context.alert.success('Uspješno obrisano.');
+          alert.success('Uspješno obrisano.');
         },
         () => {
           setShowDeleteModal(false);
-          context.alert.success('Greška. Brisanje nije moguće.');
+          alert.success('Greška. Brisanje nije moguće.');
         },
       );
     }

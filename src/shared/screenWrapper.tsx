@@ -1,6 +1,7 @@
 import React, {FC, ReactElement, ReactNode} from 'react';
 import {Breadcrumbs} from 'client-library';
 import styled from 'styled-components';
+import useAppContext from '../context/useAppContext';
 
 const Container = styled.div`
   font-family: 'Source Sans Pro', sans-serif;
@@ -21,12 +22,13 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
   margin: 0;
 `;
 
-export const ScreenWrapper: FC<{children: ReactNode; context: any}> = ({children, context}) => {
-  const breadcrumbs = context?.breadcrumbs;
+export const ScreenWrapper: FC<{children: ReactNode}> = ({children}) => {
+  const {
+    breadcrumbs,
+    navigation: {navigate},
+  } = useAppContext();
 
   const breadcrumbItems = breadcrumbs?.get();
-
-  const navigate = context?.navigation?.navigate;
 
   const handleNavigation = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | undefined,

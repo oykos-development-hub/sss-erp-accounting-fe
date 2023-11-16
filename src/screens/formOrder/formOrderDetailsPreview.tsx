@@ -29,19 +29,18 @@ import {parseDate} from '../../utils/dateUtils';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import useDeleteOrderListReceive from '../../services/graphql/orders/hooks/useDeleteOrderListReceive';
 import {tableHeads} from './constants';
+import useAppContext from '../../context/useAppContext';
 import FileList from '../../components/fileList/fileList';
 
-interface FormOrderDetailsPageProps {
-  context: MicroserviceProps;
-}
-
-export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({context}) => {
+export const FormOrderDetailsPreview: React.FC = () => {
+  //fixed for now, will be dynamic
+  const {alert, breadcrumbs, navigation} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isOpen, setIsOpen] = useState<number>(0);
 
   let date = '';
-  const url = context?.navigation.location.pathname;
+  const url = navigation.location.pathname;
   const orderId = Number(url?.split('/').at(-2));
 
   const {orders, loading, fetch} = useGetOrderList(1, 10, orderId, 0, '', '');
@@ -95,11 +94,11 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
         () => {
           setShowDeleteModal(false);
           fetch();
-          context.alert.success('Uspješno obrisano');
+          alert.success('Uspješno obrisano');
         },
         () => {
           setShowDeleteModal(false);
-          context.alert.success('Došlo je do greške pri brisanju');
+          alert.success('Došlo je do greške pri brisanju');
         },
       );
     }
@@ -110,7 +109,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
   const receiveFile = orders[0]?.receive_file;
 
   return (
-    <ScreenWrapper context={context}>
+    <ScreenWrapper>
       <SectionBox>
         <MainTitle variant="bodyMedium" content={`NARUDŽBENICA - BROJ. N${orderId}`} />
         <CustomDivider />
@@ -190,7 +189,7 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               }
               content={
                 <>
-                  <ReceiveItemsTable data={orders[0]} context={context} fetch={fetch} loading={loading} />
+                  <ReceiveItemsTable data={orders[0]} fetch={fetch} loading={loading} />
                 </>
               }
             />
@@ -203,15 +202,15 @@ export const FormOrderDetailsPreview: React.FC<FormOrderDetailsPageProps> = ({co
               content="Nazad"
               variant="secondary"
               onClick={() => {
-                context.navigation.navigate('/accounting/order-form');
-                context.breadcrumbs.remove();
+                navigation.navigate('/accounting/order-form');
+                breadcrumbs.remove();
               }}
             />
           </FormControls>
         </FormFooter>
 
         {showModal && (
-          <ReceiveItemsModal open={showModal} onClose={closeModal} fetch={fetch} data={orders} alert={context?.alert} />
+          <ReceiveItemsModal open={showModal} onClose={closeModal} fetch={fetch} data={orders} alert={alert} />
         )}
 
         <NotificationsModal

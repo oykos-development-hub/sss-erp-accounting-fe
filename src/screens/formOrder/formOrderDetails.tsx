@@ -10,12 +10,9 @@ import {useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import {FileResponseItem} from '../../types/fileUploadType';
 
-interface FormOrderDetailsPageProps {
-  context: MicroserviceProps;
-}
-
-export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context}) => {
-  const url = context?.navigation.location.pathname;
+export const FormOrderDetails: React.FC = () => {
+  const {alert, breadcrumbs, navigation} = useAppContext();
+  const url = navigation.location.pathname;
   const orderId = Number(url?.split('/').at(-1));
   const procurementID = Number(url?.split('/').at(-3));
   const [touchedFields, setTouchedFields] = useState<any>({});
@@ -114,15 +111,15 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
     orderListInsert(
       payload as any,
       () => {
-        context.alert.success('Uspješno sačuvano.');
-        context.navigation.navigate(`/accounting/${procurementID}/order-form/${orderId}/order-details`);
-        context.breadcrumbs.add({
+        alert.success('Uspješno sačuvano.');
+        navigation.navigate(`/accounting/${procurementID}/order-form/${orderId}/order-details`);
+        breadcrumbs.add({
           name: `Detalji narudžbenice - ${orderId}`,
           to: `/accounting/${procurementID}/order-form/${orderId}/order-details`,
         });
       },
       () => {
-        context.alert.error('Greška. Promjene nisu sačuvane.');
+        alert.error('Greška. Promjene nisu sačuvane.');
       },
     );
   };
@@ -187,7 +184,7 @@ export const FormOrderDetails: React.FC<FormOrderDetailsPageProps> = ({context})
   }, [mappedArticles]);
 
   return (
-    <ScreenWrapper context={context}>
+    <ScreenWrapper>
       <SectionBox>
         <MainTitle variant="bodyMedium" content={`NARUDŽBENICA - BROJ. N${orderId}`} />
         <CustomDivider />

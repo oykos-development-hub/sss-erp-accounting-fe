@@ -55,3 +55,9 @@ export enum PlanStatus {
   OBJAVLJEN = 'Objavljen',
   KONTVERTOVAN = 'Konvertovan',
 }
+
+export enum UserRole {
+  ADMIN = 1,
+  MANAGER_OJ = 2,
+  OFFICIAL_FOR_PUBLIC_PROCUREMENTS = 3,
+}

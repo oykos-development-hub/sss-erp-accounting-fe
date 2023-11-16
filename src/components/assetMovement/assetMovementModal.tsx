@@ -10,16 +10,10 @@ import {FileUploadWrapper} from '../../screens/formOrder/styles';
 import useAppContext from '../../context/useAppContext';
 import {FileResponseItem} from '../../types/fileUploadType';
 
-export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
-  onClose,
-  open,
-  context,
-  selectedItem,
-  fetch,
-}) => {
+export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({onClose, open, selectedItem, fetch}) => {
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
-
-  const organisationUnitId = context?.contextMain?.organization_unit?.id;
+  const {contextMain, alert} = useAppContext();
+  const organisationUnitId = contextMain?.organization_unit?.id;
   const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
   const {recipientUsers} = useGetRecipientUsersOverview();
   const {mutate: orderListAssetMovementMutation, loading: isSaving} = useOrderListAssetMovementMutation();
@@ -62,11 +56,11 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
       () => {
         onClose(true);
         fetch();
-        context?.alert.success('Uspješno sačuvano.');
+        alert.success('Uspješno sačuvano.');
       },
       () => {
         onClose(false);
-        context?.alert?.error('Greška. Promjene nisu sačuvane.');
+        alert?.error('Greška. Promjene nisu sačuvane.');
       },
     );
   };
@@ -87,7 +81,7 @@ export const AssetMovementModal: React.FC<AssetMovementModalProps> = ({
           handleAssetMovementInsert(values?.office?.id, values?.recipient?.id, files[0]?.id);
         },
         () => {
-          context.alert.error('Greška pri čuvanju! Fajlovi nisu učitani.');
+          alert.error('Greška pri čuvanju! Fajlovi nisu učitani.');
         },
       );
 

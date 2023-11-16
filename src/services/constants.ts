@@ -1,9 +1,9 @@
 export const MICRO_SERVICE_SLUG = 'accounting';
 
-export const REQUEST_STATUSES = {
-  success: 'success',
-  error: 'error',
-};
+export enum REQUEST_STATUSES {
+  success = 'success',
+  error = 'error',
+}
 
 export const BFF_URL = {
   local: 'http://localhost:8080',
