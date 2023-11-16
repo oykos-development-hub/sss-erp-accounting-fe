@@ -1,12 +1,13 @@
-import {Dropdown, Input, Modal} from 'client-library';
-import React, {useMemo} from 'react';
+import {Dropdown, Modal} from 'client-library';
+import React, {useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
-import {PlanStatus} from '../../constants';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import useGetPlans from '../../services/graphql/plans/hooks/useGetPlans';
+import {DropdownDataNumber} from '../../types/dropdownData';
 import {parseDateForBackend} from '../../utils/dateUtils';
 import {FormWrapper, Row} from './styles';
 import {ProcurementContractModalProps} from './types';
+import {PlanStatus} from '../../constants';
 
 const initialValues = {
   id: 0,
@@ -16,6 +17,8 @@ const initialValues = {
 };
 
 export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({open, onClose, navigate, alert}) => {
+  const [selectedPlan, setSelectedPlan] = useState<DropdownDataNumber | null>(null);
+
   const {
     handleSubmit,
     control,
@@ -36,39 +39,31 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
 
   const {loading: isSaving, mutate: orderListInsert} = useOrderListInsert();
 
-  const planOption: {id: number; title: string}[] = useMemo(() => {
+  const plansOptions = useMemo(() => {
     if (plansData) {
-      const latestPublishedPlan = plansData
+      return plansData
         .filter(item => item.status === PlanStatus.OBJAVLJEN)
-        .reduce((latestPlan, currentPlan) => {
-          const latestPlanYear = new Date(latestPlan.year).getFullYear();
-          const currentPlanYear = new Date(currentPlan.year).getFullYear();
-          return currentPlanYear > latestPlanYear ? currentPlan : latestPlan;
-        });
-
-      if (latestPublishedPlan) {
-        return [
-          {
-            id: Number(latestPublishedPlan.id),
-            title: latestPublishedPlan.title.toString(),
-          },
-        ];
-      }
+        .map(item => ({
+          id: Number(item.id),
+          title: item.title.toString(),
+        }));
+    } else {
+      return [];
     }
-
-    return [];
   }, [plansData]);
+
+  const handlePlanSelect = (value: any) => {
+    setSelectedPlan(plansOptions?.find((item: any) => item.id === value?.id) || null);
+  };
 
   let procurements: any = [];
 
-  if (planOption) {
-    const selectedPlanId = planOption[0]?.id;
-
-    const selectedPlanData = plansData?.find((plan: any) => plan?.id === selectedPlanId);
-
-    if (selectedPlanData) {
-      procurements = selectedPlanData.items.map((procurement: any) => ({id: procurement.id, title: procurement.title}));
-    }
+  if (selectedPlan) {
+    procurements = plansData
+      ?.find((plan: any) => plan.id === selectedPlan?.id)
+      ?.items.map((procurement: any) => {
+        return {id: procurement.id, title: procurement.title};
+      });
   }
 
   const onSubmit = async (values: any) => {
@@ -79,7 +74,6 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
         ...values,
         public_procurement_id: values?.public_procurement_id?.id,
         date_order: parseDateForBackend(new Date()),
-        order_file: values?.order_file?.id || null,
       };
 
       orderListInsert(payload, async orderID => {
@@ -103,7 +97,15 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
       content={
         <FormWrapper>
           <Row>
-            <Input value={planOption[0]?.title} name="plan" label="PLAN:" disabled />
+            <Dropdown
+              onChange={value => {
+                handlePlanSelect(value);
+              }}
+              value={selectedPlan}
+              name="plan"
+              label="PLAN:"
+              options={plansOptions as any}
+            />
           </Row>
           <Controller
             name="public_procurement_id"
@@ -117,6 +119,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
                 label="NABAVKA:"
                 options={procurements}
                 error={errors.public_procurement_id?.message as string}
+                isDisabled={!selectedPlan}
               />
             )}
           />
