@@ -1,33 +1,26 @@
-import { Button, Input, TableHead, Typography } from 'client-library';
+import {Button, Input, TableHead, Typography} from 'client-library';
 import React from 'react';
 import FileList from '../../components/fileList/fileList';
-import { UserRole } from '../../constants';
+import {UserRole} from '../../constants';
 import useAppContext from '../../context/useAppContext';
 import useContractArticles from '../../services/graphql/contractArticles/hooks/useContractArticles';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
 import useProcurementContracts from '../../services/graphql/procurementContractsOverview/hooks/useProcurementContracts';
-import { ScreenWrapper } from '../../shared/screenWrapper';
-import { CustomDivider, Filters, MainTitle, SectionBox, TableContainer } from '../../shared/styles';
-import { ContractArticleGet } from '../../types/graphql/contractsArticlesTypes';
-import { parseDate } from '../../utils/dateUtils';
-import { Column, FormControls, FormFooter, Plan } from './styles';
+import {ScreenWrapper} from '../../shared/screenWrapper';
+import {CustomDivider, Filters, MainTitle, SectionBox, TableContainer} from '../../shared/styles';
+import {ContractArticleGet} from '../../types/graphql/contractsArticlesTypes';
+import {parseDate} from '../../utils/dateUtils';
+import {Column, FormControls, FormFooter, Plan} from './styles';
 
 export const ContractDetailsSigned: React.FC = () => {
-  const {
-    breadcrumbs,
-    navigation,
-    contextMain,
-  } = useAppContext();
+  const {breadcrumbs, navigation, contextMain} = useAppContext();
   const contractID = navigation.location.pathname.split('/').at(-2);
   const {data: contractData} = useProcurementContracts({
     id: contractID,
   });
   const procurementID = contractData?.[0].public_procurement.id;
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID as number);
-  const {
-    data: contractArticles,
-    loading: isLoadingContractArticles,
-  } = useContractArticles(contractID);
+  const {data: contractArticles, loading: isLoadingContractArticles} = useContractArticles(contractID);
   const role = contextMain?.role_id;
 
   const tableHeads: TableHead[] = [
