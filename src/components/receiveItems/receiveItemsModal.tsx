@@ -150,7 +150,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             parseDateForBackend(values?.invoice_date),
             values?.invoice_number,
             values?.description,
-            parseDateForBackend(values?.date_order),
+            parseDateForBackend(values?.date_system),
             files[0]?.id,
           );
         },
@@ -165,7 +165,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         parseDateForBackend(values?.invoice_date),
         values?.invoice_number,
         values?.description,
-        parseDateForBackend(values?.date_order),
+        parseDateForBackend(values?.date_system),
       );
     }
   };
