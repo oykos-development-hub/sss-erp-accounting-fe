@@ -171,7 +171,7 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
             />
           </FileUploadWrapper>
           {movementDetailsItems?.file.id !== 0 && (
-            <FileList files={movementDetailsItems?.file ? [movementDetailsItems?.file] : []} />
+            <FileList isInModal files={movementDetailsItems?.file ? [movementDetailsItems?.file] : []} />
           )}
         </FormWrapper>
       }

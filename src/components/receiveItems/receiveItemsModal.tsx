@@ -215,7 +215,20 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                 <Controller
                   name="invoice_date"
                   control={control}
-                  rules={{required: 'Ovo polje je obavezno'}}
+                  rules={{
+                    validate: {
+                      customDateValidation: value => {
+                        const invoiceDate = new Date(value);
+                        const orderDate = new Date(data[0].date_order);
+
+                        if (invoiceDate < orderDate) {
+                          return 'Datum fakture ne može biti stariji od datuma narudžbenice';
+                        }
+                        return true;
+                      },
+                    },
+                    required: 'Ovo polje je obavezno',
+                  }}
                   render={({field: {onChange, name, value}}) => (
                     <Datepicker
                       onChange={onChange as any}
@@ -226,10 +239,24 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                     />
                   )}
                 />
+
                 <Controller
                   name="date_system"
                   control={control}
-                  rules={{required: 'Ovo polje je obavezno'}}
+                  rules={{
+                    validate: {
+                      customDateValidation: value => {
+                        const dateSystem = new Date(value);
+                        const orderDate = new Date(data[0].date_order);
+
+                        if (dateSystem < orderDate) {
+                          return 'Datum prijema robe ne može biti stariji od datuma narudžbenice';
+                        }
+                        return true;
+                      },
+                    },
+                    required: 'Ovo polje je obavezno',
+                  }}
                   render={({field: {onChange, name, value}}) => (
                     <Datepicker
                       onChange={onChange as any}

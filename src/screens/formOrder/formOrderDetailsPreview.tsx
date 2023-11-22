@@ -106,7 +106,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
             </Row>
             <>
               <Row>
-                <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM KREIRANJA:'} />
+                <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM:'} />
                 <Typography variant="bodySmall" content={`${date || ''}`} />
               </Row>
               {orderFile?.id !== 0 && (

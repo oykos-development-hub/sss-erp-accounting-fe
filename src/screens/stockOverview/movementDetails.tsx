@@ -4,16 +4,7 @@ import useAppContext from '../../context/useAppContext';
 import useGetMovementDetails from '../../services/graphql/movement/hooks/useGetMovementDetails';
 import {ScreenWrapper} from '../../shared/screenWrapper';
 import {tableHeadsStockArticleDetails} from './constants';
-import {
-  CustomDivider,
-  FileUploadWrapper,
-  FormControls,
-  FormFooter,
-  Header,
-  InputWrapper,
-  MainTitle,
-  SectionBox,
-} from './styles';
+import {CustomDivider, FormControls, FormFooter, Header, InputWrapper, MainTitle, SectionBox} from './styles';
 
 const MovementDetails = () => {
   const {navigation, breadcrumbs} = useAppContext();
