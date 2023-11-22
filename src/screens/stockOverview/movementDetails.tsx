@@ -59,7 +59,7 @@ const MovementDetails = () => {
               content="Nazad"
               variant="secondary"
               onClick={() => {
-                navigation.navigate(`/accounting/stock`);
+                navigation.navigate('/accounting/stock');
                 breadcrumbs.remove();
               }}
             />

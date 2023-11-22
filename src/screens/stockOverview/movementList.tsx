@@ -117,7 +117,7 @@ export const MovementList = () => {
         onRowClick={row => {
           navigate(`/accounting/stock/${row.id.toString()}/movement`);
           breadcrumbs.add({
-            name: `Detalji otpremnice`,
+            name: 'Detalji otpremnice',
             to: `/accounting/stock/${row.id.toString()}/movement`,
           });
         }}
