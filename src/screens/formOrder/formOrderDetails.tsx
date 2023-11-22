@@ -9,7 +9,7 @@ import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo, Tot
 import {useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import {FileResponseItem} from '../../types/fileUploadType';
-import { VisibilityType } from '../../types/graphql/publicProcurementArticlesTypes';
+import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes';
 
 export const FormOrderDetails: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();

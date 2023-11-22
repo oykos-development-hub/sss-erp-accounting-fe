@@ -11,7 +11,7 @@ import {CustomDivider, Filters, MainTitle, SectionBox, TableContainer} from '../
 import {ContractArticleGet} from '../../types/graphql/contractsArticlesTypes';
 import {parseDate} from '../../utils/dateUtils';
 import {Column, FormControls, FormFooter, Plan} from './styles';
-import { VisibilityType } from '../../types/graphql/publicProcurementArticlesTypes';
+import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes';
 
 export const ContractDetailsSigned: React.FC = () => {
   const {breadcrumbs, navigation, contextMain} = useAppContext();

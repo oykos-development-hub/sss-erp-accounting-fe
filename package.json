@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "serve": "http-server dist -p 3002 --cors",
     "build": "npm run git:pull-request && node -r dotenv/config load-environment.cjs && tsc && vite build",
-    "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json}",
+    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint ./src --fix --ext .js,.jsx,.ts,.tsx",
     "ts:build": "npx tsc -b",

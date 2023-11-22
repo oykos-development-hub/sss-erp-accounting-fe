@@ -4,7 +4,7 @@ import {SingularResponse} from './utils';
 export const VisibilityType = {
   None: 0,
   Accounting: 2,
-  Inventory: 3
+  Inventory: 3,
 };
 
 export interface PublicProcurementArticleParams {
