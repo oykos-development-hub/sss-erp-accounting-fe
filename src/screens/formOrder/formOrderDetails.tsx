@@ -9,6 +9,7 @@ import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo, Tot
 import {useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import {FileResponseItem} from '../../types/fileUploadType';
+import { VisibilityType } from '../../types/graphql/publicProcurementArticlesTypes';
 
 export const FormOrderDetails: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
@@ -17,7 +18,7 @@ export const FormOrderDetails: React.FC = () => {
   const procurementID = Number(url?.split('/').at(-3));
   const [touchedFields, setTouchedFields] = useState<any>({});
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
-  const {articles} = useGetOrderProcurementAvailableArticles(procurementID);
+  const {articles} = useGetOrderProcurementAvailableArticles(procurementID, VisibilityType.Accounting);
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
 
   const {orders} = useGetOrderList(1, 10, orderId, 0, '', '');

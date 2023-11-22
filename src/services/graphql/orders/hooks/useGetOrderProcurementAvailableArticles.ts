@@ -4,7 +4,7 @@ import {OrderListArticleType} from '../../../../types/graphql/articleTypes';
 import useAppContext from '../../../../context/useAppContext';
 import {OrderProcurementAvailableArticlesType} from '../../../../types/graphql/orderListTypes';
 
-const useGetOrderProcurementAvailableArticles = (public_procurement_id: number) => {
+const useGetOrderProcurementAvailableArticles = (public_procurement_id: number, visibility_type: number) => {
   const [articles, setArticles] = useState<OrderListArticleType[]>([]);
   const [loading, setLoading] = useState(true);
   const {fetch} = useAppContext();
@@ -13,6 +13,7 @@ const useGetOrderProcurementAvailableArticles = (public_procurement_id: number) 
       GraphQL.getOrderProcurementAvailableArticles,
       {
         public_procurement_id,
+        visibility_type,
       },
     );
 

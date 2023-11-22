@@ -11,6 +11,7 @@ import {CustomDivider, Filters, MainTitle, SectionBox, TableContainer} from '../
 import {ContractArticleGet} from '../../types/graphql/contractsArticlesTypes';
 import {parseDate} from '../../utils/dateUtils';
 import {Column, FormControls, FormFooter, Plan} from './styles';
+import { VisibilityType } from '../../types/graphql/publicProcurementArticlesTypes';
 
 export const ContractDetailsSigned: React.FC = () => {
   const {breadcrumbs, navigation, contextMain} = useAppContext();
@@ -19,7 +20,7 @@ export const ContractDetailsSigned: React.FC = () => {
     id: contractID,
   });
   const procurementID = contractData?.[0].public_procurement.id;
-  const {articles} = useGetOrderProcurementAvailableArticles(procurementID as number);
+  const {articles} = useGetOrderProcurementAvailableArticles(procurementID as number, VisibilityType.Accounting);
   const {data: contractArticles, loading: isLoadingContractArticles} = useContractArticles(contractID);
   const role = contextMain?.role_id;
 
