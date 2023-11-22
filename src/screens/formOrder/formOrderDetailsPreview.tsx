@@ -1,36 +1,17 @@
-import {
-  Button,
-  MicroserviceProps,
-  Table,
-  Typography,
-  Accordion,
-  ChevronDownIcon,
-  MoreVerticalIcon,
-  TrashIcon,
-} from 'client-library';
+import {Accordion, Button, ChevronDownIcon, Table, TrashIcon, Typography} from 'client-library';
 import React, {useMemo, useState} from 'react';
-import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
-import {ScreenWrapper} from '../../shared/screenWrapper';
-import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
-import {
-  AccordionHeader,
-  AccordionIconsWrapper,
-  AccordionWrapper,
-  FormControls,
-  FormFooter,
-  Menu,
-  MenuItem,
-  OrderInfo,
-} from './styles';
+import FileList from '../../components/fileList/fileList';
 import {ReceiveItemsModal} from '../../components/receiveItems/receiveItemsModal';
 import {ReceiveItemsTable} from '../../components/receiveItems/receiveItemsTable';
-import {AssetMovementModal} from '../../components/assetMovement/assetMovementModal';
-import {parseDate} from '../../utils/dateUtils';
-import {NotificationsModal} from '../../shared/notifications/notificationsModal';
-import useDeleteOrderListReceive from '../../services/graphql/orders/hooks/useDeleteOrderListReceive';
-import {tableHeads} from './constants';
 import useAppContext from '../../context/useAppContext';
-import FileList from '../../components/fileList/fileList';
+import useDeleteOrderListReceive from '../../services/graphql/orders/hooks/useDeleteOrderListReceive';
+import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
+import {NotificationsModal} from '../../shared/notifications/notificationsModal';
+import {ScreenWrapper} from '../../shared/screenWrapper';
+import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
+import {parseDate} from '../../utils/dateUtils';
+import {tableHeads} from './constants';
+import {AccordionHeader, AccordionIconsWrapper, AccordionWrapper, FormControls, FormFooter, OrderInfo} from './styles';
 
 export const FormOrderDetailsPreview: React.FC = () => {
   //fixed for now, will be dynamic

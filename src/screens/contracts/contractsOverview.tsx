@@ -107,11 +107,8 @@ export const ContractsMainPage: React.FC = () => {
               {
                 name: 'addFormOrder',
                 onClick: (item: any) => openModal(item),
-                icon: (
-                  <Tooltip content="Dodaj narudžbenicu" variant="standard" position="topLeft">
-                    <PlusIcon stroke={Theme?.palette?.gray800} />
-                  </Tooltip>
-                ),
+                icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
+                tooltip: () => 'Dodaj narudžbenicu',
               },
             ]}
           />

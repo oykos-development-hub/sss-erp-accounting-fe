@@ -1,14 +1,17 @@
-import getPlans from './plans/queries/getPlans';
-import orderListMovement from './orders/mutations/orderListMovement';
+import deleteMovement from './movement/mutations/deleteMovement';
+import insertMovement from './movement/mutations/insertMovement';
+import movementDetails from './movement/query/getMovementDetails';
+import movementOverview from './movement/query/getMovementOverview';
+import deleteOrderList from './orders/mutations/deleteOrderList';
+import deleteOrderListReceive from './orders/mutations/deleteOrderListReceive';
 import insertOrderList from './orders/mutations/insertOrderList';
+import orderListMovement from './orders/mutations/orderListMovement';
 import receiveOrderList from './orders/mutations/receiveOrderList';
 import getOrderList from './orders/queries/getOrderList';
 import getOrderProcurementAvailableArticles from './orders/queries/getOrderProcurementAvailableArticles';
-import deleteOrderList from './orders/mutations/deleteOrderList';
-import OrderListAssetMovementMutation from './movement/mutations/orderListMovement';
+import getPlans from './plans/queries/getPlans';
 import getRecipientUsers from './recipientUsersOverview/queries/getRecipientUsers';
-import deleteOrderListAssetMovement from './movement/mutations/deleteOrderListMovement';
-import deleteOrderListReceive from './orders/mutations/deleteOrderListReceive';
+import getStockOverview from './stock/query/getStockOverview';
 
 export const GraphQL = {
   // getAccountingOverview: getAccountingOverview,
@@ -19,8 +22,11 @@ export const GraphQL = {
   insertOrderList: insertOrderList,
   receiveOrderList: receiveOrderList,
   deleteOrderList: deleteOrderList,
-  OrderListAssetMovementMutation: OrderListAssetMovementMutation,
+  insertMovement: insertMovement,
+  movementOverview: movementOverview,
+  movementDetails: movementDetails,
   getRecipientUsers: getRecipientUsers,
-  deleteOrderListAssetMovement: deleteOrderListAssetMovement,
+  deleteMovement: deleteMovement,
   deleteOrderListReceive: deleteOrderListReceive,
+  getStockOverview: getStockOverview,
 };

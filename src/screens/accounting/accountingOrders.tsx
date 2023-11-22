@@ -96,10 +96,6 @@ export const AccountingOrdersMainPage: React.FC = () => {
     setSelectedItemId(0);
   };
 
-  const handlePrintIconClick = (id: number) => {
-    console.log(id);
-  };
-
   const onPageChange = (page: number) => {
     setPage(page + 1);
   };
