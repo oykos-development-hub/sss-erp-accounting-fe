@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {Table, Theme, PlusIcon, Modal, Typography} from 'client-library';
+import {Table, Theme, PlusIcon, Modal, Typography, Tooltip} from 'client-library';
 import {tableHeads} from './constants';
 import {Container, CustomDivider, MainTitle, TableHeader} from './styles';
 import useProcurementContracts from '../../services/graphql/procurementContractsOverview/hooks/useProcurementContracts';
@@ -107,7 +107,11 @@ export const ContractsMainPage: React.FC = () => {
               {
                 name: 'addFormOrder',
                 onClick: (item: any) => openModal(item),
-                icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
+                icon: (
+                  <Tooltip content="Dodaj narudžbenicu" variant="standard" position="topLeft">
+                    <PlusIcon stroke={Theme?.palette?.gray800} />
+                  </Tooltip>
+                ),
               },
             ]}
           />
