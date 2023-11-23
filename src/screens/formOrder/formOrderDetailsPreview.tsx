@@ -12,9 +12,9 @@ import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {parseDate} from '../../utils/dateUtils';
 import {tableHeads} from './constants';
 import {AccordionHeader, AccordionIconsWrapper, AccordionWrapper, FormControls, FormFooter, OrderInfo} from './styles';
+import {OrderListArticleType} from '../../types/graphql/articleTypes';
 
 export const FormOrderDetailsPreview: React.FC = () => {
-  //fixed for now, will be dynamic
   const {alert, breadcrumbs, navigation} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -37,16 +37,18 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
   const mappedOrder = useMemo(() => {
     if (orders) {
-      return orders[0]?.articles?.map((order: any) => {
-        return {
-          ...order,
-          order_id: orderId,
-        };
-      });
+      return orders[0]?.articles
+        ?.filter((order: OrderListArticleType) => order.amount !== 0)
+        .map((order: OrderListArticleType) => {
+          return {
+            ...order,
+            order_id: orderId,
+          };
+        });
     } else {
       return [];
     }
-  }, [orders]);
+  }, [orders, orderId]);
 
   const handleAddReceiveItems = () => {
     setShowModal(true);

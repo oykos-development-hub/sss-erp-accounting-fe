@@ -10,3 +10,7 @@ export const Row = styled.div`
   display: flex;
   align-items: center;
 `;
+
+export const ButtonWrapper = styled.div`
+  display: flex;
+`;

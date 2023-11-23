@@ -8,6 +8,7 @@ import {FileUploadWrapper} from '../../screens/formOrder/styles';
 import useAppContext from '../../context/useAppContext';
 import FileList from '../../components/fileList/fileList';
 import {FileItem, FileResponseItem} from '../../types/fileUploadType';
+import {OrderListArticleType} from '../../types/graphql/articleTypes';
 
 type ReceiveItemForm = {
   invoice_date: string;
@@ -183,6 +184,8 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     }
   }, [data]);
 
+  const filteredArticles = data[0]?.articles.filter((item: OrderListArticleType) => item.amount !== 0);
+
   return (
     <Modal
       open={open}
@@ -294,7 +297,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             </TextareaWrapper>
           </HeaderSection>
 
-          <Table tableHeads={tableHeads} data={data[0]?.articles || []} />
+          <Table tableHeads={tableHeads} data={filteredArticles} />
           <Row>
             <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />
             <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):" value={totalPrice.toFixed(2)} disabled={true} />

@@ -1,14 +1,13 @@
-import {Dropdown, Modal} from 'client-library';
+import {Button, Dropdown, Modal} from 'client-library';
 import React, {useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
+import {PlanStatus} from '../../constants';
+import useAppContext from '../../context/useAppContext';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import useGetPlans from '../../services/graphql/plans/hooks/useGetPlans';
 import {DropdownDataNumber} from '../../types/dropdownData';
-import {parseDateForBackend} from '../../utils/dateUtils';
-import {FormWrapper, Row} from './styles';
+import {ButtonWrapper, FormWrapper, Row} from './styles';
 import {ProcurementContractModalProps} from './types';
-import {PlanStatus} from '../../constants';
-import useAppContext from '../../context/useAppContext';
 
 const initialValues = {
   id: 0,
@@ -81,10 +80,13 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
     <Modal
       open={open}
       onClose={onClose}
-      leftButtonText="Otkaži"
-      rightButtonText="Nastavi"
-      rightButtonOnClick={handleSubmit(onSubmit)}
       buttonLoading={isSaving}
+      customButtonsControls={
+        <ButtonWrapper>
+          <Button variant="secondary" content="Otkaži" onClick={onClose} style={{marginRight: 10}} />
+          <Button variant="primary" disabled={procurementID === 0} onClick={handleSubmit(onSubmit)} content="Nastavi" />
+        </ButtonWrapper>
+      }
       content={
         <FormWrapper>
           <Row>

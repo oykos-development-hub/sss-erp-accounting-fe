@@ -44,6 +44,7 @@ export const StockReview = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [disabled, setDisabled] = useState(false);
+  const [touchedFields, setTouchedFields] = useState<any>({});
 
   const {total, stockItems} = useGetStockOverview(page, 1000, searchQuery);
   const organisationUnitId = contextMain?.organization_unit?.id;
@@ -111,6 +112,28 @@ export const StockReview = () => {
     setPage(page + 1);
   };
 
+  const handleBlurInput = (itemId: number) => {
+    setTouchedFields({...touchedFields, [itemId]: true});
+    const touchedItem = selectedItems.find((item: any) => item.id === itemId);
+    if (touchedItem && touchedItem.quantity > touchedItem.amount) {
+      const updatedItems = selectedItems.map((item: any) => {
+        if (item.id === itemId) {
+          return {...item, error: 'Količina ne može biti veća od dostupne.'};
+        }
+        return item;
+      });
+      setSelectedItems(updatedItems);
+    } else {
+      const updatedItems = selectedItems.map((item: any) => {
+        if (item.id === itemId) {
+          return {...item, error: ''};
+        }
+        return item;
+      });
+      setSelectedItems(updatedItems);
+    }
+  };
+
   const tableHeadsStockArticle: TableHead[] = [
     {
       title: 'Naziv',
@@ -137,8 +160,10 @@ export const StockReview = () => {
             type="number"
             value={row.quantity}
             onChange={event => handleInputChange(event, row)}
+            onBlur={() => handleBlurInput(row.id)}
             style={{width: '100px'}}
             disabled={disabled}
+            error={touchedFields[row.id] ? row.error : ''}
           />
         );
       },
