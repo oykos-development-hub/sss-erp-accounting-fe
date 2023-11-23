@@ -219,7 +219,10 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                     validate: {
                       customDateValidation: value => {
                         const invoiceDate = new Date(value);
+                        invoiceDate.setHours(0, 0, 0, 0);
+
                         const orderDate = new Date(data[0].date_order);
+                        orderDate.setHours(0, 0, 0, 0);
 
                         if (invoiceDate < orderDate) {
                           return 'Datum fakture ne može biti stariji od datuma narudžbenice';
@@ -247,7 +250,10 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                     validate: {
                       customDateValidation: value => {
                         const dateSystem = new Date(value);
+                        dateSystem.setHours(0, 0, 0, 0);
+
                         const orderDate = new Date(data[0].date_order);
+                        orderDate.setHours(0, 0, 0, 0);
 
                         if (dateSystem < orderDate) {
                           return 'Datum prijema robe ne može biti stariji od datuma narudžbenice';

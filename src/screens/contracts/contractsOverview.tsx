@@ -54,24 +54,12 @@ export const ContractsMainPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    try {
-      const payload: any = {
-        id: 0,
-        public_procurement_id: selectedItem?.public_procurement?.id,
-        date_order: parseDateForBackend(new Date()),
-        order_file: null,
-        articles: [],
-        supplier_id: 0,
-      };
-
-      orderListInsert(payload, async orderID => {
-        alert.success('Uspješno sačuvano.');
-        closeModal();
-        navigation.navigate(`/accounting/${selectedItem?.public_procurement?.id}/order-form/${orderID}`);
-      });
-    } catch (e) {
-      alert.error('Greška. Promjene nisu sačuvane.');
-    }
+    closeModal();
+    breadcrumbs.add({
+      name: `Nova narudžbenica - ${selectedItem?.public_procurement.title} `,
+      to: '/accounting/order-form',
+    });
+    navigation.navigate(`/accounting/order-form/${selectedItem?.public_procurement?.id}`);
   };
 
   return (
@@ -82,8 +70,7 @@ export const ContractsMainPage: React.FC = () => {
         <TableHeader>
           <ContractsFilters
             suppliers={suppliers || []}
-            setFilters={({year, supplier_id}) => {
-              // setSelectedYear(year);
+            setFilters={({supplier_id}) => {
               setSelectedSupplier(supplier_id);
             }}
             searchQuery={searchQuery}

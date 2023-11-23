@@ -1,27 +1,25 @@
-import {Button, MicroserviceProps, Table, TableHead, Typography, FileUpload} from 'client-library';
+import {Button, FileUpload, Table, TableHead, Typography} from 'client-library';
 import React, {useEffect, useMemo, useState} from 'react';
-import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
+import {useForm} from 'react-hook-form';
+import useAppContext from '../../context/useAppContext';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import {ScreenWrapper} from '../../shared/screenWrapper';
-import {CustomDivider, MainTitle, Row, SectionBox, SubTitle} from '../../shared/styles';
-import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo, Totals} from './styles';
-import {useForm} from 'react-hook-form';
-import useAppContext from '../../context/useAppContext';
+import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {FileResponseItem} from '../../types/fileUploadType';
 import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes';
+import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo} from './styles';
 
 export const FormOrderDetails: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
   const url = navigation.location.pathname;
-  const orderId = Number(url?.split('/').at(-1));
-  const procurementID = Number(url?.split('/').at(-3));
+  const procurementID = Number(url?.split('/').at(-1));
+  const breadcrumbItems = breadcrumbs?.get();
+  const procurementTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name?.split('-').at(-1)?.trim();
   const [touchedFields, setTouchedFields] = useState<any>({});
   const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID, VisibilityType.Accounting);
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
-
-  const {orders} = useGetOrderList(1, 10, orderId, 0, '', '');
 
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
 
@@ -72,7 +70,7 @@ export const FormOrderDetails: React.FC = () => {
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (values: any) => {
     if (isSaving) return;
 
     if (uploadedFile) {
@@ -82,16 +80,16 @@ export const FormOrderDetails: React.FC = () => {
       await uploadFile(formData, (files: FileResponseItem[]) => {
         setUploadedFile(null);
         setValue('receive_file', files[0]);
-        handleSaveOrder(files[0].id);
+        handleSaveOrder(values.date_order, files[0].id);
       });
 
       return;
     } else {
-      handleSaveOrder();
+      handleSaveOrder(values.date_order);
     }
   };
 
-  const handleSaveOrder = (files?: number) => {
+  const handleSaveOrder = (dateOrder: string, fileID?: number) => {
     if (isSaving) return;
 
     const insertArticles = filteredArticles.map((article: any) => {
@@ -102,21 +100,21 @@ export const FormOrderDetails: React.FC = () => {
     });
 
     const payload = {
-      id: orderId,
-      date_order: orders[0]?.date_order,
+      date_order: dateOrder,
       public_procurement_id: Number(procurementID),
       articles: insertArticles,
-      order_file: files,
+      order_file: fileID,
     };
 
     orderListInsert(
       payload as any,
-      () => {
+      orderID => {
         alert.success('Uspješno sačuvano.');
-        navigation.navigate(`/accounting/${procurementID}/order-form/${orderId}/order-details`);
+        navigation.navigate(`/accounting/${procurementID}/order-form/${orderID}/order-details`);
+        breadcrumbs.remove(2);
         breadcrumbs.add({
-          name: `Detalji narudžbenice - ${orderId}`,
-          to: `/accounting/${procurementID}/order-form/${orderId}/order-details`,
+          name: `Detalji narudžbenice - ${orderID}`,
+          to: `/accounting/${procurementID}/order-form/${orderID}/order-details`,
         });
       },
       () => {
@@ -131,7 +129,6 @@ export const FormOrderDetails: React.FC = () => {
         return {
           ...article,
           amount: article?.amount,
-          order_id: orderId,
         };
       });
     } else {
@@ -187,13 +184,13 @@ export const FormOrderDetails: React.FC = () => {
   return (
     <ScreenWrapper>
       <SectionBox>
-        <MainTitle variant="bodyMedium" content={`NARUDŽBENICA - BROJ. N${orderId}`} />
+        <MainTitle variant="bodyMedium" content={'NOVA NARUDŽBENICA'} />
         <CustomDivider />
         <OrderInfo>
           <div>
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
-              <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
+              <Typography variant="bodySmall" content={`${procurementTitle}`} />
             </Row>
 
             <Row>

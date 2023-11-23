@@ -12,7 +12,7 @@ import {StockScreen} from './screens/stockOverview/stockOverview';
 import MovementDetails from './screens/stockOverview/movementDetails';
 
 const FormOrderDetailsPreviewRegex = /^\/accounting\/[^/]+\/order-form\/[^/]+\/order-details/;
-const FormOrderDetailsRegex = /^\/accounting\/[^/]+\/order-form\/[^/]+/;
+const FormOrderDetailsRegex = /^\/accounting\/order-form\/(\d+)$/;
 const ContractDetailsRegex = /^\/accounting\/contracts\/\d+\/contract-details$/;
 const MovementDetailsRegex = /^\/accounting\/stock\/\d+\/movement$/;
 

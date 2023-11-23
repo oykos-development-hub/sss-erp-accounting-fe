@@ -8,6 +8,7 @@ import {parseDateForBackend} from '../../utils/dateUtils';
 import {FormWrapper, Row} from './styles';
 import {ProcurementContractModalProps} from './types';
 import {PlanStatus} from '../../constants';
+import useAppContext from '../../context/useAppContext';
 
 const initialValues = {
   id: 0,
@@ -26,6 +27,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
     watch,
   } = useForm({defaultValues: initialValues});
 
+  const {breadcrumbs} = useAppContext();
   const {data: plansData} = useGetPlans({
     page: 1,
     size: 100,
@@ -36,6 +38,7 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
   });
 
   const procurementID = watch('public_procurement_id')?.id;
+  const procurementTitle = watch('public_procurement_id').title;
 
   const {loading: isSaving, mutate: orderListInsert} = useOrderListInsert();
 
@@ -66,24 +69,12 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
       });
   }
 
-  const onSubmit = async (values: any) => {
-    if (isSaving) return;
-
-    try {
-      const payload = {
-        ...values,
-        public_procurement_id: values?.public_procurement_id?.id,
-        date_order: parseDateForBackend(new Date()),
-      };
-
-      orderListInsert(payload, async orderID => {
-        alert.success('Uspješno sačuvano.');
-        onClose();
-        navigate(`/accounting/${procurementID}/order-form/${orderID}`);
-      });
-    } catch (e) {
-      alert.error('Greška. Promjene nisu sačuvane.');
-    }
+  const onSubmit = async () => {
+    navigate(`/accounting/order-form/${procurementID}`);
+    breadcrumbs.add({
+      name: `Nova narudžbenica - ${procurementTitle} `,
+      to: '/accounting/order-form',
+    });
   };
 
   return (
