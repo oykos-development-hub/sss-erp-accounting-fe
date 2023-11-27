@@ -1,6 +1,6 @@
 import {Button, FileUpload, Table, TableHead, Typography} from 'client-library';
-import React, {useEffect, useMemo, useState} from 'react';
-import {useForm} from 'react-hook-form';
+import React, {useEffect, useState} from 'react';
+import {set, useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
@@ -10,20 +10,45 @@ import {FileResponseItem} from '../../types/fileUploadType';
 import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes';
 import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo} from './styles';
 
+type FormValues = {
+  date_order: string;
+  public_procurement_id: number;
+  articles: any[];
+  order_file: number;
+};
+
 export const FormOrderDetails: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
   const url = navigation.location.pathname;
   const procurementID = Number(url?.split('/').at(-1));
   const breadcrumbItems = breadcrumbs?.get();
   const procurementTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name?.split('-').at(-1)?.trim();
-  const [touchedFields, setTouchedFields] = useState<any>({});
-  const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID, VisibilityType.Accounting);
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
-
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
+  const {
+    handleSubmit,
+    clearErrors,
+    control,
+    reset,
+    register,
+    setError,
+    getValues,
+    formState: {errors},
+  } = useForm<FormValues>({
+    defaultValues: {
+      date_order: '',
+      public_procurement_id: procurementID,
+      articles: articles,
+      order_file: 0,
+    },
+  });
 
-  const {handleSubmit, clearErrors, setValue} = useForm();
+  const {fields} = useFieldArray({
+    control,
+    name: 'articles',
+    keyName: 'key',
+  });
 
   const {
     fileService: {uploadFile},
@@ -31,46 +56,9 @@ export const FormOrderDetails: React.FC = () => {
 
   const handleUpload = (files: FileList) => {
     setUploadedFile(files);
-    clearErrors('receive_file');
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
-    const {value} = event.target;
-    const updatedArticles = [...filteredArticles];
-    const index = updatedArticles.findIndex(item => item.id === row.id);
-
-    if (index !== -1) {
-      const updatedItem = {...updatedArticles[index], amount: Number(value)};
-      updatedArticles[index] = updatedItem;
-      setFilteredArticles([...updatedArticles]);
-    }
-  };
-
-  const handleBlurInput = (itemId: number) => {
-    setTouchedFields({...touchedFields, [itemId]: true});
-    const touchedItem = filteredArticles.find(item => item.id === itemId);
-
-    if (touchedItem && touchedItem.amount > touchedItem.available) {
-      const updatedArticles = filteredArticles.map(item => {
-        if (item.id === itemId) {
-          return {...item, error: 'Količina ne može biti veća od dostupne.'};
-        }
-        return item;
-      });
-      setFilteredArticles(updatedArticles);
-    } else {
-      const updatedArticles = filteredArticles.map(item => {
-        if (item.id === itemId) {
-          return {...item, error: ''};
-        }
-        return item;
-      });
-
-      setFilteredArticles(updatedArticles);
-    }
-  };
-
-  const onSubmit = async (values: any) => {
+  const onSubmit = async () => {
     if (isSaving) return;
 
     if (uploadedFile) {
@@ -79,31 +67,31 @@ export const FormOrderDetails: React.FC = () => {
 
       await uploadFile(formData, (files: FileResponseItem[]) => {
         setUploadedFile(null);
-        setValue('receive_file', files[0]);
-        handleSaveOrder(values.date_order, files[0].id);
+        handleSaveOrder(files[0].id);
       });
 
       return;
     } else {
-      handleSaveOrder(values.date_order);
+      handleSaveOrder();
     }
   };
 
-  const handleSaveOrder = (dateOrder: string, fileID?: number) => {
+  const handleSaveOrder = (fileID?: number) => {
     if (isSaving) return;
+    const articles = getValues('articles');
 
-    const insertArticles = filteredArticles.map((article: any) => {
+    const insertArticles = articles?.map((article: any) => {
       return {
-        id: article?.id,
-        amount: article?.amount,
+        id: article?.id || 0,
+        amount: article?.amount || 0,
       };
     });
 
     const payload = {
-      date_order: dateOrder,
+      date_order: new Date(),
       public_procurement_id: Number(procurementID),
-      articles: insertArticles,
-      order_file: fileID,
+      articles: insertArticles || [],
+      order_file: fileID || 0,
     };
 
     orderListInsert(
@@ -122,19 +110,6 @@ export const FormOrderDetails: React.FC = () => {
       },
     );
   };
-
-  const mappedArticles = useMemo(() => {
-    if (articles) {
-      return articles.map((article: any) => {
-        return {
-          ...article,
-          amount: article?.amount,
-        };
-      });
-    } else {
-      return [];
-    }
-  }, [articles]);
 
   const tableHeads: TableHead[] = [
     {
@@ -161,14 +136,23 @@ export const FormOrderDetails: React.FC = () => {
       title: 'Poruči',
       accessor: 'amount',
       type: 'custom',
-      renderContents: (_, row) => {
+      renderContents: (_, row, index) => {
         return (
           <AmountInput
-            type="number"
-            value={row.amount}
-            onChange={event => handleInputChange(event, row)}
-            onBlur={() => handleBlurInput(row.id)}
-            error={touchedFields[row.id] ? row.error : ''}
+            {...register(`articles.${index}.amount`, {
+              valueAsNumber: true,
+              onBlur: e => {
+                if (Number(e.target.value) > row.available) {
+                  setError(`articles.${index}`, {
+                    type: 'custom',
+                    message: 'Unijeta količina ne može biti veća od dostupne.',
+                  });
+                } else {
+                  clearErrors(`articles.${index}`);
+                }
+              },
+            })}
+            error={errors?.articles?.[index]?.message as string}
           />
         );
       },
@@ -176,10 +160,19 @@ export const FormOrderDetails: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (mappedArticles) {
-      setFilteredArticles(mappedArticles);
+    if (articles) {
+      reset(formValues => ({
+        ...formValues,
+        articles: articles.map(article => {
+          return {
+            ...article,
+            id: article.id,
+            amount: article.amount,
+          };
+        }),
+      }));
     }
-  }, [mappedArticles]);
+  }, [articles]);
 
   return (
     <ScreenWrapper>
@@ -192,7 +185,6 @@ export const FormOrderDetails: React.FC = () => {
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
               <Typography variant="bodySmall" content={`${procurementTitle}`} />
             </Row>
-
             <Row>
               <FileUploadWrapper>
                 <FileUpload
@@ -209,7 +201,7 @@ export const FormOrderDetails: React.FC = () => {
           </div>
         </OrderInfo>
 
-        <Table tableHeads={tableHeads} data={filteredArticles || []} />
+        <Table tableHeads={tableHeads} data={fields || []} />
         <FormFooter>
           <FormControls>
             <Button content="Sačuvaj" variant="primary" onClick={handleSubmit(onSubmit)} />
