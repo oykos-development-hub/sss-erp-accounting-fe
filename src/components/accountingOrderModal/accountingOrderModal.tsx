@@ -7,7 +7,7 @@ import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrd
 import useGetPlans from '../../services/graphql/plans/hooks/useGetPlans';
 import {DropdownDataNumber} from '../../types/dropdownData';
 import {ButtonWrapper, FormWrapper, Row} from './styles';
-import {ProcurementContractModalProps} from './types';
+import {AccountingOrderModalProps} from './types';
 
 const initialValues = {
   id: 0,
@@ -16,7 +16,7 @@ const initialValues = {
   articles: [],
 };
 
-export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({open, onClose, navigate, alert}) => {
+export const AccountingOrderModal: React.FC<AccountingOrderModalProps> = ({open, onClose, navigate, alert}) => {
   const [selectedPlan, setSelectedPlan] = useState<DropdownDataNumber | null>(null);
 
   const {
@@ -38,8 +38,6 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
 
   const procurementID = watch('public_procurement_id')?.id;
   const procurementTitle = watch('public_procurement_id').title;
-
-  const {loading: isSaving, mutate: orderListInsert} = useOrderListInsert();
 
   const plansOptions = useMemo(() => {
     if (plansData) {
@@ -80,7 +78,6 @@ export const AccountingOrderModal: React.FC<ProcurementContractModalProps> = ({o
     <Modal
       open={open}
       onClose={onClose}
-      buttonLoading={isSaving}
       customButtonsControls={
         <ButtonWrapper>
           <Button variant="secondary" content="Otkaži" onClick={onClose} style={{marginRight: 10}} />

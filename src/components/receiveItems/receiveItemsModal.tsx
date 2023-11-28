@@ -34,34 +34,37 @@ interface ReceiveItemsModalProps {
   fetch: () => void;
 }
 
-export const tableHeads: TableHead[] = [
-  {
-    title: 'Naziv',
-    accessor: 'title',
-    type: 'text',
-  },
-  {
-    title: 'Jedinica mjere:',
-    accessor: 'unit',
-    type: 'text',
-  },
-
-  {title: 'Poručeno', accessor: 'amount', type: 'text'},
-
-  {
-    title: 'Ukupna vrijednost(sa PDV-om)',
-    accessor: 'total_price',
-    type: 'custom',
-    renderContents: (total_price: number) => {
-      return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
-    },
-  },
-];
-
 export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open, onClose, alert, fetch}) => {
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
   const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
   const [filesToDelete, setFilesToDelete] = useState<number>();
+  const filteredArticles = data[0]?.articles.filter((item: OrderListArticleType) => item.amount !== 0);
+
+  const tableHeads: TableHead[] = [
+    {
+      title: 'Naziv',
+      accessor: 'title',
+      type: 'text',
+    },
+    {
+      title: 'Jedinica mjere:',
+      accessor: 'unit',
+      type: 'text',
+      shouldRender: Number(data[0]?.public_procurement?.id) !== 0,
+    },
+
+    {title: 'Poručeno', accessor: 'amount', type: 'text'},
+
+    {
+      title: 'Ukupna vrijednost(sa PDV-om)',
+      accessor: 'total_price',
+      type: 'custom',
+      renderContents: (total_price: number) => {
+        return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
+      },
+      shouldRender: Number(data[0]?.public_procurement?.id) !== 0,
+    },
+  ];
 
   const {
     register,
@@ -184,8 +187,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     }
   }, [data]);
 
-  const filteredArticles = data[0]?.articles.filter((item: OrderListArticleType) => item.amount !== 0);
-
   return (
     <Modal
       open={open}
@@ -200,11 +201,20 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       content={
         <FormWrapper>
           <div>
-            <Title
-              variant="bodySmall"
-              style={{fontWeight: 600}}
-              content={`JAVNA NABAVKA: JN-${data[0]?.public_procurement?.title || ''}`}
-            />
+            {Number(data[0]?.public_procurement?.id) !== 0 && (
+              <Title
+                variant="bodySmall"
+                style={{fontWeight: 600}}
+                content={`JAVNA NABAVKA: JN-${data[0]?.public_procurement?.title || ''}`}
+              />
+            )}
+            {Number(data[0]?.group_of_articles?.id) !== 0 && (
+              <Title
+                variant="bodySmall"
+                style={{fontWeight: 600}}
+                content={`GRUPA ARTIKALA: ${data[0]?.group_of_articles?.title || ''}`}
+              />
+            )}
             <Title
               style={{fontWeight: 600}}
               variant="bodySmall"
@@ -298,10 +308,16 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
           </HeaderSection>
 
           <Table tableHeads={tableHeads} data={filteredArticles} />
-          <Row>
-            <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />
-            <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):" value={totalPrice.toFixed(2)} disabled={true} />
-          </Row>
+          {Number(data[0]?.public_procurement?.id) !== 0 && (
+            <Row>
+              <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />
+              <Input
+                label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):"
+                value={totalPrice.toFixed(2)}
+                disabled={true}
+              />
+            </Row>
+          )}
         </FormWrapper>
       }
       title={'KREIRAJ NOVU PRIJEMNICU'}

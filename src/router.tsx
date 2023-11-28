@@ -10,11 +10,13 @@ import {ContractDetailsSigned} from './screens/contracts/contractDetails';
 import {MicroserviceProps} from './types/micro-service-props';
 import {StockScreen} from './screens/stockOverview/stockOverview';
 import MovementDetails from './screens/stockOverview/movementDetails';
+import {Exceptions} from './screens/exceptions/exceptions';
 
 const FormOrderDetailsPreviewRegex = /^\/accounting\/[^/]+\/order-form\/[^/]+\/order-details/;
 const FormOrderDetailsRegex = /^\/accounting\/order-form\/(\d+)$/;
 const ContractDetailsRegex = /^\/accounting\/contracts\/\d+\/contract-details$/;
 const MovementDetailsRegex = /^\/accounting\/stock\/\d+\/movement$/;
+const ExceptionsRegex = /^\/accounting\/order-form\/exceptions\/(\d+)$/;
 
 export const Router: React.FC<MicroserviceProps> = () => {
   const {
@@ -32,6 +34,7 @@ export const Router: React.FC<MicroserviceProps> = () => {
     if (ContractDetailsRegex.test(pathname)) return <ContractDetailsSigned />;
     if (pathname === '/accounting/stock') return <StockScreen />;
     if (MovementDetailsRegex.test(pathname)) return <MovementDetails />;
+    if (ExceptionsRegex.test(pathname)) return <Exceptions />;
 
     return <NotFound404 />;
   };

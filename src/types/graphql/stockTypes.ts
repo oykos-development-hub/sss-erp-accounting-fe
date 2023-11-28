@@ -6,7 +6,6 @@ export interface StockItem {
   description: string;
   amount: number;
   year: string;
-  article_id: number;
 }
 
 export interface StockListType {

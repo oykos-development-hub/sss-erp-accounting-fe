@@ -6,23 +6,22 @@ const movementDetails = `query MovementDetails($id: Int!) {
             id
             description
             date_order
-            office {
+            office{
                 id
                 title
             }
-            recipient_user {
+            recipient_user{
                 id
                 title
             }
             articles {
+                id
                 year
                 title
-                article_id
                 description
                 amount
-                id
             }
-            file {
+            file{
                 id
                 name
                 type

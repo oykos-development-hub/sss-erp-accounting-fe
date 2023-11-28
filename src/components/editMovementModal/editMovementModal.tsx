@@ -10,14 +10,6 @@ import {FileUploadWrapper} from '../../screens/formOrder/styles';
 import {FileResponseItem} from '../../types/fileUploadType';
 import useAppContext from '../../context/useAppContext';
 
-const initialValues = {
-  office: {id: 0, title: ''},
-  date_order: '',
-  recipient_user: {id: 0, title: ''},
-  articles: [],
-  file_id: 0,
-};
-
 export const EditMovementModal: React.FC<EditMovementModalProps> = ({
   open,
   onClose,
@@ -35,7 +27,6 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
     handleSubmit,
     control,
     formState: {errors},
-    watch,
     reset,
     setValue,
   } = useForm();
@@ -57,7 +48,7 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
       date_order: date_order,
       articles:
         movementDetailsItems?.articles && movementDetailsItems?.articles?.length > 0
-          ? movementDetailsItems?.articles?.map((item: any) => ({article_id: item.id, quantity: item.quantity}))
+          ? movementDetailsItems?.articles?.map((item: any) => ({id: item.id, quantity: item.quantity}))
           : [],
       file_id: fileId,
     };
@@ -73,6 +64,7 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
       },
     );
   };
+
   const onSubmit = async (values: any) => {
     if (isSaving) return;
 

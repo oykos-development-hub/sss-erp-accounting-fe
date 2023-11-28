@@ -72,6 +72,7 @@ export const AlertWrapper = styled.div`
 
 export const ButtonWrapper = styled.div`
   margin-top: 20px;
+  display: flex;
 `;
 
 export const FiltersWrapper = styled.form`

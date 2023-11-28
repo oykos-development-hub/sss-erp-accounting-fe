@@ -1,26 +1,25 @@
-import {Button, Dropdown, Pagination, PrinterIcon, Table, Theme, TrashIcon, Typography} from 'client-library';
+import {Button, Dropdown, Pagination, Table, Theme, TrashIcon, Typography} from 'client-library';
 import React, {useEffect, useMemo, useState} from 'react';
 import {AccountingOrderModal} from '../../components/accountingOrderModal/accountingOrderModal';
+import {ExceptionModal} from '../../components/exceptionModal/exceptionModal';
+import useAppContext from '../../context/useAppContext';
 import useDeleteOrderList from '../../services/graphql/orders/hooks/useDeleteOrderList';
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
 import useGetSuppliers from '../../services/graphql/suppliers/hooks/useGetSuppliers';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import {ScreenWrapper} from '../../shared/screenWrapper';
 import {Supplier} from '../../types/graphql/supplierTypes';
-import {ScreenProps} from '../../types/screen-props';
+import {useDebounce} from '../../utils/useDebounce';
 import {tableHeads} from './constants';
 import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, TableHeader} from './styles';
-import {useDebounce} from '../../utils/useDebounce';
-import useAppContext from '../../context/useAppContext';
 
 export const AccountingOrdersMainPage: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [page, setPage] = useState(1);
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+  const [showExceptionModal, setShowExceptionModal] = useState(false);
   const {suppliers} = useGetSuppliers({id: 0, search: null, page: 1, size: 100});
 
   const [form, setForm] = useState<any>({
@@ -61,6 +60,14 @@ export const AccountingOrdersMainPage: React.FC = () => {
 
   const handleAdd = () => {
     setShowModal(true);
+  };
+
+  const handleOpenModal = () => {
+    setShowExceptionModal(true);
+  };
+
+  const closeExceptionModal = () => {
+    setShowExceptionModal(false);
   };
 
   const closeModal = () => {
@@ -126,6 +133,12 @@ export const AccountingOrdersMainPage: React.FC = () => {
               variant="secondary"
               content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
               onClick={handleAdd}
+              style={{marginRight: 10}}
+            />
+            <Button
+              variant="secondary"
+              content={<Typography variant="bodyMedium" content="Izuzeće od plana" />}
+              onClick={handleOpenModal}
             />
           </ButtonWrapper>
         </TableHeader>
@@ -136,11 +149,19 @@ export const AccountingOrdersMainPage: React.FC = () => {
             data={(orders as any) || []}
             isLoading={loading}
             onRowClick={row => {
-              navigation.navigate(`/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`);
-              breadcrumbs.add({
-                name: `Detalji narudžbenice - ${row?.id} `,
-                to: `/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`,
-              });
+              if (Number(row?.public_procurement?.id) !== 0) {
+                navigation.navigate(`/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`);
+                breadcrumbs.add({
+                  name: `Detalji narudžbenice - ${row?.public_procurement?.title} `,
+                  to: `/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`,
+                });
+              } else if (Number(row?.public_procurement?.id) === 0) {
+                navigation.navigate(`/accounting/${row?.group_of_articles?.id}/order-form/${row?.id}/order-details`);
+                breadcrumbs.add({
+                  name: `Detalji narudžbenice - ${row?.group_of_articles?.title} `,
+                  to: `/accounting/${row?.group_of_articles?.id}/order-form/${row?.id}/order-details`,
+                });
+              }
             }}
             tableActions={[
               {
@@ -165,6 +186,15 @@ export const AccountingOrdersMainPage: React.FC = () => {
             open={showModal}
             onClose={closeModal}
             selectedItem={selectedItem}
+            navigate={navigation.navigate}
+          />
+        )}
+
+        {showExceptionModal && (
+          <ExceptionModal
+            alert={alert}
+            open={showExceptionModal}
+            onClose={closeExceptionModal}
             navigate={navigation.navigate}
           />
         )}

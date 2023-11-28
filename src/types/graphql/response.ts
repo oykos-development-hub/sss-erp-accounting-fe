@@ -15,3 +15,9 @@ export type DeleteResponse = {
   status: string;
   message: string;
 };
+
+export type InsertResponse<T> = {
+  status: string;
+  message: string;
+  item: T;
+};

@@ -1,4 +1,4 @@
-export interface ProcurementContractModalProps {
+export interface AccountingOrderModalProps {
   alert: any;
   selectedItem?: any;
   open: boolean;

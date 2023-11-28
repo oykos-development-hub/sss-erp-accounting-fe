@@ -1,4 +1,4 @@
-import {Accordion, Button, ChevronDownIcon, Table, TrashIcon, Typography} from 'client-library';
+import {Accordion, Button, ChevronDownIcon, Table, TableHead, Typography} from 'client-library';
 import React, {useMemo, useState} from 'react';
 import FileList from '../../components/fileList/fileList';
 import {ReceiveItemsModal} from '../../components/receiveItems/receiveItemsModal';
@@ -9,10 +9,9 @@ import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import {ScreenWrapper} from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
-import {parseDate} from '../../utils/dateUtils';
-import {tableHeads} from './constants';
-import {AccordionHeader, AccordionIconsWrapper, AccordionWrapper, FormControls, FormFooter, OrderInfo} from './styles';
 import {OrderListArticleType} from '../../types/graphql/articleTypes';
+import {parseDate} from '../../utils/dateUtils';
+import {AccordionHeader, AccordionIconsWrapper, AccordionWrapper, FormControls, FormFooter, OrderInfo} from './styles';
 
 export const FormOrderDetailsPreview: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
@@ -34,6 +33,33 @@ export const FormOrderDetailsPreview: React.FC = () => {
     const convertDate = new Date(dateOrder);
     date = parseDate(convertDate);
   }
+
+  const tableHeads: TableHead[] = [
+    {
+      title: 'Naziv',
+      accessor: 'title',
+      type: 'text',
+    },
+    {
+      title: 'Bitne karakteristike',
+      accessor: 'description',
+      type: 'text',
+    },
+    {
+      title: 'Jedinica mjere',
+      accessor: 'unit',
+      type: 'text',
+      shouldRender: Number(orders[0]?.public_procurement?.id) !== 0,
+    },
+    {
+      title: 'Količina',
+      accessor: 'amount',
+      type: 'custom',
+      renderContents: (amount: number) => {
+        return <Typography variant="bodyMedium" content={amount ? parseFloat(amount?.toFixed(2)) : 0} />;
+      },
+    },
+  ];
 
   const mappedOrder = useMemo(() => {
     if (orders) {
@@ -60,10 +86,6 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
   const openAccordion = (id: number) => {
     setIsOpen(prevState => (prevState === id ? 0 : id));
-  };
-
-  const handleDeleteIconClick = () => {
-    setShowDeleteModal(true);
   };
 
   const handleCloseDeleteModal = () => {
@@ -98,10 +120,18 @@ export const FormOrderDetailsPreview: React.FC = () => {
         <CustomDivider />
         <OrderInfo>
           <div>
-            <Row>
-              <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
-              <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
-            </Row>
+            {Number(orders[0]?.public_procurement?.id) !== 0 && (
+              <Row>
+                <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
+                <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
+              </Row>
+            )}
+            {Number(orders[0]?.public_procurement?.id) === 0 && (
+              <Row>
+                <Typography variant="bodySmall" style={{fontWeight: 600}} content={'GRUPA ARTIKALA:'} />
+                <Typography variant="bodySmall" content={`${orders && orders[0]?.group_of_articles?.title}`} />
+              </Row>
+            )}
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DOBAVLJAČ:'} />
               <Typography variant="bodySmall" content={`${supplier?.title || ''} `} />
@@ -160,12 +190,6 @@ export const FormOrderDetailsPreview: React.FC = () => {
                         e.stopPropagation();
                         openAccordion(orders[0]?.id || 0);
                       }}
-                    />
-                    <TrashIcon
-                      onClick={() => {
-                        handleDeleteIconClick();
-                      }}
-                      style={{padding: '10px'}}
                     />
                   </AccordionIconsWrapper>
                 </AccordionHeader>

@@ -38,6 +38,10 @@ const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, 
                 id
                 title
             }
+            group_of_articles{
+                id
+                title
+            }
             order_file{
                 id
                 name

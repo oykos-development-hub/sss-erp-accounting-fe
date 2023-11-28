@@ -34,7 +34,7 @@ export const FormControls = styled.div`
 `;
 
 export const AmountInput = styled(Input)`
-  width: 80px;
+  width: 90px;
   border-radius: 8px;
 `;
 
@@ -121,4 +121,17 @@ export const FileUploadWrapper = styled.div`
 export const ErrorText = styled.span`
   color: ${Theme.palette.error500};
   font-size: 12px;
+`;
+
+export const RowWrapper = styled.div`
+  width: 300px;
+`;
+
+export const TextInput = styled(Input)`
+  width: 300px;
+`;
+
+export const ButtonContentWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `;

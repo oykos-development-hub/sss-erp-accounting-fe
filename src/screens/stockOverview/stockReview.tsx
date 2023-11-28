@@ -178,9 +178,7 @@ export const StockReview = () => {
       recipient_user_id: recipientId,
       date_order: parseDateForBackend(new Date()),
       articles:
-        selectedItems?.length > 0
-          ? selectedItems.map((item: any) => ({article_id: item.id, quantity: item.quantity}))
-          : [],
+        selectedItems?.length > 0 ? selectedItems.map((item: any) => ({id: item.id, quantity: item.quantity})) : [],
       file_id: movementFileId,
     };
 
@@ -243,9 +241,9 @@ export const StockReview = () => {
         tableActions={[
           {
             name: 'Dodaj',
-            onClick: item => addToSelectedItems(item.article_id, item.title, item.description, item.amount),
+            onClick: item => addToSelectedItems(item.id, item.title, item.description, item.amount),
             icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
-            disabled: item => isItemAlreadySelected(item.article_id),
+            disabled: item => isItemAlreadySelected(item.id),
             tooltip: () => 'Dodajte artikal',
           },
         ]}

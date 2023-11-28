@@ -32,6 +32,7 @@ export interface OrderListItem {
     name: string;
     type: string;
   };
+  group_of_articles?: DropdownDataString;
 }
 
 export interface GetOrderListParams {
@@ -52,12 +53,13 @@ export interface OrderListReceiveParams {
 }
 
 export interface OrderListInsertParams {
-  id: number;
-  date_order: string;
+  id: number | null;
+  date_order: Date;
   public_procurement_id: number;
   supplier_id: number;
   articles: OrderListArticleInsert[];
   order_file?: number;
+  group_of_articles_id?: number;
 }
 
 export interface OrderListMovementParams {

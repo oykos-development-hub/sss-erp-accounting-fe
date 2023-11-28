@@ -23,7 +23,9 @@ export const tableHeads: TableHead[] = [
     accessor: 'public_procurement',
     type: 'custom',
     renderContents: public_procurement => {
-      return <Typography variant="bodyMedium" content={public_procurement.title} />;
+      return (
+        <Typography variant="bodyMedium" content={public_procurement.title ? public_procurement.title : 'Izuzeće'} />
+      );
     },
   },
 

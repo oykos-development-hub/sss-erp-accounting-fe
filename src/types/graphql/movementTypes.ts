@@ -24,7 +24,6 @@ export interface ArticleType {
   description: string;
   type: string;
   year: string;
-  article_id: number;
   id: number;
 }
 
@@ -45,7 +44,7 @@ export interface MovementParams {
 
 interface InsertArticleType {
   quantity: number;
-  article_id: number;
+  id: number;
 }
 export interface MovementTypeResponse {
   get: {
