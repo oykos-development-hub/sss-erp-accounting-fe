@@ -11,10 +11,23 @@ import {ScreenWrapper} from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {OrderListArticleType} from '../../types/graphql/articleTypes';
 import {parseDate} from '../../utils/dateUtils';
-import {AccordionHeader, AccordionIconsWrapper, AccordionWrapper, FormControls, FormFooter, OrderInfo} from './styles';
+import {
+  AccordionHeader,
+  AccordionIconsWrapper,
+  AccordionWrapper,
+  ButtonContainer,
+  FormControls,
+  FormFooter,
+  OrderInfo,
+} from './styles';
 
 export const FormOrderDetailsPreview: React.FC = () => {
-  const {alert, breadcrumbs, navigation} = useAppContext();
+  const {
+    alert,
+    breadcrumbs,
+    navigation,
+    reportService: {generatePdf},
+  } = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isOpen, setIsOpen] = useState<number>(0);
@@ -109,6 +122,12 @@ export const FormOrderDetailsPreview: React.FC = () => {
     }
   };
 
+  const printOrder = () => {
+    if (orders.length) {
+      generatePdf('ACCOUNTING_ORDER', orders[0]);
+    }
+  };
+
   const orderFile = orders[0]?.order_file;
   const movementFile = orders[0]?.movement_file;
   const receiveFile = orders[0]?.receive_file;
@@ -161,7 +180,8 @@ export const FormOrderDetailsPreview: React.FC = () => {
               )}
             </>
           </div>
-          <div>
+          <ButtonContainer>
+            <Button content="Štampaj narudžbenicu" size="sm" variant="secondary" onClick={printOrder} />
             <Button
               content="Kreiraj prijemnicu"
               size="sm"
@@ -169,7 +189,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
               disabled={!!orders[0]?.invoice_date}
               onClick={handleAddReceiveItems}
             />
-          </div>
+          </ButtonContainer>
         </OrderInfo>
 
         <Table tableHeads={tableHeads} data={mappedOrder || []} isLoading={loading} />

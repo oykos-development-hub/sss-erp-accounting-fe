@@ -135,3 +135,9 @@ export const ButtonContentWrapper = styled.div`
   display: flex;
   align-items: center;
 `;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+`;
