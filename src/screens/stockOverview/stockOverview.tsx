@@ -46,7 +46,7 @@ export const StockScreen = () => {
           <StyledTabs tabs={planTabs} activeTab={activeTab} onChange={onTabChange} />
         </TitleTabsWrapper>
         <CustomDivider style={{marginTop: 0}} />
-        {activeTab === Tabs.Stock && <StockReview />}
+        {activeTab === Tabs.Stock && <StockReview navigateToList={() => setActiveTab(Tabs.AssetMovement)} />}
         {activeTab === Tabs.AssetMovement && <MovementList />}
       </SectionBox>
     </ScreenWrapper>

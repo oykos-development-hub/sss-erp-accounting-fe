@@ -1,48 +1,32 @@
 import {
   Button,
   Dropdown,
-  FileUpload,
   Input,
+  Pagination,
   PlusIcon,
   SearchIcon,
   Table,
-  Theme,
-  Typography,
-  XIcon,
   TableHead,
-  Pagination,
+  Theme,
+  XIcon,
 } from 'client-library';
 import {useMemo, useState} from 'react';
-import useGetStockOverview from '../../services/graphql/stock/hooks/useGetStockOverview';
-import {tableHeadsStockReview} from './constants';
-import {
-  ArticleTitleWrapper,
-  Column,
-  DropdownWrapper,
-  FileUploadWrapper,
-  Filter,
-  FormControls,
-  FormFooter,
-  Header,
-  MainTitle,
-} from './styles';
+import {Controller, useForm} from 'react-hook-form';
+import useAppContext from '../../context/useAppContext';
 import useInsertMovement from '../../services/graphql/movement/hooks/useInsertMovement';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
-import useAppContext from '../../context/useAppContext';
 import useGetRecipientUsersOverview from '../../services/graphql/recipientUsersOverview/hooks/useGetRecipientUsers';
-import {Controller, useForm} from 'react-hook-form';
-import {FileResponseItem} from '../../types/fileUploadType';
+import useGetStockOverview from '../../services/graphql/stock/hooks/useGetStockOverview';
 import {parseDateForBackend} from '../../utils/dateUtils';
-import {MovementItems} from '../../types/graphql/movementTypes';
+import {tableHeadsStockReview} from './constants';
+import {ArticleTitleWrapper, Column, DropdownWrapper, Filter, FormControls, FormFooter, MainTitle} from './styles';
 
-export const StockReview = () => {
+export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
   const {
     contextMain,
     alert,
-    fileService: {uploadFile},
     reportService: {generatePdf},
   } = useAppContext();
-  const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
   const [selectedItems, setSelectedItems] = useState<any>([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,11 +77,6 @@ export const StockReview = () => {
   };
 
   const {handleSubmit, control, clearErrors, setValue} = useForm();
-
-  const handleUpload = (files: FileList) => {
-    setUploadedFile(files);
-    clearErrors('file_id');
-  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
     const {value} = event.target;
@@ -176,6 +155,7 @@ export const StockReview = () => {
 
   const onSubmit = (values: any) => {
     if (isSaving) return;
+    console.log(selectedItems);
     const payload = {
       id: values.id,
       office_id: values?.office?.id,
@@ -193,11 +173,17 @@ export const StockReview = () => {
         alert.success('Uspješno sačuvano.');
 
         generatePdf('MOVEMENT_RECEIPT', {
-          articles: selectedItems,
+          articles: selectedItems.map((item: any) => ({
+            title: item.title,
+            amount: item.amount,
+            description: item.description,
+          })),
           office: officesDropdownData?.find(office => office.id === values?.office?.id)?.title || '',
           recipient: usersDropdownData?.find(user => user.id === values?.recipient?.id)?.title || '',
           date: new Date(),
         });
+
+        navigateToList();
       },
       () => {
         alert?.error('Greška. Promjene nisu sačuvane.');
