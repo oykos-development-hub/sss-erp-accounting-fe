@@ -293,7 +293,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                   files={uploadedFile}
                   variant="secondary"
                   onUpload={handleUpload}
-                  note={<Typography variant="bodySmall" content="Prijemnica" />}
+                  note={<Typography variant="bodySmall" content="Dokument" />}
                   hint="Fajlovi neće biti učitani dok ne sačuvate prijemnicu."
                   buttonText="Učitaj"
                 />

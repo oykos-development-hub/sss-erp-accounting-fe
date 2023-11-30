@@ -10,6 +10,8 @@ import useGetRecipientUsersOverview from '../../services/graphql/recipientUsersO
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import {tableHeadsMovement} from './constants';
 import {MovementListFilters} from './styles';
+import {MovementDetailsItems} from '../../types/graphql/movementTypes';
+import {PrinterIcon} from '@oykos-development/devkit-react-ts-styled-components';
 
 export const MovementList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -21,6 +23,7 @@ export const MovementList = () => {
     alert,
     navigation: {navigate},
     breadcrumbs,
+    reportService: {generatePdf},
   } = useAppContext();
   const {control, watch} = useForm();
   const office = watch('office')?.id;
@@ -79,6 +82,17 @@ export const MovementList = () => {
     }
     setSelectedItemId(0);
   };
+
+  const generateMovementPdf = (item: MovementDetailsItems) => {
+    console.log(item, 'item');
+    generatePdf('MOVEMENT_RECEIPT', {
+      office: item.office?.title,
+      recipient: item.recipient_user?.title,
+      date: item.date_order,
+      articles: item.articles,
+    });
+  };
+
   return (
     <>
       <MovementListFilters>
@@ -131,6 +145,11 @@ export const MovementList = () => {
             name: 'Obriši',
             onClick: item => handleDeleteIconClick(item.id),
             icon: <TrashIcon stroke={Theme?.palette?.gray800} />,
+          },
+          {
+            name: 'Štampaj',
+            onClick: item => generateMovementPdf(item),
+            icon: <PrinterIcon stroke={Theme?.palette?.gray800} />,
           },
         ]}
       />

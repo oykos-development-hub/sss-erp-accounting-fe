@@ -1,20 +1,19 @@
-import {Button, FileUpload, Table, TableHead, Typography} from 'client-library';
-import React, {useEffect, useState} from 'react';
-import {set, useFieldArray, useForm} from 'react-hook-form';
+import {Button, Table, TableHead, Typography} from 'client-library';
+import React, {useEffect} from 'react';
+import {useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import {ScreenWrapper} from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
-import {FileResponseItem} from '../../types/fileUploadType';
 import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes';
-import {AmountInput, FileUploadWrapper, FormControls, FormFooter, OrderInfo} from './styles';
+import {AmountInput, FormControls, FormFooter, OrderInfo} from './styles';
 
 type FormValues = {
   date_order: string;
   public_procurement_id: number;
   articles: any[];
-  order_file: number;
+  order_file: number | null;
 };
 
 export const FormOrderDetails: React.FC = () => {
@@ -24,7 +23,6 @@ export const FormOrderDetails: React.FC = () => {
   const breadcrumbItems = breadcrumbs?.get();
   const procurementTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name?.split('-').at(-1)?.trim();
   const {articles} = useGetOrderProcurementAvailableArticles(procurementID, VisibilityType.Accounting);
-  const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
   const {
     handleSubmit,
@@ -40,7 +38,7 @@ export const FormOrderDetails: React.FC = () => {
       date_order: '',
       public_procurement_id: procurementID,
       articles: articles,
-      order_file: 0,
+      order_file: null,
     },
   });
 
@@ -50,30 +48,10 @@ export const FormOrderDetails: React.FC = () => {
     keyName: 'key',
   });
 
-  const {
-    fileService: {uploadFile},
-  } = useAppContext();
-
-  const handleUpload = (files: FileList) => {
-    setUploadedFile(files);
-  };
-
   const onSubmit = async () => {
     if (isSaving) return;
 
-    if (uploadedFile) {
-      const formData = new FormData();
-      formData.append('file', uploadedFile[0]);
-
-      await uploadFile(formData, (files: FileResponseItem[]) => {
-        setUploadedFile(null);
-        handleSaveOrder(files[0].id);
-      });
-
-      return;
-    } else {
-      handleSaveOrder();
-    }
+    handleSaveOrder();
   };
 
   const handleSaveOrder = (fileID?: number) => {
@@ -91,7 +69,7 @@ export const FormOrderDetails: React.FC = () => {
       date_order: new Date(),
       public_procurement_id: Number(procurementID),
       articles: insertArticles || [],
-      order_file: fileID || 0,
+      order_file: fileID || null,
     };
 
     orderListInsert(
@@ -184,19 +162,6 @@ export const FormOrderDetails: React.FC = () => {
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'JAVNA NABAVKA:'} />
               <Typography variant="bodySmall" content={`${procurementTitle}`} />
-            </Row>
-            <Row>
-              <FileUploadWrapper>
-                <FileUpload
-                  icon={null}
-                  files={uploadedFile}
-                  variant="secondary"
-                  onUpload={handleUpload}
-                  note={<Typography variant="bodySmall" content="Narudžbenica" />}
-                  hint="Fajlovi neće biti učitani dok ne sačuvate narudžbenicu."
-                  buttonText="Učitaj"
-                />
-              </FileUploadWrapper>
             </Row>
           </div>
         </OrderInfo>

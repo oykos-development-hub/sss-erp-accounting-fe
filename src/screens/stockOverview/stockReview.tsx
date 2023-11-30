@@ -38,6 +38,7 @@ export const StockReview = () => {
     contextMain,
     alert,
     fileService: {uploadFile},
+    reportService: {generatePdf},
   } = useAppContext();
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
   const [selectedItems, setSelectedItems] = useState<any>([]);
@@ -187,6 +188,13 @@ export const StockReview = () => {
       () => {
         setDisabled(true);
         alert.success('Uspješno sačuvano.');
+
+        generatePdf('MOVEMENT_RECEIPT', {
+          articles: selectedItems,
+          office: officesDropdownData?.find(office => office.id === officeId)?.title || '',
+          recipient: usersDropdownData?.find(user => user.id === recipientId)?.title || '',
+          date: new Date(),
+        });
       },
       () => {
         alert?.error('Greška. Promjene nisu sačuvane.');

@@ -31,6 +31,7 @@ export const FormControls = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
+  margin-left: 10px;
 `;
 
 export const AmountInput = styled(Input)`

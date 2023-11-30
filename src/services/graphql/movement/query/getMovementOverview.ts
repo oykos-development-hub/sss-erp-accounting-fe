@@ -15,6 +15,12 @@ const movementOverview = `query MovementOverview($page: Int, $size: Int, $office
                 id
                 title
             }
+            articles {
+                id
+                title
+                amount
+                description
+            }
         }
     }
 }`;
