@@ -168,6 +168,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
                 name: 'Obriši',
                 onClick: item => handleDeleteIconClick(item.id),
                 icon: <TrashIcon stroke={Theme?.palette?.gray800} />,
+                shouldRender: item => item.status !== 'Receive',
               },
             ]}
           />
