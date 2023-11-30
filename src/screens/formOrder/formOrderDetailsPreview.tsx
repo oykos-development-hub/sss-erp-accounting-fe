@@ -233,7 +233,13 @@ export const FormOrderDetailsPreview: React.FC = () => {
           </div>
           <ButtonContainer>
             {orders[0]?.invoice_date && orders[0]?.date_system && (
-              <Button content="Proslijedi finansijama" variant="secondary" onClick={() => {}} />
+              <Button
+                content="Proslijedi finansijama"
+                variant="secondary"
+                onClick={() => {
+                  console.log('');
+                }}
+              />
             )}
             <Button content="Štampaj narudžbenicu" size="sm" variant="secondary" onClick={printOrder} />
             <Button
