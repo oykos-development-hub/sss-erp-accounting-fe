@@ -62,7 +62,7 @@ export const Filter = styled.div`
 `;
 
 export const Column = styled.div`
-  width: 400px;
+  width: 300px;
 `;
 
 export const FileUploadWrapper = styled.div`
@@ -115,4 +115,8 @@ export const MovementListFilters = styled.div`
   margin-bottom: 10px;
   gap: 8px;
   display: flex;
+`;
+
+export const DropdownWrapper = styled.div`
+  width: 50%;
 `;

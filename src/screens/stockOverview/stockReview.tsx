@@ -18,6 +18,7 @@ import {tableHeadsStockReview} from './constants';
 import {
   ArticleTitleWrapper,
   Column,
+  DropdownWrapper,
   FileUploadWrapper,
   Filter,
   FormControls,
@@ -32,6 +33,7 @@ import useGetRecipientUsersOverview from '../../services/graphql/recipientUsersO
 import {Controller, useForm} from 'react-hook-form';
 import {FileResponseItem} from '../../types/fileUploadType';
 import {parseDateForBackend} from '../../utils/dateUtils';
+import {MovementItems} from '../../types/graphql/movementTypes';
 
 export const StockReview = () => {
   const {
@@ -172,15 +174,16 @@ export const StockReview = () => {
     {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
   ];
 
-  const handleAssetMovementInsert = (id: number, officeId: number, recipientId: number, movementFileId?: number) => {
+  const onSubmit = (values: any) => {
+    if (isSaving) return;
     const payload = {
-      id: id,
-      office_id: officeId,
-      recipient_user_id: recipientId,
+      id: values.id,
+      office_id: values?.office?.id,
+      recipient_user_id: values?.recipient?.id,
       date_order: parseDateForBackend(new Date()),
       articles:
         selectedItems?.length > 0 ? selectedItems.map((item: any) => ({id: item.id, quantity: item.quantity})) : [],
-      file_id: movementFileId,
+      file_id: 0,
     };
 
     orderListAssetMovementMutation(
@@ -191,8 +194,8 @@ export const StockReview = () => {
 
         generatePdf('MOVEMENT_RECEIPT', {
           articles: selectedItems,
-          office: officesDropdownData?.find(office => office.id === officeId)?.title || '',
-          recipient: usersDropdownData?.find(user => user.id === recipientId)?.title || '',
+          office: officesDropdownData?.find(office => office.id === values?.office?.id)?.title || '',
+          recipient: usersDropdownData?.find(user => user.id === values?.recipient?.id)?.title || '',
           date: new Date(),
         });
       },
@@ -200,32 +203,6 @@ export const StockReview = () => {
         alert?.error('Greška. Promjene nisu sačuvane.');
       },
     );
-  };
-
-  const onSubmit = async (values: any) => {
-    if (isSaving) return;
-
-    if (uploadedFile) {
-      const formData = new FormData();
-      formData.append('file', uploadedFile[0]);
-
-      await uploadFile(
-        formData,
-        (files: FileResponseItem[]) => {
-          setUploadedFile(null);
-          setValue('file_id', files[0]);
-
-          handleAssetMovementInsert(values?.id, values?.office?.id, values?.recipient?.id, files[0]?.id);
-        },
-        () => {
-          alert.error('Greška pri čuvanju! Fajlovi nisu učitani.');
-        },
-      );
-
-      return;
-    } else {
-      handleAssetMovementInsert(values?.id, values?.office?.id, values?.recipient?.id);
-    }
   };
 
   return (
@@ -282,7 +259,7 @@ export const StockReview = () => {
               },
             ]}
           />
-          <Header>
+          <DropdownWrapper>
             <Filter>
               <Column>
                 <Controller
@@ -319,20 +296,7 @@ export const StockReview = () => {
                 />
               </Column>
             </Filter>
-            <Column></Column>
-          </Header>
-          <FileUploadWrapper>
-            <FileUpload
-              icon={null}
-              files={uploadedFile}
-              variant="secondary"
-              onUpload={handleUpload}
-              note={<Typography variant="bodySmall" content="Otpremnica" />}
-              hint="Fajlovi neće biti učitani dok ne sačuvate otpremnicu."
-              buttonText="Učitaj"
-              disabled={disabled}
-            />
-          </FileUploadWrapper>
+          </DropdownWrapper>
 
           <FormFooter>
             <FormControls>
