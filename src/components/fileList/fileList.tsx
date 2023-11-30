@@ -32,6 +32,7 @@ const FileList = ({files, onDelete, isInModal}: FileListProps) => {
       onError: () => {
         alert.error('Došlo je do greške prilikom preuzimanja fajla');
       },
+      fileName: file.name,
     });
   };
 
