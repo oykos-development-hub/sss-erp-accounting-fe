@@ -63,7 +63,7 @@ export const ExceptionModal: React.FC<AccountingOrderModalProps> = ({open, onClo
           </Row>
         </FormWrapper>
       }
-      title="KREIRANJE NOVE NARUDŽBENICE"
+      title="IZUZEĆE OD PLANA"
     />
   );
 };

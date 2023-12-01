@@ -155,6 +155,8 @@ export const FormOrderDetailsPreview: React.FC = () => {
           order_file: files[0].id || null,
           date_order: orders[0].date_order,
           public_procurement_id: orders[0].public_procurement?.id,
+          supplier_id: orders[0]?.supplier?.id,
+          group_of_articles_id: orders[0]?.group_of_articles?.id,
         };
 
         orderListInsert(
@@ -204,19 +206,21 @@ export const FormOrderDetailsPreview: React.FC = () => {
                 <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM:'} />
                 <Typography variant="bodySmall" content={`${date || ''}`} />
               </Row>
-              <Row>
-                <FileUploadWrapper>
-                  <FileUpload
-                    icon={null}
-                    files={uploadedFile}
-                    variant="secondary"
-                    onUpload={handleUpload}
-                    note={<Typography variant="bodySmall" content="Narudžbenica" />}
-                    hint="Fajlovi neće biti učitani dok ne sačuvate narudžbenicu."
-                    buttonText="Učitaj"
-                  />
-                </FileUploadWrapper>
-              </Row>
+              {!orders[0]?.invoice_date && !orders[0]?.date_system && (
+                <Row>
+                  <FileUploadWrapper>
+                    <FileUpload
+                      icon={null}
+                      files={uploadedFile}
+                      variant="secondary"
+                      onUpload={handleUpload}
+                      note={<Typography variant="bodySmall" content="Narudžbenica" />}
+                      hint="Fajlovi neće biti učitani dok ne sačuvate narudžbenicu."
+                      buttonText="Učitaj"
+                    />
+                  </FileUploadWrapper>
+                </Row>
+              )}
               {orderFile?.id !== 0 && (
                 <Row>
                   <Typography variant="bodySmall" style={{fontWeight: 600}} content={'NARUDŽBENICA:'} />
@@ -233,13 +237,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
           </div>
           <ButtonContainer>
             {orders[0]?.invoice_date && orders[0]?.date_system && (
-              <Button
-                content="Proslijedi finansijama"
-                variant="secondary"
-                onClick={() => {
-                  console.log('');
-                }}
-              />
+              <Button content="Proslijedi finansijama" variant="secondary" size="sm" />
             )}
             <Button content="Štampaj narudžbenicu" size="sm" variant="secondary" onClick={printOrder} />
             <Button
@@ -262,7 +260,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
               customHeader={
                 <AccordionHeader>
                   <Typography variant="bodyMedium" content={`Prijemnica - ${orders[0].id}`} style={{fontWeight: 600}} />
-                  <AccordionIconsWrapper isOpen={isOpen === orders[0]?.id}>
+                  <AccordionIconsWrapper isOpen={isOpen === orders[0]?.id ? true : false}>
                     <ChevronDownIcon
                       width="15px"
                       height="8px"
@@ -294,14 +292,16 @@ export const FormOrderDetailsPreview: React.FC = () => {
               }}
             />
           </FormControls>
-          <FormControls>
-            <Button
-              content="Sačuvaj"
-              variant="primary"
-              onClick={handleSubmit(onSubmit)}
-              disabled={uploadedFile === null}
-            />
-          </FormControls>
+          {!orders[0]?.invoice_date && !orders[0]?.date_system && (
+            <FormControls>
+              <Button
+                content="Sačuvaj"
+                variant="primary"
+                onClick={handleSubmit(onSubmit)}
+                disabled={uploadedFile === null}
+              />
+            </FormControls>
+          )}
         </FormFooter>
 
         {showModal && (

@@ -117,7 +117,7 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
       open={open}
       onClose={onClose}
       leftButtonText="Otkaži"
-      rightButtonText="Nastavi"
+      rightButtonText="Sačuvaj"
       rightButtonOnClick={handleSubmit(onSubmit)}
       content={
         <FormWrapper>

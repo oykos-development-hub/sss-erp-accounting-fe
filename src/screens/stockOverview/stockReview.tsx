@@ -76,7 +76,13 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
     setSelectedItems(updatedItems);
   };
 
-  const {handleSubmit, control, clearErrors, setValue} = useForm();
+  const {
+    handleSubmit,
+    control,
+    clearErrors,
+    setValue,
+    formState: {errors},
+  } = useForm();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
     const {value} = event.target;
@@ -251,6 +257,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
                 <Controller
                   name="office"
                   control={control}
+                  rules={{required: 'Ovo polje je obavezno'}}
                   render={({field: {onChange, name, value}}) => (
                     <Dropdown
                       onChange={onChange}
@@ -259,6 +266,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
                       label="KANCELARIJA:"
                       options={officesDropdownData || []}
                       isDisabled={disabled}
+                      error={errors?.office?.message as string}
                     />
                   )}
                 />
@@ -267,6 +275,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
                 <Controller
                   name="recipient"
                   control={control}
+                  rules={{required: 'Ovo polje je obavezno'}}
                   render={({field: {onChange, name, value}}) => {
                     return (
                       <Dropdown
@@ -276,6 +285,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
                         label="PRIMALAC:"
                         options={usersDropdownData || []}
                         isDisabled={disabled}
+                        error={errors?.recipient?.message as string}
                       />
                     );
                   }}
