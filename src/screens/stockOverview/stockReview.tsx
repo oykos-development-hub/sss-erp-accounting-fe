@@ -181,7 +181,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
         generatePdf('MOVEMENT_RECEIPT', {
           articles: selectedItems.map((item: any) => ({
             title: item.title,
-            amount: item.amount,
+            amount: item.quantity,
             description: item.description,
           })),
           office: officesDropdownData?.find(office => office.id === values?.office?.id)?.title || '',
