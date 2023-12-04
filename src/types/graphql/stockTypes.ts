@@ -13,3 +13,10 @@ export interface StockListType {
     stock_Overview: GetResponse<StockItem>;
   };
 }
+
+export type StockOverviewParams = {
+  page?: number;
+  size?: number;
+  title?: string;
+  date?: string;
+};

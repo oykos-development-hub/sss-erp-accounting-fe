@@ -11,6 +11,7 @@ import {MicroserviceProps} from './types/micro-service-props';
 import {StockScreen} from './screens/stockOverview/stockOverview';
 import MovementDetails from './screens/stockOverview/movementDetails';
 import {Exceptions} from './screens/exceptions/exceptions';
+import AccountingReports from './screens/reports/reports';
 
 const FormOrderDetailsPreviewRegex = /^\/accounting\/[^/]+\/order-form\/[^/]+\/order-details/;
 const FormOrderDetailsRegex = /^\/accounting\/order-form\/(\d+)$/;
@@ -35,6 +36,7 @@ export const Router: React.FC<MicroserviceProps> = () => {
     if (pathname === '/accounting/stock') return <StockScreen />;
     if (MovementDetailsRegex.test(pathname)) return <MovementDetails />;
     if (ExceptionsRegex.test(pathname)) return <Exceptions />;
+    if (pathname === '/accounting/reports') return <AccountingReports />;
 
     return <NotFound404 />;
   };

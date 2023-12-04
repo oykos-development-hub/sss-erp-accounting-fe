@@ -33,7 +33,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
   const [disabled, setDisabled] = useState(false);
   const [touchedFields, setTouchedFields] = useState<any>({});
 
-  const {total, stockItems} = useGetStockOverview(page, 1000, searchQuery);
+  const {total, stockItems} = useGetStockOverview({page, size: 20, title: searchQuery});
   const organisationUnitId = contextMain?.organization_unit?.id;
   const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
   const {recipientUsers} = useGetRecipientUsersOverview();

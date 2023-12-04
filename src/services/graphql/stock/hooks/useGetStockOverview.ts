@@ -1,29 +1,34 @@
 import {useEffect, useState} from 'react';
 import {GraphQL} from '../..';
 import useAppContext from '../../../../context/useAppContext';
-import {StockItem, StockListType} from '../../../../types/graphql/stockTypes';
+import {StockItem, StockListType, StockOverviewParams} from '../../../../types/graphql/stockTypes';
 
-const useGetStockOverview = (page: number, size: number, title: string) => {
+const useGetStockOverview = (params?: StockOverviewParams, lazy?: boolean) => {
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [total, setTotal] = useState<number>();
   const [loading, setLoading] = useState(true);
   const {fetch} = useAppContext();
 
-  const fetchStockOverview = async () => {
-    const response: StockListType['get'] = await fetch(GraphQL.getStockOverview, {page, size, title});
+  const fetchStockOverview = async (date?: string) => {
+    const response: StockListType['get'] = await fetch(GraphQL.getStockOverview, lazy ? params : {date});
     if (response) {
       const items = response.stock_Overview.items;
       const total = response.stock_Overview.total;
 
       setStockItems(items);
       setTotal(total);
+      setLoading(false);
+
+      if (lazy) {
+        return items;
+      }
     }
-    setLoading(false);
   };
 
   useEffect(() => {
+    if (lazy) return;
     fetchStockOverview();
-  }, []);
+  }, [params?.page, params?.size, params?.title, lazy]);
 
   return {total, stockItems, loading, fetch: fetchStockOverview};
 };

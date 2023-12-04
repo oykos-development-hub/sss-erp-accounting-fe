@@ -7,7 +7,7 @@ import {
 import useAppContext from '../../../../context/useAppContext';
 
 const useGetOfficesOfOrganizationUnits = (id: number, organization_unit_id: number, search: string) => {
-  const [officesOfOrganizationUnits, setOfficesOfOrganizationUnits] = useState<OfficesOfOrganizationUnits[]>();
+  const [officesOfOrganizationUnits, setOfficesOfOrganizationUnits] = useState<OfficesOfOrganizationUnits[]>([]);
   const [loading, setLoading] = useState(true);
   const {fetch, graphQl} = useAppContext();
 
