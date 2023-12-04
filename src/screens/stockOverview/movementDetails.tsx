@@ -2,7 +2,7 @@ import {Button, Input, Table, Typography} from 'client-library';
 import FileList from '../../components/fileList/fileList';
 import useAppContext from '../../context/useAppContext';
 import useGetMovementDetails from '../../services/graphql/movement/hooks/useGetMovementDetails';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {tableHeadsStockArticleDetails} from './constants';
 import {CustomDivider, FormControls, FormFooter, Header, InputWrapper, MainTitle, SectionBox} from './styles';
 

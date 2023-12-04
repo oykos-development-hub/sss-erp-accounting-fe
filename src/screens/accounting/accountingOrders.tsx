@@ -7,7 +7,7 @@ import useDeleteOrderList from '../../services/graphql/orders/hooks/useDeleteOrd
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
 import useGetSuppliers from '../../services/graphql/suppliers/hooks/useGetSuppliers';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {Supplier} from '../../types/graphql/supplierTypes';
 import {useDebounce} from '../../utils/useDebounce';
 import {tableHeads} from './constants';

@@ -1,7 +1,7 @@
 import {Tab} from '@oykos-development/devkit-react-ts-styled-components';
 import {useState} from 'react';
 import useAppContext from '../../context/useAppContext';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {MovementList} from './movementList';
 import {StockReview} from './stockReview';
 import {CustomDivider, MainTitle, SectionBox, StyledTabs, TitleTabsWrapper} from './styles';

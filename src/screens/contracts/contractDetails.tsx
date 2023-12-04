@@ -6,7 +6,7 @@ import useAppContext from '../../context/useAppContext';
 import useContractArticles from '../../services/graphql/contractArticles/hooks/useContractArticles';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
 import useProcurementContracts from '../../services/graphql/procurementContractsOverview/hooks/useProcurementContracts';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, Filters, MainTitle, SectionBox, TableContainer} from '../../shared/styles';
 import {ContractArticleGet} from '../../types/graphql/contractsArticlesTypes';
 import {parseDate} from '../../utils/dateUtils';

@@ -4,7 +4,7 @@ import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import useGetSuppliers from '../../services/graphql/suppliers/hooks/useGetSuppliers';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {OrderListArticleType} from '../../types/graphql/articleTypes';
 import {

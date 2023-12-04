@@ -7,7 +7,7 @@ import useAppContext from '../../context/useAppContext';
 import useDeleteOrderListReceive from '../../services/graphql/orders/hooks/useDeleteOrderListReceive';
 import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList';
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {OrderListArticleType} from '../../types/graphql/articleTypes';
 import {parseDate} from '../../utils/dateUtils';

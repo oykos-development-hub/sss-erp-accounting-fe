@@ -22,13 +22,14 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
   margin: 0;
 `;
 
-export const ScreenWrapper: FC<{children: ReactNode}> = ({children}) => {
-  const {
-    breadcrumbs,
-    navigation: {navigate},
-  } = useAppContext();
+const ScreenWrapper: FC<{children: ReactNode; showBreadcrumbs?: boolean}> = ({children, showBreadcrumbs = true}) => {
+  const context = useAppContext();
+
+  const breadcrumbs = context?.breadcrumbs;
 
   const breadcrumbItems = breadcrumbs?.get();
+
+  const navigate = context?.navigation?.navigate;
 
   const handleNavigation = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | undefined,
@@ -48,8 +49,10 @@ export const ScreenWrapper: FC<{children: ReactNode}> = ({children}) => {
 
   return (
     <Container>
-      <StyledBreadcrumbs items={breadcrumbItems} onClick={handleNavigation} />
+      {showBreadcrumbs ? <StyledBreadcrumbs items={breadcrumbItems} onClick={handleNavigation} /> : null}
       {children}
     </Container>
   );
 };
+
+export default ScreenWrapper;

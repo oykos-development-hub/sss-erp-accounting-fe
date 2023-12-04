@@ -11,6 +11,7 @@ import {MicroserviceProps} from './types/micro-service-props';
 import {StockScreen} from './screens/stockOverview/stockOverview';
 import MovementDetails from './screens/stockOverview/movementDetails';
 import {Exceptions} from './screens/exceptions/exceptions';
+import {LandingPage} from './screens/landingPage/landingPage';
 import AccountingReports from './screens/reports/reports';
 
 const FormOrderDetailsPreviewRegex = /^\/accounting\/[^/]+\/order-form\/[^/]+\/order-details/;
@@ -27,7 +28,7 @@ export const Router: React.FC<MicroserviceProps> = () => {
   } = useAppContext();
 
   const renderScreen = () => {
-    if (pathname === '/accounting') return <ACCOUNTING />;
+    if (pathname === '/accounting') return <LandingPage />;
     if (pathname === '/accounting/order-form') return <AccountingOrdersMainPage />;
     if (pathname === '/accounting/contracts') return <ContractsMainPage />;
     if (FormOrderDetailsPreviewRegex.test(pathname)) return <FormOrderDetailsPreview />;

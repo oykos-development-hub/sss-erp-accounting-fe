@@ -37,13 +37,19 @@ export const MovementList = () => {
 
   const officesDropdownData = useMemo(() => {
     if (officesOfOrganizationUnits) {
-      return officesOfOrganizationUnits?.map(office => ({id: office?.id, title: office?.title}));
+      const offices = officesOfOrganizationUnits?.map(office => ({id: office?.id, title: office?.title}));
+      return [{id: null, title: 'Sve'}, ...offices];
+    } else {
+      return [];
     }
   }, [officesOfOrganizationUnits]);
 
   const usersDropdownData = useMemo(() => {
-    if (recipientUsers) {
-      return recipientUsers?.map((user: any) => ({id: user?.id, title: user?.title}));
+    if (recipientUsers && recipientUsers.length > 0) {
+      const usersData = recipientUsers.map((user: any) => ({id: user?.id, title: user?.title}));
+      return [{id: null, title: 'Sve'}, ...usersData];
+    } else {
+      return [];
     }
   }, [recipientUsers]);
 

@@ -5,7 +5,7 @@ import {Container, CustomDivider, MainTitle, TableHeader} from './styles';
 import useProcurementContracts from '../../services/graphql/procurementContractsOverview/hooks/useProcurementContracts';
 import {ProcurementContract} from '../../types/graphql/procurementContractsTypes';
 import useGetSuppliers from '../../services/graphql/suppliers/hooks/useGetSuppliers';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import useAppContext from '../../context/useAppContext';
 import {ContractsFilters} from './contractFilters/contractFilters';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
