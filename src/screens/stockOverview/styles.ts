@@ -118,5 +118,5 @@ export const MovementListFilters = styled.div`
 `;
 
 export const DropdownWrapper = styled.div`
-  width: 50%;
+  width: 70%;
 `;
