@@ -6,7 +6,7 @@ import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOr
 import useGetOrganizationUnits from '../../services/graphql/organizationUnits/hooks/useGetOrganizationUnits';
 import useGetOverallSpendingReport from '../../services/graphql/overallSpendingReport/useGetOverallSpendingReport';
 import useGetStockOverview from '../../services/graphql/stock/hooks/useGetStockOverview';
-import {ScreenWrapper} from '../../shared/screenWrapper';
+import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle} from '../../shared/styles';
 import {DropdownDataNumber, DropdownDataString} from '../../types/dropdownData';
 import {parseDateForBackend} from '../../utils/dateUtils';

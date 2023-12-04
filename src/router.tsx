@@ -3,7 +3,6 @@ import {NotFound404} from './screens/404';
 import {AccountingOrdersMainPage} from './screens/accounting/accountingOrders';
 import {FormOrderDetails} from './screens/formOrder/formOrderDetails';
 import {FormOrderDetailsPreview} from './screens/formOrder/formOrderDetailsPreview';
-import ACCOUNTING from './screens/landing';
 import {ContractsMainPage} from './screens/contracts/contractsOverview';
 import useAppContext from './context/useAppContext';
 import {ContractDetailsSigned} from './screens/contracts/contractDetails';
