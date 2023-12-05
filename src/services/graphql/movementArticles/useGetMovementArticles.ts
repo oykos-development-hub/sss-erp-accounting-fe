@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import {GraphQL} from '..';
 import useAppContext from '../../../context/useAppContext';
-import {OrderListType} from '../../../types/graphql/orderListTypes';
 import {MovementArticlesResponse} from '../../../types/graphql/movementArticles';
 
 const useGetMovementArticles = (title: string, skip?: boolean) => {

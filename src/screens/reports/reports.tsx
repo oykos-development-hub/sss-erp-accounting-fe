@@ -2,7 +2,6 @@ import {Button, Datepicker, Dropdown} from 'client-library';
 import {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
-import useGetMovementArticles from '../../services/graphql/movementArticles/useGetMovementArticles';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
 import useGetOrganizationUnits from '../../services/graphql/organizationUnits/hooks/useGetOrganizationUnits';
 import useGetOverallSpendingReport from '../../services/graphql/overallSpendingReport/useGetOverallSpendingReport';
@@ -14,6 +13,7 @@ import {parseDateForBackend} from '../../utils/dateUtils';
 import {useDebounce} from '../../utils/useDebounce';
 import {AccountingReportType, accountingReportTypeOptions} from './constants';
 import {Container, OfficeOptionsRow, Options, OptionsRow} from './styles';
+import useGetMovementArticles from '../../services/graphql/movementArticles/useGetMovementArticles';
 
 type AccountingReportFilterState = {
   type: DropdownDataString | null;
@@ -127,7 +127,7 @@ const AccountingReports = () => {
   };
 
   const articleOptions = useMemo(() => {
-    return movementArticles?.map(item => ({id: item, title: item})) as any;
+    return movementArticles?.map((item: any) => ({id: item, title: item})) as any;
   }, [movementArticles]);
 
   const onSearch = (value: string) => {
@@ -246,7 +246,7 @@ const AccountingReports = () => {
             </OfficeOptionsRow>
           )}
 
-          {type?.id === AccountingReportType.TOTAL_SPENDING && isSuperAdmin && (
+          {/* {type?.id === AccountingReportType.TOTAL_SPENDING && isSuperAdmin && (
             <Controller
               control={control}
               name="organization_unit_id"
@@ -260,7 +260,7 @@ const AccountingReports = () => {
                 />
               )}
             />
-          )}
+          )} */}
         </Options>
 
         <Button content="Generiši izvještaj" onClick={handleSubmit(onSubmit)} style={{width: 'fit-content'}} />
