@@ -10,7 +10,7 @@ const useGetStockOverview = (params?: StockOverviewParams, lazy?: boolean) => {
   const {fetch} = useAppContext();
 
   const fetchStockOverview = async (date?: string) => {
-    const response: StockListType['get'] = await fetch(GraphQL.getStockOverview, lazy ? params : {date});
+    const response: StockListType['get'] = await fetch(GraphQL.getStockOverview, lazy ? {date} : params);
     if (response) {
       const items = response.stock_Overview.items;
       const total = response.stock_Overview.total;

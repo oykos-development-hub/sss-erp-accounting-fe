@@ -2,6 +2,7 @@ import deleteMovement from './movement/mutations/deleteMovement';
 import insertMovement from './movement/mutations/insertMovement';
 import movementDetails from './movement/query/getMovementDetails';
 import movementOverview from './movement/query/getMovementOverview';
+import getMovementArticles from './movementArticles/getMovementArticles';
 import deleteOrderList from './orders/mutations/deleteOrderList';
 import deleteOrderListReceive from './orders/mutations/deleteOrderListReceive';
 import insertOrderList from './orders/mutations/insertOrderList';
@@ -31,4 +32,5 @@ export const GraphQL = {
   deleteOrderListReceive: deleteOrderListReceive,
   getStockOverview: getStockOverview,
   getOverallSpendingReport: getOverallSpendingReport,
+  getMovementArticles: getMovementArticles,
 };

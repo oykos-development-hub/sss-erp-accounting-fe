@@ -12,7 +12,7 @@ export type OverallSpendingReportResponse = {overallSpending_Report: GetResponse
 export type GetOverallSpendingReportParams = {
   start_date: string | null;
   end_date: string | null;
-  search: string | null;
+  articles: string[] | null;
   office_id: number | null;
   exception: boolean | null;
   organization_unit_id?: number | null;

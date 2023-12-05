@@ -30,6 +30,12 @@ export const OptionsRow = styled.div`
   margin-bottom: 30px;
 
   & > div {
-    max-width: 320px;
+    max-width: 360px;
+  }
+`;
+
+export const OfficeOptionsRow = styled(OptionsRow)`
+  & > div:nth-child(2) {
+    max-width: 640px;
   }
 `;

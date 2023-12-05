@@ -1,7 +1,8 @@
-import {Button, Datepicker, Dropdown, Input} from 'client-library';
-import {useEffect} from 'react';
+import {Button, Datepicker, Dropdown} from 'client-library';
+import {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
+import useGetMovementArticles from '../../services/graphql/movementArticles/useGetMovementArticles';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
 import useGetOrganizationUnits from '../../services/graphql/organizationUnits/hooks/useGetOrganizationUnits';
 import useGetOverallSpendingReport from '../../services/graphql/overallSpendingReport/useGetOverallSpendingReport';
@@ -10,8 +11,9 @@ import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle} from '../../shared/styles';
 import {DropdownDataNumber, DropdownDataString} from '../../types/dropdownData';
 import {parseDateForBackend} from '../../utils/dateUtils';
+import {useDebounce} from '../../utils/useDebounce';
 import {AccountingReportType, accountingReportTypeOptions} from './constants';
-import {Container, Options, OptionsRow} from './styles';
+import {Container, OfficeOptionsRow, Options, OptionsRow} from './styles';
 
 type AccountingReportFilterState = {
   type: DropdownDataString | null;
@@ -20,7 +22,7 @@ type AccountingReportFilterState = {
   office: DropdownDataNumber | null;
   organization_unit_id: DropdownDataNumber | null;
   exception: boolean | null;
-  search: string | null;
+  articles: {value: string; label: string}[] | null;
   date: Date | null;
 };
 
@@ -30,12 +32,14 @@ const initialValues: AccountingReportFilterState = {
   end_date: null,
   office: null,
   organization_unit_id: null,
-  search: null,
+  articles: null,
   exception: null,
   date: null,
 };
 
 const AccountingReports = () => {
+  const [search, setSearch] = useState('');
+
   const {
     reportService: {generatePdf},
     contextMain,
@@ -53,15 +57,21 @@ const AccountingReports = () => {
     control,
     formState: {isValid, errors},
     watch,
-    register,
     setValue,
   } = useForm({defaultValues: initialValues});
 
-  const {type, start_date, end_date, office, search, date} = watch();
+  const {type, start_date, end_date, office, articles, date} = watch();
 
   const {fetch: fetchStock} = useGetStockOverview(undefined, true);
 
   const {lazyFetch} = useGetOverallSpendingReport();
+
+  const debouncedSearch = useDebounce(search, 500);
+
+  const {articles: movementArticles} = useGetMovementArticles(
+    debouncedSearch,
+    type?.id !== AccountingReportType.OFFICE_SPENDING,
+  );
 
   const onSubmit = async () => {
     if (type?.id === AccountingReportType.STOCK) {
@@ -78,20 +88,20 @@ const AccountingReports = () => {
     } else {
       if (!isValid) return;
 
-      const articles = await lazyFetch({
+      const data = await lazyFetch({
         start_date: parseDateForBackend(start_date) || null,
         end_date: parseDateForBackend(end_date) || null,
         office_id: office?.id || null,
-        search: search || null,
+        articles: articles ? articles.map(opt => opt.value) : null,
         exception: type?.id === AccountingReportType.EXCEPTED_FROM_PLAN ? true : null,
       });
 
-      if (!articles || articles.length === 0) {
-        alert.error('Nema artikala za ove datume!');
+      if (!data || data.length === 0) {
+        alert.error('Nema artikala za ovaj period!');
         return;
       }
 
-      generatePdf('ACCOUNTING_SPENDING', {articles, type: type?.id});
+      generatePdf('ACCOUNTING_SPENDING', {articles: data, type: type?.id});
     }
   };
 
@@ -104,7 +114,7 @@ const AccountingReports = () => {
 
     if (type && type.id !== AccountingReportType.OFFICE_SPENDING) {
       setValue('office', null);
-      setValue('search', null);
+      setValue('articles', null);
     }
   }, [type]);
 
@@ -114,6 +124,14 @@ const AccountingReports = () => {
         return 'Datum OD ne može biti veći od datuma DO!';
       }
     }
+  };
+
+  const articleOptions = useMemo(() => {
+    return movementArticles?.map(item => ({id: item, title: item})) as any;
+  }, [movementArticles]);
+
+  const onSearch = (value: string) => {
+    setSearch(value);
   };
 
   return (
@@ -188,7 +206,7 @@ const AccountingReports = () => {
           </OptionsRow>
 
           {type?.id === AccountingReportType.OFFICE_SPENDING && (
-            <OptionsRow>
+            <OfficeOptionsRow>
               <Controller
                 control={control}
                 name="office"
@@ -200,7 +218,7 @@ const AccountingReports = () => {
                 }}
                 render={({field: {onChange, value}}) => (
                   <Dropdown
-                    label="KANCELARIJA"
+                    label="KANCELARIJA:"
                     value={value}
                     onChange={onChange}
                     options={officeOptions}
@@ -208,8 +226,24 @@ const AccountingReports = () => {
                   />
                 )}
               />
-              <Input {...register('search')} label="ARTIKAL:" />
-            </OptionsRow>
+              <Controller
+                control={control}
+                name="articles"
+                render={({field: {onChange, value}}) => (
+                  <Dropdown
+                    label="ARTIKLI:"
+                    value={value as any}
+                    onChange={onChange}
+                    options={articleOptions as any}
+                    isMulti={true}
+                    isSearchable={true}
+                    // Remove this when component is fixed in devkit and storybook
+                    //@ts-ignore
+                    onInputChange={onSearch}
+                  />
+                )}
+              />
+            </OfficeOptionsRow>
           )}
 
           {type?.id === AccountingReportType.TOTAL_SPENDING && isSuperAdmin && (
@@ -218,7 +252,7 @@ const AccountingReports = () => {
               name="organization_unit_id"
               render={({field: {onChange, value}}) => (
                 <Dropdown
-                  label="ORGANIZACIONA JEDINICA"
+                  label="ORGANIZACIONA JEDINICA:"
                   value={value}
                   onChange={onChange}
                   options={organizationUnitOptions}

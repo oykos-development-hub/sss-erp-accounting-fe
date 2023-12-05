@@ -11,22 +11,8 @@ const useGetOverallSpendingReport = () => {
 
   const {fetch} = useAppContext();
 
-  const fetchSpendingReport = async ({
-    start_date,
-    end_date,
-    office_id,
-    organization_unit_id,
-    exception,
-    search,
-  }: GetOverallSpendingReportParams) => {
-    const response: OverallSpendingReportResponse = await fetch(GraphQL.getOverallSpendingReport, {
-      start_date,
-      end_date,
-      office_id,
-      organization_unit_id,
-      exception,
-      search,
-    });
+  const fetchSpendingReport = async (params: GetOverallSpendingReportParams) => {
+    const response: OverallSpendingReportResponse = await fetch(GraphQL.getOverallSpendingReport, {data: params});
 
     const spendingReport = response?.overallSpending_Report.items;
 
