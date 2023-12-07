@@ -17,12 +17,16 @@ type FormValues = {
 };
 
 export const FormOrderDetails: React.FC = () => {
-  const {alert, breadcrumbs, navigation} = useAppContext();
+  const {alert, breadcrumbs, navigation, contextMain} = useAppContext();
   const url = navigation.location.pathname;
   const procurementID = Number(url?.split('/').at(-1));
   const breadcrumbItems = breadcrumbs?.get();
   const procurementTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name?.split('-').at(-1)?.trim();
-  const {articles} = useGetOrderProcurementAvailableArticles(procurementID, VisibilityType.Accounting);
+  const {articles} = useGetOrderProcurementAvailableArticles(
+    procurementID,
+    VisibilityType.Accounting,
+    contextMain?.organization_unit?.id,
+  );
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
   const {
     handleSubmit,

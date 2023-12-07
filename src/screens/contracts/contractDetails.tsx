@@ -20,7 +20,11 @@ export const ContractDetailsSigned: React.FC = () => {
     id: contractID,
   });
   const procurementID = contractData?.[0].public_procurement.id;
-  const {articles} = useGetOrderProcurementAvailableArticles(procurementID as number, VisibilityType.Accounting);
+  const {articles} = useGetOrderProcurementAvailableArticles(
+    procurementID as number,
+    VisibilityType.Accounting,
+    contextMain?.organization_unit?.id,
+  );
   const {data: contractArticles, loading: isLoadingContractArticles} = useContractArticles(contractID);
   const role = contextMain?.role_id;
 

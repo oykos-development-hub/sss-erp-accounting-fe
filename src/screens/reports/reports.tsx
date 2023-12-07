@@ -210,12 +210,6 @@ const AccountingReports = () => {
               <Controller
                 control={control}
                 name="office"
-                rules={{
-                  required: {
-                    value: type?.id === AccountingReportType.OFFICE_SPENDING,
-                    message: 'Ovo polje je obavezno!',
-                  },
-                }}
                 render={({field: {onChange, value}}) => (
                   <Dropdown
                     label="KANCELARIJA:"

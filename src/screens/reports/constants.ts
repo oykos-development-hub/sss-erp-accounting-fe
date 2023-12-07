@@ -1,5 +1,5 @@
 export enum AccountingReportType {
-  STOCK = 'Dostupne količine',
+  STOCK = 'Dostupne količine / Lager lista',
   TOTAL_SPENDING = 'Ukupna potrošnja',
   OFFICE_SPENDING = 'Potrošnja po kancelarijama',
   EXCEPTED_FROM_PLAN = 'Izuzeće od plana',
