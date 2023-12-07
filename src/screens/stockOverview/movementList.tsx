@@ -1,4 +1,4 @@
-import {Dropdown, EditIconTwo, Table, Theme, TrashIcon} from 'client-library';
+import {Dropdown, EditIconTwo, Table, Theme, TrashIcon, PrinterIcon} from 'client-library';
 import {useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {EditMovementModal} from '../../components/editMovementModal/editMovementModal';
@@ -11,7 +11,6 @@ import {NotificationsModal} from '../../shared/notifications/notificationsModal'
 import {tableHeadsMovement} from './constants';
 import {MovementListFilters} from './styles';
 import {MovementDetailsItems} from '../../types/graphql/movementTypes';
-import {PrinterIcon} from '@oykos-development/devkit-react-ts-styled-components';
 
 export const MovementList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);

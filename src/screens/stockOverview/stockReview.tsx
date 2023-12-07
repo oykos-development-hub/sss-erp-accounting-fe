@@ -11,7 +11,7 @@ import {
   XIcon,
 } from 'client-library';
 import {useMemo, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
+import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import useInsertMovement from '../../services/graphql/movement/hooks/useInsertMovement';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
@@ -20,6 +20,17 @@ import useGetStockOverview from '../../services/graphql/stock/hooks/useGetStockO
 import {parseDateForBackend} from '../../utils/dateUtils';
 import {tableHeadsStockReview} from './constants';
 import {ArticleTitleWrapper, Column, DropdownWrapper, Filter, FormControls, FormFooter, MainTitle} from './styles';
+import {StockItem} from '../../types/graphql/stockTypes';
+
+interface Item extends StockItem {
+  quantity: string;
+}
+
+type formFields = {
+  office: string;
+  recipient: string;
+  articles: Item[];
+};
 
 export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
   const {
@@ -27,17 +38,82 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
     alert,
     reportService: {generatePdf},
   } = useAppContext();
+
   const [selectedItems, setSelectedItems] = useState<any>([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [disabled, setDisabled] = useState(false);
-  const [touchedFields, setTouchedFields] = useState<any>({});
-
-  const {total, stockItems} = useGetStockOverview({page, size: 20, title: searchQuery});
   const organisationUnitId = contextMain?.organization_unit?.id;
-  const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
+  const {total, stockItems} = useGetStockOverview({page, size: 20, title: searchQuery});
   const {recipientUsers} = useGetRecipientUsersOverview();
+  const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
   const {mutate: orderListAssetMovementMutation, loading: isSaving} = useInsertMovement();
+
+  const {
+    handleSubmit,
+    control,
+    register,
+    formState: {errors},
+    setError,
+    clearErrors,
+  } = useForm<formFields>({
+    defaultValues: {
+      office: '',
+      articles: stockItems,
+      recipient: '',
+    },
+  });
+
+  const {fields, append, remove} = useFieldArray({
+    control,
+    name: 'articles',
+    keyName: 'key',
+  });
+
+  const tableHeadsStockArticle: TableHead[] = [
+    {
+      title: 'Naziv',
+      accessor: 'title',
+      type: 'text',
+    },
+    {
+      title: 'Bitne karakteristike',
+      accessor: 'description',
+      type: 'text',
+    },
+    {
+      title: 'Dostupne količine',
+      accessor: 'amount',
+      type: 'text',
+    },
+    {
+      title: 'Količina',
+      accessor: 'quantity',
+      type: 'custom',
+      renderContents: (_, row, index) => {
+        return (
+          <Input
+            {...register(`articles.${index}.quantity`, {
+              valueAsNumber: true,
+              required: 'Ovo polje je obavezno.',
+              onChange: e => {
+                if (Number(e.target.value) > row.amount) {
+                  setError(`articles.${index}.quantity`, {
+                    type: 'custom',
+                    message: 'Unijeta količina ne može biti veća od dostupne.',
+                  });
+                } else {
+                  clearErrors(`articles.${index}.quantity`);
+                }
+              },
+            })}
+            error={errors?.articles?.[index]?.quantity?.message as string}
+            style={{width: '200px'}}
+          />
+        );
+      },
+    },
+    {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
+  ];
 
   const officesDropdownData = useMemo(() => {
     if (officesOfOrganizationUnits) {
@@ -62,124 +138,40 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
     return title.includes(searchString);
   });
 
-  const addToSelectedItems = (id: number, title: string, description: string, amount: number) => {
-    const newItem = {id, title, description, amount};
+  const addToSelectedItems = (id: number, title: string, description: string, amount: number, year: string) => {
+    const newItem = {id, title, description, amount, year, quantity: ''};
     setSelectedItems([...selectedItems, newItem]);
+    append(newItem);
   };
 
   const isItemAlreadySelected = (id: number) => {
-    return selectedItems.some((item: any) => item.id === id);
-  };
-
-  const removeFromSelectedItems = (id: number) => {
-    const updatedItems = selectedItems.filter((item: any) => item.id !== id);
-    setSelectedItems(updatedItems);
-  };
-
-  const {
-    handleSubmit,
-    control,
-    clearErrors,
-    setValue,
-    formState: {errors},
-  } = useForm();
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, row: any) => {
-    const {value} = event.target;
-    const updatedArticles = [...selectedItems];
-    const index = updatedArticles.findIndex(item => item.id === row.id);
-
-    if (index !== -1) {
-      const updatedItem = {...updatedArticles[index], quantity: value === '' ? null : +value};
-      updatedArticles[index] = updatedItem;
-      setSelectedItems(updatedArticles);
-    }
+    return fields.some((item: any) => item.id === id);
   };
 
   const onPageChange = (page: number) => {
     setPage(page + 1);
   };
 
-  const handleBlurInput = (itemId: number) => {
-    setTouchedFields({...touchedFields, [itemId]: true});
-    const touchedItem = selectedItems.find((item: any) => item.id === itemId);
-    if (touchedItem && touchedItem.quantity > touchedItem.amount) {
-      const updatedItems = selectedItems.map((item: any) => {
-        if (item.id === itemId) {
-          return {...item, error: 'Količina ne može biti veća od dostupne.'};
-        }
-        return item;
-      });
-      setSelectedItems(updatedItems);
-    } else {
-      const updatedItems = selectedItems.map((item: any) => {
-        if (item.id === itemId) {
-          return {...item, error: ''};
-        }
-        return item;
-      });
-      setSelectedItems(updatedItems);
-    }
-  };
-
-  const tableHeadsStockArticle: TableHead[] = [
-    {
-      title: 'Naziv',
-      accessor: 'title',
-      type: 'text',
-    },
-    {
-      title: 'Bitne karakteristike',
-      accessor: 'description',
-      type: 'text',
-    },
-    {
-      title: 'Dostupne količine',
-      accessor: 'amount',
-      type: 'text',
-    },
-    {
-      title: 'Količina',
-      accessor: 'quantity',
-      type: 'custom',
-      renderContents: (_, row) => {
-        return (
-          <Input
-            type="number"
-            value={row.quantity}
-            onChange={event => handleInputChange(event, row)}
-            onBlur={() => handleBlurInput(row.id)}
-            style={{width: '100px'}}
-            disabled={disabled}
-            error={touchedFields[row.id] ? row.error : ''}
-          />
-        );
-      },
-    },
-    {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
-  ];
-
   const onSubmit = (values: any) => {
     if (isSaving) return;
-    console.log(selectedItems);
+
+    const articles = values?.articles || [];
     const payload = {
-      id: values.id,
+      id: 0,
       office_id: values?.office?.id,
       recipient_user_id: values?.recipient?.id,
       date_order: parseDateForBackend(new Date()),
-      articles:
-        selectedItems?.length > 0 ? selectedItems.map((item: any) => ({id: item.id, quantity: item.quantity})) : [],
+      articles: articles?.length > 0 ? articles.map((item: any) => ({id: item.id, quantity: item.quantity})) : [],
       file_id: 0,
     };
 
     orderListAssetMovementMutation(
       payload,
       () => {
-        setDisabled(true);
         alert.success('Uspješno sačuvano.');
 
         generatePdf('MOVEMENT_RECEIPT', {
-          articles: selectedItems.map((item: any) => ({
+          articles: articles.map((item: Item) => ({
             title: item.title,
             amount: item.quantity,
             description: item.description,
@@ -218,7 +210,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
         tableActions={[
           {
             name: 'Dodaj',
-            onClick: item => addToSelectedItems(item.id, item.title, item.description, item.amount),
+            onClick: item => addToSelectedItems(item.id, item.title, item.description, item.amount, item.year),
             icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
             disabled: item => isItemAlreadySelected(item.id),
             tooltip: () => 'Dodajte artikal',
@@ -233,7 +225,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
         pageCount={total ? total / 10 : 0}
       />
 
-      {selectedItems.length > 0 && (
+      {fields.length > 0 && (
         <>
           <ArticleTitleWrapper>
             <MainTitle content="ODABRANI ARTIKLI" variant="bodyMedium" />
@@ -241,12 +233,12 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
 
           <Table
             tableHeads={tableHeadsStockArticle}
-            data={selectedItems}
+            data={fields}
             tableActions={[
               {
                 name: 'Ukloni',
                 icon: <XIcon stroke={Theme?.palette?.gray800} width="10px" />,
-                onClick: (item: any) => removeFromSelectedItems(item.id),
+                onClick: (index: number) => remove(index),
                 tooltip: () => 'Uklonite artikal',
               },
             ]}
@@ -261,11 +253,10 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
                   render={({field: {onChange, name, value}}) => (
                     <Dropdown
                       onChange={onChange}
-                      value={value}
+                      value={value as any}
                       name={name}
                       label="KANCELARIJA:"
                       options={officesDropdownData || []}
-                      isDisabled={disabled}
                       error={errors?.office?.message as string}
                     />
                   )}
@@ -284,7 +275,6 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
                         name={name}
                         label="PRIMALAC:"
                         options={usersDropdownData || []}
-                        isDisabled={disabled}
                         error={errors?.recipient?.message as string}
                       />
                     );
@@ -296,12 +286,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
 
           <FormFooter>
             <FormControls>
-              <Button
-                content="Sačuvaj internu otpremnicu"
-                variant="secondary"
-                onClick={handleSubmit(onSubmit)}
-                disabled={disabled}
-              />
+              <Button content="Sačuvaj internu otpremnicu" variant="secondary" onClick={handleSubmit(onSubmit)} />
             </FormControls>
           </FormFooter>
         </>

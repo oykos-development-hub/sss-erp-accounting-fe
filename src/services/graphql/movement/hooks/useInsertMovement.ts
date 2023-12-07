@@ -13,7 +13,7 @@ const useInsertMovement = () => {
     const response: MovementTypeResponse['insert'] = await fetch(GraphQL.insertMovement, {
       data,
     });
-    if (response.movement_Insert.status === REQUEST_STATUSES.success) {
+    if (response?.movement_Insert.status === REQUEST_STATUSES.success) {
       onSuccess && onSuccess();
     } else {
       onError && onError();

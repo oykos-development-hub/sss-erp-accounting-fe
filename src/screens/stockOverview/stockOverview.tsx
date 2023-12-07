@@ -14,7 +14,6 @@ enum Tabs {
 export const StockScreen = () => {
   const {navigation} = useAppContext();
   const location = navigation?.location;
-
   const [activeTab, setActiveTab] = useState<Tabs>(location?.state?.activeTab || Tabs.Stock);
 
   const planTabs = [
