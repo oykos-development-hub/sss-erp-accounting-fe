@@ -3,7 +3,6 @@ import React, {useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {PlanStatus} from '../../constants';
 import useAppContext from '../../context/useAppContext';
-import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import useGetPlans from '../../services/graphql/plans/hooks/useGetPlans';
 import {DropdownDataNumber} from '../../types/dropdownData';
 import {ButtonWrapper, FormWrapper, Row} from './styles';
@@ -16,7 +15,7 @@ const initialValues = {
   articles: [],
 };
 
-export const AccountingOrderModal: React.FC<AccountingOrderModalProps> = ({open, onClose, navigate, alert}) => {
+export const AccountingOrderModal: React.FC<AccountingOrderModalProps> = ({open, onClose}) => {
   const [selectedPlan, setSelectedPlan] = useState<DropdownDataNumber | null>(null);
 
   const {
@@ -26,7 +25,7 @@ export const AccountingOrderModal: React.FC<AccountingOrderModalProps> = ({open,
     watch,
   } = useForm({defaultValues: initialValues});
 
-  const {breadcrumbs} = useAppContext();
+  const {breadcrumbs, navigation} = useAppContext();
   const {data: plansData} = useGetPlans({
     page: 1,
     size: 100,
@@ -67,7 +66,7 @@ export const AccountingOrderModal: React.FC<AccountingOrderModalProps> = ({open,
   }
 
   const onSubmit = async () => {
-    navigate(`/accounting/order-form/${procurementID}`);
+    navigation.navigate(`/accounting/order-form/${procurementID}`);
     breadcrumbs.add({
       name: `Nova narudžbenica - ${procurementTitle} `,
       to: '/accounting/order-form',

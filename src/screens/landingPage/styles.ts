@@ -38,6 +38,7 @@ export const ContentBox = styled.div`
   width: 100%;
   background-color: ${Theme?.palette?.white};
   padding: 0;
+  cursor: pointer;
 
   :hover ${TitleWrapper} {
     background-color: ${Theme?.palette?.primary500};

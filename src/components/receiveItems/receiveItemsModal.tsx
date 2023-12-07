@@ -194,7 +194,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         onClose();
       }}
       leftButtonText="Otkaži"
-      rightButtonText="Dodaj"
+      rightButtonText="Sačuvaj"
       rightButtonOnClick={handleSubmit(onSubmit)}
       buttonLoading={isSaving}
       width={870}

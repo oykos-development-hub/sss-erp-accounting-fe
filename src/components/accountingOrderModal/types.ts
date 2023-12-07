@@ -4,5 +4,4 @@ export interface AccountingOrderModalProps {
   open: boolean;
   onClose: () => void;
   dropdownData?: any;
-  navigate: (path: any) => void;
 }

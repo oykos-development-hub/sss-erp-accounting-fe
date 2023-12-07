@@ -182,23 +182,10 @@ export const AccountingOrdersMainPage: React.FC = () => {
         />
 
         {showModal && (
-          <AccountingOrderModal
-            alert={alert}
-            open={showModal}
-            onClose={closeModal}
-            selectedItem={selectedItem}
-            navigate={navigation.navigate}
-          />
+          <AccountingOrderModal alert={alert} open={showModal} onClose={closeModal} selectedItem={selectedItem} />
         )}
 
-        {showExceptionModal && (
-          <ExceptionModal
-            alert={alert}
-            open={showExceptionModal}
-            onClose={closeExceptionModal}
-            navigate={navigation.navigate}
-          />
-        )}
+        {showExceptionModal && <ExceptionModal alert={alert} open={showExceptionModal} onClose={closeExceptionModal} />}
 
         <NotificationsModal
           open={!!showDeleteModal}

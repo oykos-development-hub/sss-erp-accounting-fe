@@ -35,6 +35,7 @@ export const Exceptions: React.FC = () => {
   const exceptionsTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name?.split('-').at(-1)?.trim();
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
   const {suppliers} = useGetSuppliers({id: 0, search: null, page: 1, size: 100});
+  const countTitle = navigation.location.state?.count;
 
   const {
     handleSubmit,
@@ -103,7 +104,7 @@ export const Exceptions: React.FC = () => {
       payload as any,
       orderID => {
         alert.success('Uspješno sačuvano.');
-        navigation.navigate(`/accounting/${exceptionID}/order-form/${orderID}/order-details`);
+        navigation.navigate(`/accounting/${exceptionID}/order-form/${orderID}/order-details`, {state: {countTitle}});
         breadcrumbs.remove(2);
         breadcrumbs.add({
           name: `Detalji narudžbenice - ${exceptionsTitle}`,
@@ -152,6 +153,10 @@ export const Exceptions: React.FC = () => {
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'GRUPA ARTIKALA:'} />
               <Typography variant="bodySmall" content={`${exceptionsTitle}`} />
+            </Row>
+            <Row>
+              <Typography variant="bodySmall" style={{fontWeight: 600}} content={'KONTO:'} />
+              <Typography variant="bodySmall" content={`${countTitle}`} />
             </Row>
             <Row>
               <Controller

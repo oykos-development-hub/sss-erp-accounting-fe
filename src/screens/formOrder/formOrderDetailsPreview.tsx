@@ -23,7 +23,6 @@ import {
 } from './styles';
 import {FileResponseItem} from '../../types/fileUploadType';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
-import {OrderListInsertParams, OrderListItem} from '../../types/graphql/orderListTypes';
 import {useForm} from 'react-hook-form';
 
 export const FormOrderDetailsPreview: React.FC = () => {
@@ -197,6 +196,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
                 <Typography variant="bodySmall" content={`${orders && orders[0]?.group_of_articles?.title}`} />
               </Row>
             )}
+
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DOBAVLJAČ:'} />
               <Typography variant="bodySmall" content={`${supplier?.title || ''} `} />
