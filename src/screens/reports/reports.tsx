@@ -2,6 +2,7 @@ import {Button, Datepicker, Dropdown} from 'client-library';
 import {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
+import useGetMovementArticles from '../../services/graphql/movementArticles/useGetMovementArticles';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
 import useGetOrganizationUnits from '../../services/graphql/organizationUnits/hooks/useGetOrganizationUnits';
 import useGetOverallSpendingReport from '../../services/graphql/overallSpendingReport/useGetOverallSpendingReport';
@@ -13,7 +14,6 @@ import {parseDateForBackend} from '../../utils/dateUtils';
 import {useDebounce} from '../../utils/useDebounce';
 import {AccountingReportType, accountingReportTypeOptions} from './constants';
 import {Container, OfficeOptionsRow, Options, OptionsRow} from './styles';
-import useGetMovementArticles from '../../services/graphql/movementArticles/useGetMovementArticles';
 
 type AccountingReportFilterState = {
   type: DropdownDataString | null;
@@ -60,7 +60,7 @@ const AccountingReports = () => {
     setValue,
   } = useForm({defaultValues: initialValues});
 
-  const {type, start_date, end_date, office, articles, date} = watch();
+  const {type, start_date, end_date, office, articles, date, organization_unit_id} = watch();
 
   const {fetch: fetchStock} = useGetStockOverview(undefined, true);
 
@@ -88,12 +88,19 @@ const AccountingReports = () => {
     } else {
       if (!isValid) return;
 
+      const orgUnit = isSuperAdmin
+        ? organization_unit_id
+          ? organization_unit_id.id
+          : null
+        : contextMain?.organization_unit?.id;
+
       const data = await lazyFetch({
         start_date: parseDateForBackend(start_date) || null,
         end_date: parseDateForBackend(end_date) || null,
         office_id: office?.id || null,
         articles: articles ? articles.map(opt => opt.value) : null,
         exception: type?.id === AccountingReportType.EXCEPTED_FROM_PLAN ? true : null,
+        organization_unit_id: orgUnit,
       });
 
       if (!data || data.length === 0) {
@@ -240,7 +247,7 @@ const AccountingReports = () => {
             </OfficeOptionsRow>
           )}
 
-          {/* {type?.id === AccountingReportType.TOTAL_SPENDING && isSuperAdmin && (
+          {type?.id === AccountingReportType.EXCEPTED_FROM_PLAN && isSuperAdmin && (
             <Controller
               control={control}
               name="organization_unit_id"
@@ -251,10 +258,11 @@ const AccountingReports = () => {
                   onChange={onChange}
                   options={organizationUnitOptions}
                   isDisabled={!!office}
+                  style={{maxWidth: '320px'}}
                 />
               )}
             />
-          )} */}
+          )}
         </Options>
 
         <Button content="Generiši izvještaj" onClick={handleSubmit(onSubmit)} style={{width: 'fit-content'}} />
