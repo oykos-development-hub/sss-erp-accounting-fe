@@ -138,7 +138,7 @@ export const Exceptions: React.FC = () => {
       accessor: 'amount',
       type: 'custom',
       renderContents: (_, row, index) => {
-        return <AmountInput {...register(`articles.${index}.amount`)} />;
+        return <AmountInput {...register(`articles.${index}.amount`)} isRequired />;
       },
     },
   ];
@@ -172,6 +172,7 @@ export const Exceptions: React.FC = () => {
                       label="DOBAVLJAČ:"
                       options={suppliers as any}
                       error={errors?.supplier?.message as string}
+                      isRequired
                     />
                   );
                 }}

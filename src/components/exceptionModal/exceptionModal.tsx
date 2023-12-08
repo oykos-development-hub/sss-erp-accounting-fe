@@ -68,6 +68,7 @@ export const ExceptionModal: React.FC<AccountingOrderModalProps> = ({open, onClo
                   name={name}
                   label="GRUPA ARTIKALA:"
                   options={articleGroup}
+                  isRequired
                 />
               )}
             />

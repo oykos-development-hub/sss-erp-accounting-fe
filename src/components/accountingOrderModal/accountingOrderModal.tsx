@@ -109,6 +109,7 @@ export const AccountingOrderModal: React.FC<AccountingOrderModalProps> = ({open,
                 options={procurements}
                 error={errors.public_procurement_id?.message as string}
                 isDisabled={!selectedPlan}
+                isRequired
               />
             )}
           />

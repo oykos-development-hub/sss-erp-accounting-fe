@@ -182,6 +182,7 @@ export const ProcurementContractModal: React.FC<ProcurementContractModalProps> =
                 {...register('serial_number', {required: 'Ovo polje je obavezno'})}
                 error={errors?.serial_number?.message as string}
                 label={'ŠIFRA UGOVORA:'}
+                isRequired
               />
             </Column>
             <Column>
@@ -224,6 +225,7 @@ export const ProcurementContractModal: React.FC<ProcurementContractModalProps> =
                     name={name}
                     value={value ? parseDate(value) : ''}
                     error={errors.date_of_signing?.message}
+                    isRequired
                   />
                 )}
               />
@@ -246,6 +248,7 @@ export const ProcurementContractModal: React.FC<ProcurementContractModalProps> =
                     name={name}
                     value={value ? parseDate(value) : ''}
                     error={errors.date_of_expiry?.message}
+                    isRequired
                   />
                 )}
               />

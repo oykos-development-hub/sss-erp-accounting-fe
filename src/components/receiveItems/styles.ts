@@ -43,12 +43,4 @@ export const DatepickersWrapper = styled.div`
 
 export const TextareaWrapper = styled.div`
   height: 100%;
-
-  div {
-    height: 100%;
-  }
-
-  div > div {
-    height: 100%;
-  }
 `;

@@ -15,7 +15,21 @@ export const tableHeads: TableHead[] = [
     accessor: 'total_bruto',
     type: 'custom',
     renderContents: (total_bruto: number) => {
-      return <Typography variant="bodyMedium" content={total_bruto ? parseFloat(total_bruto?.toFixed(2)) : 0.0} />;
+      return (
+        <Typography
+          variant="bodyMedium"
+          content={
+            total_bruto
+              ? parseFloat(
+                  total_bruto?.toLocaleString('sr-RS', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }),
+                )
+              : 0.0
+          }
+        />
+      );
     },
   },
   {

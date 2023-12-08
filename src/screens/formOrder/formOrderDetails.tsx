@@ -134,6 +134,7 @@ export const FormOrderDetails: React.FC = () => {
                 }
               },
             })}
+            isRequired
             error={errors?.articles?.[index]?.message as string}
           />
         );
@@ -172,6 +173,13 @@ export const FormOrderDetails: React.FC = () => {
 
         <Table tableHeads={tableHeads} data={fields || []} />
         <FormFooter>
+          <FormControls>
+            <Button
+              content="Otkaži"
+              variant="secondary"
+              onClick={() => navigation.navigate('/accounting/order-form')}
+            />
+          </FormControls>
           <FormControls>
             <Button content="Sačuvaj" variant="primary" onClick={handleSubmit(onSubmit)} />
           </FormControls>

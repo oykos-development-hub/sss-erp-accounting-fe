@@ -109,6 +109,7 @@ export const StockReview = () => {
             })}
             error={errors?.articles?.[index]?.quantity?.message as string}
             style={{width: '200px'}}
+            isRequired
           />
         );
       },
@@ -258,6 +259,7 @@ export const StockReview = () => {
                       label="KANCELARIJA:"
                       options={officesDropdownData || []}
                       error={errors?.office?.message as string}
+                      isRequired
                     />
                   )}
                 />
@@ -276,6 +278,7 @@ export const StockReview = () => {
                         label="PRIMALAC:"
                         options={usersDropdownData || []}
                         error={errors?.recipient?.message as string}
+                        isRequired
                       />
                     );
                   }}

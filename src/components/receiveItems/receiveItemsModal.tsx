@@ -60,7 +60,21 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       accessor: 'total_price',
       type: 'custom',
       renderContents: (total_price: number) => {
-        return <Typography variant="bodyMedium" content={total_price ? parseFloat(total_price.toFixed(2)) : ''} />;
+        return (
+          <Typography
+            variant="bodyMedium"
+            content={
+              total_price
+                ? parseFloat(
+                    total_price.toLocaleString('sr-RS', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }),
+                  )
+                : ''
+            }
+          />
+        );
       },
       shouldRender: Number(data[0]?.public_procurement?.id) !== 0,
     },
@@ -252,6 +266,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                       name={name}
                       value={value ? parseDate(value) : ''}
                       error={errors.invoice_date?.message as string}
+                      isRequired
                     />
                   )}
                 />
@@ -283,6 +298,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                       name={name}
                       value={value ? parseDate(value) : ''}
                       error={errors.date_system?.message as string}
+                      isRequired
                     />
                   )}
                 />
@@ -304,20 +320,31 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             </div>
             <TextareaWrapper>
               <Input {...register('description')} label="NAPOMENA:" textarea={true} />
+              {Number(data[0]?.public_procurement?.id) !== 0 && (
+                <>
+                  <Input
+                    label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):"
+                    value={totalNeto.toLocaleString('sr-RS', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    disabled={true}
+                    style={{marginBlock: 5}}
+                  />
+                  <Input
+                    label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):"
+                    value={totalPrice.toLocaleString('sr-RS', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    disabled={true}
+                  />
+                </>
+              )}
             </TextareaWrapper>
           </HeaderSection>
 
           <Table tableHeads={tableHeads} data={filteredArticles} />
-          {Number(data[0]?.public_procurement?.id) !== 0 && (
-            <Row>
-              <Input label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):" value={totalNeto} disabled={true} />
-              <Input
-                label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):"
-                value={totalPrice.toFixed(2)}
-                disabled={true}
-              />
-            </Row>
-          )}
         </FormWrapper>
       }
       title={'KREIRAJ NOVU PRIJEMNICU'}

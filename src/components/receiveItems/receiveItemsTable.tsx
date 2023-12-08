@@ -43,7 +43,21 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch
       accessor: 'total_bruto',
       type: 'custom',
       renderContents: (total_bruto: number) => {
-        return <Typography variant="bodyMedium" content={total_bruto ? parseFloat(total_bruto.toFixed(2)) : ''} />;
+        return (
+          <Typography
+            variant="bodyMedium"
+            content={
+              total_bruto
+                ? parseFloat(
+                    total_bruto.toLocaleString('sr-RS', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }),
+                  )
+                : ''
+            }
+          />
+        );
       },
       shouldRender: Number(data?.public_procurement?.id) !== 0,
     },

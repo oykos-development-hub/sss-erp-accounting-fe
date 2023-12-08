@@ -133,6 +133,7 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
                 label="PRIMALAC:"
                 options={dropdownData.users}
                 error={errors.recipient_user?.message as string}
+                isRequired
               />
             )}
           />
@@ -148,6 +149,7 @@ export const EditMovementModal: React.FC<EditMovementModalProps> = ({
                 label="KANCELARIJA:"
                 options={dropdownData.offices}
                 error={errors.office?.message as string}
+                isRequired
               />
             )}
           />
