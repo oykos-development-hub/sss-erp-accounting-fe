@@ -32,11 +32,12 @@ type formFields = {
   articles: Item[];
 };
 
-export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
+export const StockReview = () => {
   const {
     contextMain,
     alert,
     reportService: {generatePdf},
+    navigation,
   } = useAppContext();
 
   const [selectedItems, setSelectedItems] = useState<any>([]);
@@ -180,8 +181,7 @@ export const StockReview = ({navigateToList}: {navigateToList: () => void}) => {
           recipient: usersDropdownData?.find(user => user.id === values?.recipient?.id)?.title || '',
           date: new Date(),
         });
-
-        navigateToList();
+        navigation.navigate('/accounting/movement');
       },
       () => {
         alert?.error('Greška. Promjene nisu sačuvane.');

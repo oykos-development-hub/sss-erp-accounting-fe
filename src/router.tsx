@@ -34,6 +34,7 @@ export const Router: React.FC<MicroserviceProps> = () => {
     if (FormOrderDetailsRegex.test(pathname)) return <FormOrderDetails />;
     if (ContractDetailsRegex.test(pathname)) return <ContractDetailsSigned />;
     if (pathname === '/accounting/stock') return <StockScreen />;
+    if (pathname === '/accounting/movement') return <StockScreen />;
     if (MovementDetailsRegex.test(pathname)) return <MovementDetails />;
     if (ExceptionsRegex.test(pathname)) return <Exceptions />;
     if (pathname === '/accounting/reports') return <AccountingReports />;

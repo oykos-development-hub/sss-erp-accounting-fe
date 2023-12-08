@@ -65,3 +65,24 @@ export const tableHeadsStockArticleDetails: TableHead[] = [
   },
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
+
+export enum Tabs {
+  Stock = 1,
+  AssetMovement = 2,
+}
+
+export const stockTabs = [
+  {id: Tabs.Stock, title: 'Pregled zaliha', routeName: 'stock'},
+  {id: Tabs.AssetMovement, title: 'Lista svih otpremnica', routeName: 'movement'},
+];
+
+export const getCurrentTab = (pathname: string) => {
+  const path = pathname.split('/');
+  const name = path[path.length - 1];
+  return stockTabs.find(tab => tab.routeName === name)?.id;
+};
+
+export const getRouteName = (tabName: string) => {
+  const tabIndex = stockTabs.findIndex(tab => tab.title === tabName);
+  return stockTabs[tabIndex].routeName;
+};
