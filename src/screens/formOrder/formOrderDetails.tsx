@@ -177,7 +177,10 @@ export const FormOrderDetails: React.FC = () => {
             <Button
               content="Otkaži"
               variant="secondary"
-              onClick={() => navigation.navigate('/accounting/order-form')}
+              onClick={() => {
+                navigation.navigate('/accounting/order-form');
+                breadcrumbs.remove();
+              }}
             />
           </FormControls>
           <FormControls>

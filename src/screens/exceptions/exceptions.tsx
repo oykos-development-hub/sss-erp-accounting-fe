@@ -196,6 +196,16 @@ export const Exceptions: React.FC = () => {
         <Table tableHeads={tableHeads} data={newArticles || []} />
         <FormFooter>
           <FormControls>
+            <Button
+              content="Otkaži"
+              variant="secondary"
+              onClick={() => {
+                navigation.navigate('/accounting/order-form');
+                breadcrumbs.remove();
+              }}
+            />
+          </FormControls>
+          <FormControls>
             <Button content="Sačuvaj" variant="primary" onClick={handleSubmit(onSubmit)} />
           </FormControls>
         </FormFooter>
