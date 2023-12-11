@@ -1,5 +1,5 @@
 import {Button, Table, TableHead, Typography} from 'client-library';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import useGetOrderProcurementAvailableArticles from '../../services/graphql/orders/hooks/useGetOrderProcurementAvailableArticles';
@@ -8,12 +8,17 @@ import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
 import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes';
 import {AmountInput, FormControls, FormFooter, OrderInfo} from './styles';
+import {OrderListArticleType} from '../../types/graphql/articleTypes';
 
-type FormValues = {
+interface articlesItem extends OrderListArticleType {
+  amount: number;
+}
+
+type formFields = {
   date_order: string;
   public_procurement_id: number;
-  articles: any[];
   order_file: number | null;
+  articles: articlesItem[];
 };
 
 export const FormOrderDetails: React.FC = () => {
@@ -27,6 +32,7 @@ export const FormOrderDetails: React.FC = () => {
     VisibilityType.Accounting,
     contextMain?.organization_unit?.id,
   );
+
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
   const {
     handleSubmit,
@@ -37,7 +43,7 @@ export const FormOrderDetails: React.FC = () => {
     setError,
     getValues,
     formState: {errors},
-  } = useForm<FormValues>({
+  } = useForm<formFields>({
     defaultValues: {
       date_order: '',
       public_procurement_id: procurementID,
@@ -123,19 +129,19 @@ export const FormOrderDetails: React.FC = () => {
           <AmountInput
             {...register(`articles.${index}.amount`, {
               valueAsNumber: true,
+              required: 'Ovo polje je obavezno.',
               onBlur: e => {
                 if (Number(e.target.value) > row.available) {
-                  setError(`articles.${index}`, {
+                  setError(`articles.${index}.amount`, {
                     type: 'custom',
                     message: 'Unijeta količina ne može biti veća od dostupne.',
                   });
                 } else {
-                  clearErrors(`articles.${index}`);
+                  clearErrors(`articles.${index}.amount`);
                 }
               },
             })}
-            isRequired
-            error={errors?.articles?.[index]?.message as string}
+            error={errors?.articles?.[index]?.amount?.message as string}
           />
         );
       },

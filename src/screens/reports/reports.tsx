@@ -159,6 +159,7 @@ const AccountingReports = () => {
                   value={value}
                   onChange={onChange}
                   options={accountingReportTypeOptions}
+                  isRequired
                   error={errors.type?.message}
                 />
               )}
@@ -174,6 +175,7 @@ const AccountingReports = () => {
                     label="DATUM:"
                     name={name}
                     selected={value ? new Date(value) : ''}
+                    isRequired
                     error={errors.date?.message}
                   />
                 )}
@@ -190,6 +192,7 @@ const AccountingReports = () => {
                       label="DATUM OD:"
                       name={name}
                       selected={value ? new Date(value) : ''}
+                      isRequired
                       error={errors.start_date?.message}
                     />
                   )}
@@ -204,6 +207,7 @@ const AccountingReports = () => {
                       label="DATUM DO:"
                       name={name}
                       selected={value ? new Date(value) : ''}
+                      isRequired
                       error={errors.end_date?.message}
                     />
                   )}
@@ -223,6 +227,7 @@ const AccountingReports = () => {
                     value={value}
                     onChange={onChange}
                     options={officeOptions}
+                    isRequired
                     error={errors.office?.message}
                   />
                 )}
