@@ -5,6 +5,7 @@ export const tableHeadsStockReview: TableHead[] = [
   {
     title: 'Godina',
     accessor: 'year',
+    sortable: true,
     type: 'text',
   },
   {
@@ -20,6 +21,7 @@ export const tableHeadsStockReview: TableHead[] = [
   {
     title: 'Dostupne količine',
     accessor: 'amount',
+    sortable: true,
     type: 'text',
   },
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
@@ -28,6 +30,7 @@ export const tableHeadsStockReview: TableHead[] = [
 export const tableHeadsMovement: TableHead[] = [
   {
     title: ' Datum interne otpremnice',
+    sortable: true,
     accessor: 'date_order',
     type: 'custom',
     renderContents: date_order => <Typography content={date_order ? parseDate(date_order) : ''} />,

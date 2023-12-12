@@ -17,13 +17,17 @@ export const AccountingOrdersMainPage: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
-  const [page, setPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showExceptionModal, setShowExceptionModal] = useState(false);
   const {suppliers} = useGetSuppliers({id: 0, search: null, page: 1, size: 100});
 
   const [form, setForm] = useState<any>({
+    page: 1,
+    size: 10,
+    order_id: 0,
     supplier: {id: 0, title: ''},
+    status: '',
+    search: '',
   });
 
   const debouncedForm = useDebounce(form, 500);
@@ -44,14 +48,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
     return options;
   }, [suppliers]);
 
-  const {orders, total, fetch, loading} = useGetOrderList(
-    page,
-    10,
-    0,
-    form?.supplier?.id ? form.supplier.id : null,
-    null,
-    null,
-  );
+  const {orders, total, fetch, loading} = useGetOrderList({...form, supplier_id: form?.supplier?.id || null});
   const {mutate: deleteOrder} = useDeleteOrderList();
 
   const selectedItem = useMemo(() => {
@@ -104,7 +101,23 @@ export const AccountingOrdersMainPage: React.FC = () => {
   };
 
   const onPageChange = (page: number) => {
-    setPage(page + 1);
+    setForm((prevState: any) => ({
+      ...prevState,
+      page,
+    }));
+  };
+
+  const handleSort = (column: string, direction: string) => {
+    const sorter = column === 'total_bruto' ? 'sort_by_total_price' : `sort_by_${column}`;
+    setForm((prevState: any) => ({
+      page: prevState.page,
+      size: prevState.size,
+      order_id: prevState.order_id,
+      supplier_id: prevState.supplier_id,
+      status: prevState.status,
+      search: prevState.search,
+      [sorter]: direction,
+    }));
   };
 
   useEffect(() => {
@@ -148,6 +161,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
             tableHeads={tableHeads}
             data={(orders as any) || []}
             isLoading={loading}
+            onSort={handleSort}
             onRowClick={row => {
               if (Number(row?.public_procurement?.id) !== 0) {
                 navigation.navigate(`/accounting/${row?.public_procurement?.id}/order-form/${row?.id}/order-details`);

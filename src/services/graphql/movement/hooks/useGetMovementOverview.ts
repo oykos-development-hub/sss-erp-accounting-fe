@@ -1,15 +1,27 @@
 import {useEffect, useState} from 'react';
 import useAppContext from '../../../../context/useAppContext';
 import {GraphQL} from '../..';
-import {MovementItems, MovementTypeResponse} from '../../../../types/graphql/movementTypes';
+import {GetMovementOverviewParams, MovementItems, MovementTypeResponse} from '../../../../types/graphql/movementTypes';
 
-const useGetMovementOverview = (office_id: number | null, recipient_user_id: number | null) => {
+const useGetMovementOverview = ({
+  page,
+  size,
+  office_id,
+  recipient_user_id,
+  sort_by_date_order,
+}: GetMovementOverviewParams) => {
   const [movementItems, setMovementItems] = useState<MovementItems[]>([]);
   const [loading, setLoading] = useState(true);
   const {fetch} = useAppContext();
 
   const fetchMovement = async () => {
-    const response: MovementTypeResponse['get'] = await fetch(GraphQL.movementOverview, {office_id, recipient_user_id});
+    const response: MovementTypeResponse['get'] = await fetch(GraphQL.movementOverview, {
+      page,
+      size,
+      office_id,
+      recipient_user_id,
+      sort_by_date_order,
+    });
     if (response) {
       const items = response.movement_Overview.items;
       setMovementItems(items);
@@ -19,7 +31,7 @@ const useGetMovementOverview = (office_id: number | null, recipient_user_id: num
 
   useEffect(() => {
     fetchMovement();
-  }, [office_id, recipient_user_id]);
+  }, [page, size, office_id, recipient_user_id]);
 
   return {movementItems, loading, fetch: fetchMovement};
 };

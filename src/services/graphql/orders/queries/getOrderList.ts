@@ -1,5 +1,5 @@
-const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, $supplier_id: Int, $status: String, $search: String, $active_plan: Boolean) {
-    orderList_Overview(page: $page, size: $size, id: $id, supplier_id: $supplier_id, status: $status, search: $search, active_plan: $active_plan) {
+const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, $supplier_id: Int, $status: String, $search: String, $active_plan: Boolean, $year: String, $sort_by_date_order: String, $sort_by_total_price: String) {
+    orderList_Overview(page: $page, size: $size, id: $id, supplier_id: $supplier_id, status: $status, search: $search, active_plan: $active_plan, year:$year, sort_by_date_order: $sort_by_date_order, sort_by_total_price: $sort_by_total_price) {
         status 
         message
         total 

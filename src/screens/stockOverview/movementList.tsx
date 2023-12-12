@@ -1,5 +1,5 @@
 import {Dropdown, EditIconTwo, Table, Theme, TrashIcon, PrinterIcon} from 'client-library';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {EditMovementModal} from '../../components/editMovementModal/editMovementModal';
 import useAppContext from '../../context/useAppContext';
@@ -29,7 +29,12 @@ export const MovementList = () => {
   const recipient = watch('recipient')?.id;
   const organisationUnitId = contextMain?.organization_unit?.id;
 
-  const {movementItems, fetch} = useGetMovementOverview(office, recipient);
+  const [form, setForm] = useState({
+    office_id: office,
+    recipient_user_id: recipient,
+  });
+
+  const {movementItems, fetch} = useGetMovementOverview({office_id: office, recipient_user_id: recipient});
   const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
   const {recipientUsers} = useGetRecipientUsersOverview();
   const {mutate} = useDeleteMovement();
@@ -89,7 +94,6 @@ export const MovementList = () => {
   };
 
   const generateMovementPdf = (item: MovementDetailsItems) => {
-    console.log(item, 'item');
     generatePdf('MOVEMENT_RECEIPT', {
       office: item.office?.title,
       recipient: item.recipient_user?.title,
@@ -97,6 +101,19 @@ export const MovementList = () => {
       articles: item.articles,
     });
   };
+
+  const handleSort = (column: string, direction: string) => {
+    const sorter = `sort_by_${column}`;
+    setForm((prevState: any) => ({
+      office_id: prevState.office_id,
+      recipient_user_id: prevState.recipient_user_id,
+      [sorter]: direction,
+    }));
+  };
+
+  useEffect(() => {
+    fetch();
+  }, [form]);
 
   return (
     <>
@@ -133,6 +150,7 @@ export const MovementList = () => {
       <Table
         tableHeads={tableHeadsMovement}
         data={movementItems}
+        onSort={handleSort}
         onRowClick={row => {
           navigate(`/accounting/stock/${row.id.toString()}/movement`);
           breadcrumbs.add({

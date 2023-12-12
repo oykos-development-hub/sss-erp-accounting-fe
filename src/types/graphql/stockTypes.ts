@@ -19,4 +19,6 @@ export type StockOverviewParams = {
   size?: number;
   title?: string;
   date?: string;
+  sort_by_amount?: string;
+  sort_by_year?: string;
 };

@@ -10,8 +10,8 @@ import {
   Theme,
   XIcon,
 } from 'client-library';
-import {useMemo, useState} from 'react';
-import {Controller, useFieldArray, useForm} from 'react-hook-form';
+import {useEffect, useMemo, useState} from 'react';
+import {Controller, set, useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
 import useInsertMovement from '../../services/graphql/movement/hooks/useInsertMovement';
 import useGetOfficesOfOrganizationUnits from '../../services/graphql/officesOfOrganisationUnit/hooks/useGetOfficeOfOrganizationUnits';
@@ -41,10 +41,13 @@ export const StockReview = () => {
   } = useAppContext();
 
   const [selectedItems, setSelectedItems] = useState<any>([]);
-  const [page, setPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [form, setForm] = useState({
+    page: 1,
+    size: 20,
+    title: '',
+  });
   const organisationUnitId = contextMain?.organization_unit?.id;
-  const {total, stockItems} = useGetStockOverview({page, size: 20, title: searchQuery});
+  const {total, stockItems, fetch} = useGetStockOverview(form);
   const {recipientUsers} = useGetRecipientUsersOverview();
   const {officesOfOrganizationUnits} = useGetOfficesOfOrganizationUnits(0, organisationUnitId, '');
   const {mutate: orderListAssetMovementMutation, loading: isSaving} = useInsertMovement();
@@ -130,11 +133,14 @@ export const StockReview = () => {
   }, [recipientUsers]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
+    setForm((prevState: any) => ({
+      ...prevState,
+      title: event.target.value,
+    }));
   };
 
   const filteredTableData = stockItems?.filter(item => {
-    const searchString = searchQuery.toLowerCase();
+    const searchString = form?.title.toLowerCase();
     const title = item?.title.toLowerCase();
 
     return title.includes(searchString);
@@ -151,7 +157,10 @@ export const StockReview = () => {
   };
 
   const onPageChange = (page: number) => {
-    setPage(page + 1);
+    setForm((prevState: any) => ({
+      ...prevState,
+      page: page + 1,
+    }));
   };
 
   const onSubmit = (values: any) => {
@@ -190,13 +199,27 @@ export const StockReview = () => {
     );
   };
 
+  const handleSort = (column: string, direction: string) => {
+    const sorter = `sort_by_${column}`;
+    setForm((prevState: any) => ({
+      page: prevState.page,
+      size: prevState.size,
+      title: prevState.title,
+      [sorter]: direction,
+    }));
+  };
+
+  useEffect(() => {
+    fetch();
+  }, [form]);
+
   return (
     <>
       <div>
         <Filter>
           <Column>
             <Input
-              value={searchQuery}
+              value={form?.title}
               onChange={handleSearch}
               label="NAZIV ARTIKLA:"
               rightContent={<SearchIcon style={{marginLeft: 10, marginRight: 10}} stroke={Theme.palette.gray500} />}
@@ -208,6 +231,7 @@ export const StockReview = () => {
       <Table
         tableHeads={tableHeadsStockReview}
         data={filteredTableData}
+        onSort={handleSort}
         tableActions={[
           {
             name: 'Dodaj',

@@ -1,5 +1,5 @@
 import {Accordion, Button, ChevronDownIcon, Table, TableHead, Typography, FileUpload} from 'client-library';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import FileList from '../../components/fileList/fileList';
 import {ReceiveItemsModal} from '../../components/receiveItems/receiveItemsModal';
 import {ReceiveItemsTable} from '../../components/receiveItems/receiveItemsTable';
@@ -45,7 +45,15 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const url = navigation.location.pathname;
   const orderId = Number(url?.split('/').at(-2));
 
-  const {orders, loading, fetch} = useGetOrderList(1, 10, orderId, 0, '', '');
+  const [form, setForm] = useState({
+    page: 1,
+    size: 10,
+    order_id: orderId,
+    status: '',
+    search: '',
+  });
+
+  const {orders, loading, fetch} = useGetOrderList(form);
   const {mutate: deleteOrderListReceive} = useDeleteOrderListReceive();
   const {mutate: orderListInsert} = useOrderListInsert();
 

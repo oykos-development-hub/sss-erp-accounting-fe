@@ -36,12 +36,15 @@ export interface OrderListItem {
 }
 
 export interface GetOrderListParams {
-  page?: number;
-  size?: number;
+  page: number;
+  size: number;
   id?: number;
   supplier_id?: number;
   status?: string;
   search?: string;
+  year?: string;
+  sort_by_date_order?: string;
+  sort_by_total_price?: string;
 }
 export interface OrderListReceiveParams {
   order_id: number;

@@ -5,6 +5,7 @@ export const tableHeads: TableHead[] = [
   {
     title: 'Datum narudžbenice',
     accessor: 'date_order',
+    sortable: true,
     type: 'custom',
     renderContents: (date_order: string) => {
       return <Typography variant="bodyMedium" content={date_order ? parseDate(date_order) : ''} />;
@@ -12,6 +13,7 @@ export const tableHeads: TableHead[] = [
   },
   {
     title: 'Ukupna cijena',
+    sortable: true,
     accessor: 'total_bruto',
     type: 'custom',
     renderContents: (total_bruto: number) => {

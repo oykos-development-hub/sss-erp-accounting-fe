@@ -9,6 +9,14 @@ export interface MovementItems {
   recipient_user: DropdownDataNumber;
 }
 
+export interface GetMovementOverviewParams {
+  page?: number;
+  size?: number;
+  office_id?: number;
+  recipient_user_id?: number;
+  sort_by_date_order?: string;
+}
+
 export interface MovementDetailsItems {
   id: number;
   description: string;
