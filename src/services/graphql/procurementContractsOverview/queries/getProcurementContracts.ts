@@ -1,5 +1,5 @@
-const contractsOverviewQuery = `query Contracts($id: Int, $procurement_id: Int, $supplier_id: Int) {
-    publicProcurementContracts_Overview(id: $id, procurement_id: $procurement_id, supplier_id: $supplier_id) {
+const contractsOverviewQuery = `query Contracts($id: Int, $procurement_id: Int, $supplier_id: Int, $year: String) {
+    publicProcurementContracts_Overview(id: $id, procurement_id: $procurement_id, supplier_id: $supplier_id, year:$year) {
         status 
         message
         total

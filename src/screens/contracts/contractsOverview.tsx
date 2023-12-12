@@ -1,27 +1,27 @@
+import {Modal, PlusIcon, Table, Theme, Typography} from 'client-library';
 import React, {useMemo, useState} from 'react';
-import {Table, Theme, PlusIcon, Modal, Typography, Tooltip} from 'client-library';
-import {tableHeads} from './constants';
-import {Container, CustomDivider, MainTitle, TableHeader} from './styles';
+import useAppContext from '../../context/useAppContext';
 import useProcurementContracts from '../../services/graphql/procurementContractsOverview/hooks/useProcurementContracts';
-import {ProcurementContract} from '../../types/graphql/procurementContractsTypes';
 import useGetSuppliers from '../../services/graphql/suppliers/hooks/useGetSuppliers';
 import ScreenWrapper from '../../shared/screenWrapper';
-import useAppContext from '../../context/useAppContext';
+import {ProcurementContract} from '../../types/graphql/procurementContractsTypes';
+import {tableHeads} from './constants';
 import {ContractsFilters} from './contractFilters/contractFilters';
-import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
-import {parseDateForBackend} from '../../utils/dateUtils';
+import {Container, CustomDivider, MainTitle, TableHeader} from './styles';
 
 export const ContractsMainPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
-  const {alert, breadcrumbs, navigation} = useAppContext();
+  const {breadcrumbs, navigation} = useAppContext();
   const [selectedSupplier, setSelectedSupplier] = useState(0);
+  const [selectedYear, setSelectedYear] = useState(undefined);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const {mutate: orderListInsert} = useOrderListInsert();
 
   const {data: tableData, loading} = useProcurementContracts({
     id: 0,
     procurement_id: 0,
     supplier_id: selectedSupplier,
+    year: selectedYear,
   });
 
   const filteredTableData = tableData?.filter(item => {
@@ -70,8 +70,9 @@ export const ContractsMainPage: React.FC = () => {
         <TableHeader>
           <ContractsFilters
             suppliers={suppliers || []}
-            setFilters={({supplier_id}) => {
+            setFilters={({supplier_id, year}) => {
               setSelectedSupplier(supplier_id);
+              setSelectedYear(year);
             }}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}

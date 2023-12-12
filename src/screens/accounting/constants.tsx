@@ -22,12 +22,10 @@ export const tableHeads: TableHead[] = [
           variant="bodyMedium"
           content={
             total_bruto
-              ? parseFloat(
-                  total_bruto?.toLocaleString('sr-RS', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }),
-                )
+              ? total_bruto?.toLocaleString('sr-RS', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
               : 0.0
           }
         />

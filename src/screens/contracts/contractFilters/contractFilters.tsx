@@ -8,7 +8,7 @@ import {Supplier} from '../../../types/graphql/supplierTypes';
 
 const initialValues = {
   supplier_id: {id: 0, title: 'Sve'},
-  year: {id: 0, title: 'Sve'},
+  year: {id: null, title: 'Sve'},
 };
 
 export const ContractsFilters: React.FC<ContractFiltersProps> = ({
@@ -18,7 +18,7 @@ export const ContractsFilters: React.FC<ContractFiltersProps> = ({
   searchQuery,
 }) => {
   const {control, watch} = useForm({defaultValues: initialValues});
-  const years = yearsForDropdown();
+  const years = yearsForDropdown(7, true, 2);
 
   const suppliersOptions = useMemo(() => {
     const options = suppliers.map((supplier: Supplier) => ({
@@ -52,9 +52,7 @@ export const ContractsFilters: React.FC<ContractFiltersProps> = ({
         control={control}
         defaultValue={initialValues.year}
         render={({field: {onChange, name, value}}) => {
-          return (
-            <Dropdown onChange={onChange} value={value as any} name={name} label="GODINA:" options={years || []} />
-          );
+          return <Dropdown onChange={onChange} value={value} name={name} label="GODINA:" options={years || []} />;
         }}
       />
       <Controller

@@ -35,6 +35,7 @@ export interface GetProcurementContractParams {
   id: number;
   supplier_id?: number;
   procurement_id?: number;
+  year?: string;
 }
 
 export interface ProcurementContractsGetResponse {

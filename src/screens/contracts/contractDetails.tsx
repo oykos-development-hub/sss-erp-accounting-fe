@@ -107,6 +107,8 @@ export const ContractDetailsSigned: React.FC = () => {
     },
   ];
 
+  const VatValue = contractData && +contractData[0].gross_value - +contractData[0].net_value;
+
   return (
     <ScreenWrapper>
       <SectionBox>
@@ -141,20 +143,39 @@ export const ContractDetailsSigned: React.FC = () => {
 
         <Filters style={{marginTop: '44px'}}>
           <Column>
-            <Input label="UKUPNA NETO VRIJEDNOST" value={contractData && contractData[0]?.net_value} disabled={true} />
+            <Input
+              label="UKUPNA NETO VRIJEDNOST"
+              value={
+                contractData &&
+                Number(contractData[0]?.net_value).toLocaleString('sr-RS', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }
+              disabled={true}
+            />
           </Column>
           <Column>
             <Input
               label="UKUPNA VRIJEDNOST PDV-A"
               disabled={true}
-              value={contractData && contractData[0]?.gross_value}
+              value={Number(VatValue).toLocaleString('sr-RS', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
           </Column>
           <Column>
             <Input
               label="UKUPNA VRIJEDNOST UGOVORA"
               disabled={true}
-              value={contractData && contractData[0]?.vat_value}
+              value={
+                contractData &&
+                Number(contractData[0]?.gross_value).toLocaleString('sr-RS', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }
             />
           </Column>
         </Filters>

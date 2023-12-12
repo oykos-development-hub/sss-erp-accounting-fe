@@ -8,7 +8,7 @@ import query from '../queries/getProcurementContracts';
 import useAppContext from '../../../../context/useAppContext';
 import {REQUEST_STATUSES} from '../../../constants';
 
-const useProcurementContracts = ({id, procurement_id, supplier_id}: GetProcurementContractParams) => {
+const useProcurementContracts = ({id, procurement_id, supplier_id, year}: GetProcurementContractParams) => {
   const [procurementContracts, setProcurementContracts] = useState<ProcurementContract[]>();
   const [loading, setLoading] = useState(true);
   const {fetch} = useAppContext();
@@ -18,6 +18,7 @@ const useProcurementContracts = ({id, procurement_id, supplier_id}: GetProcureme
       id,
       procurement_id,
       supplier_id,
+      year,
     });
 
     if (response.publicProcurementContracts_Overview.status === REQUEST_STATUSES.success) {
@@ -28,7 +29,7 @@ const useProcurementContracts = ({id, procurement_id, supplier_id}: GetProcureme
 
   useEffect(() => {
     fetchProcurementContracts();
-  }, [id, procurement_id, supplier_id]);
+  }, [id, procurement_id, supplier_id, year]);
 
   return {data: procurementContracts, loading, refetchData: fetchProcurementContracts};
 };

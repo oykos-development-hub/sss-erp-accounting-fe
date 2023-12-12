@@ -48,12 +48,10 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch
             variant="bodyMedium"
             content={
               total_bruto
-                ? parseFloat(
-                    total_bruto.toLocaleString('sr-RS', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }),
-                  )
+                ? total_bruto.toLocaleString('sr-RS', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
                 : ''
             }
           />
