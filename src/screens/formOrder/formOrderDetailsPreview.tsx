@@ -48,7 +48,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const [form, setForm] = useState({
     page: 1,
     size: 10,
-    order_id: orderId,
+    id: orderId,
     status: '',
     search: '',
   });
