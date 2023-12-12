@@ -257,7 +257,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                         return true;
                       },
                     },
-                    required: 'Ovo polje je obavezno',
                   }}
                   render={({field: {onChange, name, value}}) => (
                     <Datepicker
@@ -266,7 +265,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                       name={name}
                       value={value ? parseDate(value) : ''}
                       error={errors.invoice_date?.message as string}
-                      isRequired
                     />
                   )}
                 />

@@ -56,7 +56,7 @@ const FileList = ({files, onDelete, isInModal}: FileListProps) => {
               !isInModal && handleViewFile(file);
             }}
             viewable={allowedTypes.includes(file.type)}>
-            <Typography content={file.name} />
+            <Typography content={file.name} style={{borderBottom: '1px solid black'}} />
             <Controls>
               {!isInModal && (
                 <FileIconButton

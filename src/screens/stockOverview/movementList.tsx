@@ -56,11 +56,9 @@ export const MovementList = () => {
       return [];
     }
   }, [recipientUsers]);
-
   const selectedItem = useMemo(() => {
     return movementItems?.find(item => item.id === selectedItemId);
   }, [selectedItemId]);
-
   const handleDeleteIconClick = (id: number) => {
     setSelectedItemId(id);
     setShowDeleteModal(true);
