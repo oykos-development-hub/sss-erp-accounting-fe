@@ -20,6 +20,8 @@ const movementDetails = `query MovementDetails($id: Int!) {
                 title
                 description
                 amount
+                net_price
+                vat_percentage
             }
             file{
                 id

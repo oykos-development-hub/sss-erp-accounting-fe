@@ -10,15 +10,11 @@ import {VisibilityType} from '../../types/graphql/publicProcurementArticlesTypes
 import {AmountInput, FormControls, FormFooter, OrderInfo} from './styles';
 import {OrderListArticleType} from '../../types/graphql/articleTypes';
 
-interface articlesItem extends OrderListArticleType {
-  amount: number;
-}
-
 type formFields = {
   date_order: string;
   public_procurement_id: number;
   order_file: number | null;
-  articles: articlesItem[];
+  articles: OrderListArticleType[];
 };
 
 export const FormOrderDetails: React.FC = () => {

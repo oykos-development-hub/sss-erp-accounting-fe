@@ -15,7 +15,7 @@ import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, Tabl
 
 export const AccountingOrdersMainPage: React.FC = () => {
   const {alert, breadcrumbs, navigation} = useAppContext();
-  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showExceptionModal, setShowExceptionModal] = useState(false);
@@ -56,7 +56,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
   }, [orders, selectedItemId]);
 
   const handleAdd = () => {
-    setShowModal(true);
+    setShowAddModal(true);
   };
 
   const handleOpenModal = () => {
@@ -68,7 +68,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
   };
 
   const closeModal = () => {
-    setShowModal(false);
+    setShowAddModal(false);
     setSelectedItemId(0);
   };
 
@@ -195,8 +195,8 @@ export const AccountingOrdersMainPage: React.FC = () => {
           pageRangeDisplayed={3}
         />
 
-        {showModal && (
-          <AccountingOrderModal alert={alert} open={showModal} onClose={closeModal} selectedItem={selectedItem} />
+        {showAddModal && (
+          <AccountingOrderModal alert={alert} open={showAddModal} onClose={closeModal} selectedItem={selectedItem} />
         )}
 
         {showExceptionModal && <ExceptionModal alert={alert} open={showExceptionModal} onClose={closeExceptionModal} />}

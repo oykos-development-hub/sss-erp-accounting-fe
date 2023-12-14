@@ -30,9 +30,11 @@ export interface MovementDetailsItems {
 export interface ArticleType {
   title: string;
   description: string;
-  type: string;
   year: string;
   id: number;
+  amount: number;
+  net_price: number;
+  vat_percentage: number;
 }
 
 export interface FileType {

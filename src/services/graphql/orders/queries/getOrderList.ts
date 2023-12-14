@@ -21,11 +21,10 @@ const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, 
                 id
                 title
                 description
-                manufacturer
-                unit
+                net_price
+                vat_percentage
                 amount
                 total_price
-                price
             }
             invoice_date
             invoice_number

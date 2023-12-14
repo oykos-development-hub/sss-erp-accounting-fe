@@ -1,14 +1,16 @@
-import {Datepicker, Input, Modal, Table, TableHead, Typography, FileUpload} from 'client-library';
+import {Datepicker, Input, Modal, Table, TableHead, Typography, FileUpload, Dropdown, ValueType} from 'client-library';
 import React, {useEffect, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
+import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import useOrderListReceive from '../../services/graphql/orders/hooks/useOrderListReceive';
 import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
-import {DatepickersWrapper, FormWrapper, HeaderSection, Row, StyledInput, TextareaWrapper, Title} from './styles';
+import {DatepickersWrapper, FormWrapper, HeaderSection, StyledInput, TextareaWrapper, Title} from './styles';
 import {FileUploadWrapper} from '../../screens/formOrder/styles';
 import useAppContext from '../../context/useAppContext';
 import FileList from '../../components/fileList/fileList';
 import {FileItem, FileResponseItem} from '../../types/fileUploadType';
-import {OrderListArticleType} from '../../types/graphql/articleTypes';
+import {OrderArticleType, OrderListArticleType} from '../../types/graphql/articleTypes';
+import {pdvOptions} from '../../constants';
+import {ReceiveItemStatus} from '../../types/graphql/orderListTypes';
 
 type ReceiveItemForm = {
   invoice_date: string;
@@ -16,6 +18,7 @@ type ReceiveItemForm = {
   invoice_number: string;
   description: string;
   receive_file: FileItem | null;
+  articles?: OrderArticleType[];
 };
 
 const initialValues: ReceiveItemForm = {
@@ -24,6 +27,7 @@ const initialValues: ReceiveItemForm = {
   invoice_number: '',
   description: '',
   receive_file: null,
+  articles: [],
 };
 
 interface ReceiveItemsModalProps {
@@ -38,7 +42,30 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
   const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
   const [filesToDelete, setFilesToDelete] = useState<number>();
-  const filteredArticles = data[0]?.articles.filter((item: OrderListArticleType) => item.amount !== 0);
+  const isException = data[0]?.public_procurement?.id === 0;
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: {errors},
+    reset,
+    clearErrors,
+    watch,
+    setValue,
+    getValues,
+  } = useForm({defaultValues: initialValues});
+
+  const {fields} = useFieldArray({
+    control,
+    name: 'articles',
+    keyName: 'key',
+  });
+
+  const receiveFile = watch('receive_file');
+
+  const {
+    fileService: {uploadFile, deleteFile},
+  } = useAppContext();
 
   const tableHeads: TableHead[] = [
     {
@@ -49,11 +76,82 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     {
       title: 'Jedinica mjere:',
       accessor: 'unit',
-      type: 'text',
-      shouldRender: Number(data[0]?.public_procurement?.id) !== 0,
+      type: 'custom',
+      renderContents: (unit: number) => {
+        return <Typography variant="bodyMedium" content={unit || 'Kom'} />;
+      },
+      shouldRender: !isException,
     },
 
     {title: 'Poručeno', accessor: 'amount', type: 'text'},
+    {
+      title: 'Jedinična cijena',
+      accessor: 'net_price',
+      type: 'custom',
+      renderContents: (net_price: number, _, index) => {
+        return data[0].status !== ReceiveItemStatus.RECEIVED ? (
+          <Input
+            leftContent={<Typography variant="bodyMedium" content="€" />}
+            {...register(`articles.${index}.net_price`, {
+              required: 'Ovo polje je obavezno',
+            })}
+          />
+        ) : (
+          <Typography variant="bodyMedium" content={`${net_price} €` || ''} />
+        );
+      },
+      shouldRender: isException,
+    },
+    {
+      title: 'PDV',
+      accessor: 'vat_percentage',
+      type: 'custom',
+      renderContents: (vat_percentage: any, _, index) => {
+        return data[0].status !== ReceiveItemStatus.RECEIVED ? (
+          <Controller
+            name={`articles.${index}.vat_percentage`}
+            control={control}
+            rules={{required: 'Ovo polje je obavezno'}}
+            render={({field: {onChange, name, value}}) => {
+              return (
+                <Dropdown
+                  onChange={onChange}
+                  value={value as any}
+                  name={name}
+                  options={pdvOptions}
+                  error={errors.articles?.[index]?.vat_percentage?.message}
+                />
+              );
+            }}
+          />
+        ) : (
+          <Typography variant="bodyMedium" content={`${vat_percentage?.id} %` || ''} />
+        );
+      },
+      shouldRender: isException,
+    },
+    {
+      title: 'Ukupna vrijednost',
+      accessor: 'total',
+      type: 'custom',
+      renderContents: (_, row, index) => {
+        const total = calculateTotalPrice(row, index);
+        return (
+          <Typography
+            variant="bodyMedium"
+            content={
+              total
+                ? `${total?.toLocaleString('sr-RS', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} €`
+                : ''
+            }
+          />
+        );
+      },
+      shouldRender: isException,
+    },
 
     {
       title: 'Ukupna vrijednost(sa PDV-om)',
@@ -76,26 +174,16 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
           />
         );
       },
-      shouldRender: Number(data[0]?.public_procurement?.id) !== 0,
+      shouldRender: !isException,
     },
   ];
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: {errors},
-    reset,
-    clearErrors,
-    watch,
-    setValue,
-  } = useForm({defaultValues: initialValues});
-
-  const receiveFile = watch('receive_file');
-
-  const {
-    fileService: {uploadFile, deleteFile},
-  } = useAppContext();
+  const calculateTotalPrice = (item: OrderArticleType, index: number) => {
+    const net_price = watch('articles')?.[index]?.net_price;
+    const vat_percentage = watch('articles')?.[index]?.vat_percentage as any;
+    const totalArticlePrice = net_price && vat_percentage?.id ? net_price * (1 + vat_percentage?.id / 100) : net_price;
+    return totalArticlePrice && totalArticlePrice * item.amount;
+  };
 
   const handleUpload = (files: FileList) => {
     setUploadedFile(files);
@@ -125,6 +213,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     description: string,
     dateSystem: string | null,
     receiveFileId?: number,
+    articles?: OrderArticleType[],
   ) => {
     const payload = {
       order_id: data[0]?.id,
@@ -133,6 +222,16 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       description: description,
       date_system: dateSystem,
       receive_file: receiveFileId,
+      articles:
+        isException && articles && articles?.length > 0
+          ? articles?.map((item: any) => {
+              return {
+                id: item.id,
+                net_price: parseFloat(item.net_price.replace(',', '.')),
+                vat_percentage: item?.vat_percentage?.id,
+              };
+            })
+          : [],
     };
 
     orderListReceive(
@@ -170,6 +269,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             values?.description,
             parseDateForBackend(values?.date_system),
             files[0]?.id,
+            values?.articles,
           );
         },
         () => {
@@ -184,6 +284,8 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         values?.invoice_number,
         values?.description,
         parseDateForBackend(values?.date_system),
+        undefined,
+        values?.articles,
       );
     }
   };
@@ -197,6 +299,15 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         invoice_number: data[0]?.invoice_number || '',
         description: data[0]?.description || '',
         receive_file: data[0]?.receive_file || null,
+        articles: data[0]?.articles
+          .filter((item: OrderArticleType) => item.amount !== 0)
+          .map((item: OrderArticleType) => {
+            return {
+              ...item,
+              net_price: item.net_price || '',
+              vat_percentage: {id: item.vat_percentage, title: `${item.vat_percentage} %`},
+            };
+          }),
       });
     }
   }, [data]);
@@ -342,7 +453,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             </TextareaWrapper>
           </HeaderSection>
 
-          <Table tableHeads={tableHeads} data={filteredArticles} />
+          <Table tableHeads={tableHeads} data={fields} />
         </FormWrapper>
       }
       title={'KREIRAJ NOVU PRIJEMNICU'}

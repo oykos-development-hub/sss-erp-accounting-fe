@@ -24,6 +24,18 @@ export const tableHeadsStockReview: TableHead[] = [
     sortable: true,
     type: 'text',
   },
+  {
+    title: 'Jedinična cijena',
+    accessor: 'net_price',
+    type: 'custom',
+    renderContents: net_price => <Typography variant="bodyMedium" content={`${net_price} €` || ''} />,
+  },
+  {
+    title: 'PDV',
+    accessor: 'vat_percentage',
+    type: 'custom',
+    renderContents: vat_percentage => <Typography variant="bodyMedium" content={`${vat_percentage}%` || ''} />,
+  },
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
 
@@ -65,6 +77,18 @@ export const tableHeadsStockArticleDetails: TableHead[] = [
     title: 'Količina',
     accessor: 'amount',
     type: 'text',
+  },
+  {
+    title: 'Jedinična cijena',
+    accessor: 'net_price',
+    type: 'custom',
+    renderContents: net_price => <Typography variant="bodyMedium" content={`${net_price} €` || ''} />,
+  },
+  {
+    title: 'PDV',
+    accessor: 'vat_percentage',
+    type: 'custom',
+    renderContents: vat_percentage => <Typography variant="bodyMedium" content={`${vat_percentage}%` || ''} />,
   },
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];

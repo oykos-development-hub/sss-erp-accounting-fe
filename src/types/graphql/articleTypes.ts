@@ -1,3 +1,12 @@
+export interface OrderArticleType {
+  id: number;
+  title: string;
+  description: string;
+  net_price: number;
+  vat_percentage: number;
+  amount: number;
+  total_price?: number;
+}
 export interface OrderListArticleType {
   id: number;
   title: string;

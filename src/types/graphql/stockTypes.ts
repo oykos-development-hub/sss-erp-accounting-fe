@@ -6,6 +6,8 @@ export interface StockItem {
   description: string;
   amount: number;
   year: string;
+  net_price: number;
+  vat_percentage: number;
 }
 
 export interface StockListType {

@@ -146,8 +146,16 @@ export const StockReview = () => {
     return title.includes(searchString);
   });
 
-  const addToSelectedItems = (id: number, title: string, description: string, amount: number, year: string) => {
-    const newItem = {id, title, description, amount, year, quantity: ''};
+  const addToSelectedItems = (
+    id: number,
+    title: string,
+    description: string,
+    amount: number,
+    year: string,
+    net_price: number,
+    vat_percentage: number,
+  ) => {
+    const newItem = {id, title, description, amount, year, net_price, vat_percentage, quantity: ''};
     setSelectedItems([...selectedItems, newItem]);
     append(newItem);
   };
@@ -235,7 +243,16 @@ export const StockReview = () => {
         tableActions={[
           {
             name: 'Dodaj',
-            onClick: item => addToSelectedItems(item.id, item.title, item.description, item.amount, item.year),
+            onClick: item =>
+              addToSelectedItems(
+                item.id,
+                item.title,
+                item.description,
+                item.amount,
+                item.year,
+                item.net_price,
+                item.vat_percentage,
+              ),
             icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
             disabled: item => isItemAlreadySelected(item.id),
             tooltip: () => 'Dodajte artikal',

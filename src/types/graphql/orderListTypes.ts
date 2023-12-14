@@ -1,6 +1,12 @@
 import {DropdownDataNumber, DropdownDataString} from '../dropdownData';
-import {OrderListArticleInsert, OrderListArticleType} from './articleTypes';
+import {OrderArticleType, OrderListArticleInsert, OrderListArticleType} from './articleTypes';
 import {DeleteResponse, DetailsResponse, GetResponse} from './response';
+
+export enum ReceiveItemStatus {
+  RECEIVED = 'Receive',
+  CREATED = 'Updated',
+  UPDATED = 'Created',
+}
 export interface OrderListItem {
   id?: number;
   date_order?: string;
@@ -9,7 +15,7 @@ export interface OrderListItem {
   public_procurement?: DropdownDataString;
   supplier?: DropdownDataString;
   status?: string;
-  articles?: OrderListArticleType[];
+  articles?: OrderArticleType[];
   invoice_date?: string;
   invoice_number?: string;
   date_system?: string;

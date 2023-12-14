@@ -1,5 +1,5 @@
 import {Accordion, Button, ChevronDownIcon, Table, TableHead, Typography, FileUpload} from 'client-library';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import FileList from '../../components/fileList/fileList';
 import {ReceiveItemsModal} from '../../components/receiveItems/receiveItemsModal';
 import {ReceiveItemsTable} from '../../components/receiveItems/receiveItemsTable';
@@ -9,7 +9,7 @@ import useGetOrderList from '../../services/graphql/orders/hooks/useGetOrderList
 import {NotificationsModal} from '../../shared/notifications/notificationsModal';
 import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
-import {OrderListArticleType} from '../../types/graphql/articleTypes';
+import {OrderArticleType} from '../../types/graphql/articleTypes';
 import {parseDate} from '../../utils/dateUtils';
 import {
   AccordionHeader,
@@ -95,11 +95,12 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const mappedOrder = useMemo(() => {
     if (orders) {
       return orders[0]?.articles
-        ?.filter((order: OrderListArticleType) => order.amount !== 0)
-        .map((order: OrderListArticleType) => {
+        ?.filter((article: OrderArticleType) => article.amount !== 0)
+        .map(article => {
           return {
-            ...order,
+            ...article,
             order_id: orderId,
+            unit: 'Kom',
           };
         });
     } else {

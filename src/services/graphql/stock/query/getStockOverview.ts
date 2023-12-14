@@ -9,6 +9,8 @@ const getStockOverview = `query StockOverview($page: Int, $size: Int, $title: St
             title
             description
             amount
+            net_price
+            vat_percentage
         }
     }
 }`;
