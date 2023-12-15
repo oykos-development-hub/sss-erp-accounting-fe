@@ -71,6 +71,7 @@ const FileList = ({files, onDelete, isInModal}: FileListProps) => {
                 <FileIconButton
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation();
+                    e.preventDefault();
                     onDelete(file.id);
                   }}>
                   <DeleteFileIcon stroke={Theme.palette.gray700} />

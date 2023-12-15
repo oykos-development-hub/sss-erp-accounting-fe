@@ -11,13 +11,14 @@ import {FileItem, FileResponseItem} from '../../types/fileUploadType';
 import {OrderArticleType, OrderListArticleType} from '../../types/graphql/articleTypes';
 import {pdvOptions} from '../../constants';
 import {ReceiveItemStatus} from '../../types/graphql/orderListTypes';
+import {convertToCurrency} from '../../utils/stringUtils';
 
 type ReceiveItemForm = {
   invoice_date: string;
   date_system: string;
   invoice_number: string;
   description: string;
-  receive_file: FileItem | null;
+  receive_file: FileItem[] | null;
   articles?: OrderArticleType[];
 };
 
@@ -39,9 +40,9 @@ interface ReceiveItemsModalProps {
 }
 
 export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open, onClose, alert, fetch}) => {
-  const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<FileList | null>();
   const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
-  const [filesToDelete, setFilesToDelete] = useState<number>();
+  const [filesToDelete, setFilesToDelete] = useState<number[]>();
   const isException = data[0]?.public_procurement?.id === 0;
   const {
     register,
@@ -52,7 +53,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     clearErrors,
     watch,
     setValue,
-    getValues,
   } = useForm({defaultValues: initialValues});
 
   const {fields} = useFieldArray({
@@ -64,7 +64,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
   const receiveFile = watch('receive_file');
 
   const {
-    fileService: {uploadFile, deleteFile},
+    fileService: {uploadFile, batchDeleteFiles},
   } = useAppContext();
 
   const tableHeads: TableHead[] = [
@@ -97,7 +97,15 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             })}
           />
         ) : (
-          <Typography variant="bodyMedium" content={`${net_price} €` || ''} />
+          <Typography
+            variant="bodyMedium"
+            content={
+              `${net_price.toLocaleString('sr-RS', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })} €` || ''
+            }
+          />
         );
       },
       shouldRender: isException,
@@ -136,19 +144,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       type: 'custom',
       renderContents: (_, row, index) => {
         const total = calculateTotalPrice(row, index);
-        return (
-          <Typography
-            variant="bodyMedium"
-            content={
-              total
-                ? `${total?.toLocaleString('sr-RS', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })} €`
-                : ''
-            }
-          />
-        );
+        return <Typography variant="bodyMedium" content={total ? convertToCurrency(total) : ''} />;
       },
       shouldRender: isException,
     },
@@ -158,21 +154,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       accessor: 'total_price',
       type: 'custom',
       renderContents: (total_price: number) => {
-        return (
-          <Typography
-            variant="bodyMedium"
-            content={
-              total_price
-                ? parseFloat(
-                    total_price.toLocaleString('sr-RS', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }),
-                  )
-                : ''
-            }
-          />
-        );
+        return <Typography variant="bodyMedium" content={total_price ? convertToCurrency(totalPrice) : ''} />;
       },
       shouldRender: !isException,
     },
@@ -186,13 +168,14 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
   };
 
   const handleUpload = (files: FileList) => {
-    setUploadedFile(files);
+    setUploadedFiles(files);
     clearErrors('receive_file');
   };
 
-  const onDeleteFile = () => {
-    setValue('receive_file', null);
-    setFilesToDelete(receiveFile?.id);
+  const onDeleteFile = (id: number) => {
+    const filteredFiles = receiveFile?.filter((item: FileItem) => item.id !== id) || null;
+    setValue('receive_file', filteredFiles);
+    setFilesToDelete(prevState => [...(prevState || []), id]);
   };
 
   const totalPrice = [data[0]]?.reduce((sum: any, article: any) => {
@@ -212,7 +195,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     invoiceNumber: string,
     description: string,
     dateSystem: string | null,
-    receiveFileId?: number,
+    receiveFileIds?: number[],
     articles?: OrderArticleType[],
   ) => {
     const payload = {
@@ -221,13 +204,16 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       invoice_number: invoiceNumber,
       description: description,
       date_system: dateSystem,
-      receive_file: receiveFileId,
+      receive_file: receiveFileIds,
       articles:
         isException && articles && articles?.length > 0
           ? articles?.map((item: any) => {
               return {
                 id: item.id,
-                net_price: parseFloat(item.net_price.replace(',', '.')),
+                net_price:
+                  data[0].status !== ReceiveItemStatus.RECEIVED
+                    ? parseFloat(item.net_price.replace(',', '.'))
+                    : item.net_price,
                 vat_percentage: item?.vat_percentage?.id,
               };
             })
@@ -250,25 +236,29 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
   const onSubmit = async (values: any) => {
     if (isSaving) return;
 
-    if (filesToDelete) {
-      await deleteFile(filesToDelete);
+    if (filesToDelete && filesToDelete?.length > 0) {
+      await batchDeleteFiles(filesToDelete);
     }
 
-    if (uploadedFile) {
+    if (uploadedFiles) {
+      const filesToUpload = [...uploadedFiles];
+
       const formData = new FormData();
-      formData.append('file', uploadedFile[0]);
+      filesToUpload.forEach((file: File) => {
+        formData.append('file', file);
+      });
 
       await uploadFile(
         formData,
         (files: FileResponseItem[]) => {
-          setUploadedFile(null);
-          setValue('receive_file', files[0]);
+          setUploadedFiles(null);
+          setValue('receive_file', files);
           handleReceiveListInsert(
             parseDateForBackend(values?.invoice_date),
             values?.invoice_number,
             values?.description,
             parseDateForBackend(values?.date_system),
-            files[0]?.id,
+            files.map((item: FileResponseItem) => item.id),
             values?.articles,
           );
         },
@@ -415,7 +405,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
               <FileUploadWrapper>
                 <FileUpload
                   icon={null}
-                  files={uploadedFile}
+                  files={uploadedFiles}
                   variant="secondary"
                   onUpload={handleUpload}
                   note={<Typography variant="bodySmall" content="Dokument" />}
@@ -423,8 +413,8 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                   buttonText="Učitaj"
                 />
               </FileUploadWrapper>
-              {receiveFile?.id !== 0 && (
-                <FileList files={receiveFile && [receiveFile]} onDelete={onDeleteFile} isInModal={true} />
+              {receiveFile && receiveFile.length !== 0 && (
+                <FileList files={receiveFile} onDelete={onDeleteFile} isInModal={true} />
               )}
             </div>
             <TextareaWrapper>

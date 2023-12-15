@@ -236,11 +236,11 @@ export const FormOrderDetailsPreview: React.FC = () => {
                   <FileList files={(orderFile && [orderFile]) ?? []} />
                 </Row>
               )}
-              {receiveFile?.id !== 0 && (
-                <Row>
+              {receiveFile && receiveFile.length !== 0 && (
+                <div>
                   <Typography variant="bodySmall" style={{fontWeight: 600}} content={'PRIJEMNICA/FAKTURA:'} />
-                  <FileList files={(receiveFile && [receiveFile]) ?? []} />
-                </Row>
+                  <FileList files={(receiveFile && receiveFile) ?? []} />
+                </div>
               )}
             </>
           </div>
