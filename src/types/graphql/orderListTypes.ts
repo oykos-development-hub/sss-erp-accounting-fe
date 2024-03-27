@@ -23,6 +23,7 @@ export interface OrderListItem {
   recipient_user?: DropdownDataString;
   office?: DropdownDataString;
   price?: number;
+  passed_to_finance: boolean;
   order_file?: {
     id: number;
     name: string;

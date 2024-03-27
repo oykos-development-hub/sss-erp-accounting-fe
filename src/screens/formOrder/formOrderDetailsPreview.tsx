@@ -186,6 +186,26 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const orderFile = orders[0]?.order_file;
   const receiveFile = orders[0]?.receive_file;
 
+  const sendToFinance = async () => {
+    const payload = {
+      id: orderId,
+      passed_to_finance: true,
+    };
+
+    orderListInsert(
+      payload as any,
+      () => {
+        fetch();
+        alert.success('Uspješno proslijedjeno finansijama.');
+      },
+      () => {
+        alert.error('Greška. Nije moguće proslijediti finansijama.');
+      },
+    );
+
+    return;
+  };
+
   return (
     <ScreenWrapper>
       <SectionBox>
@@ -246,7 +266,13 @@ export const FormOrderDetailsPreview: React.FC = () => {
           </div>
           <ButtonContainer>
             {orders[0]?.invoice_date && orders[0]?.date_system && (
-              <Button content="Proslijedi finansijama" variant="secondary" size="sm" />
+              <Button
+                content="Proslijedi finansijama"
+                variant="secondary"
+                size="sm"
+                onClick={handleSubmit(sendToFinance)}
+                disabled={orders[0]?.passed_to_finance}
+              />
             )}
             <Button content="Štampaj narudžbenicu" size="sm" variant="secondary" onClick={printOrder} />
             <Button
@@ -283,7 +309,12 @@ export const FormOrderDetailsPreview: React.FC = () => {
               }
               content={
                 <>
-                  <ReceiveItemsTable data={orders[0]} fetch={fetch} loading={loading} />
+                  <ReceiveItemsTable
+                    data={orders[0]}
+                    fetch={fetch}
+                    loading={loading}
+                    isDisabled={orders[0]?.passed_to_finance}
+                  />
                 </>
               }
             />

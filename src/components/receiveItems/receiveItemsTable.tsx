@@ -9,9 +9,10 @@ interface ReceiveItemsTableProps {
   data: any;
   fetch: () => any;
   loading: boolean;
+  isDisabled: boolean;
 }
 
-export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch, loading}) => {
+export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch, loading, isDisabled}) => {
   const {alert} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
@@ -86,6 +87,7 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch
             name: 'Izmijeni',
             onClick: item => handleEdit(item.id),
             icon: <EditIconTwo stroke={Theme?.palette?.gray800} />,
+            shouldRender: () => !isDisabled,
           },
         ]}
       />

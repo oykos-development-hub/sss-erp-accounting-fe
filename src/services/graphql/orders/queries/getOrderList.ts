@@ -29,6 +29,7 @@ const getOrderList = `query OrderListOverview($page: Int, $size: Int, $id: Int, 
             invoice_date
             invoice_number
             date_system
+            passed_to_finance
             recipient_user{
                 id
                 title
