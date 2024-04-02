@@ -6,7 +6,7 @@ import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrd
 import useGetSuppliers from '../../services/graphql/suppliers/hooks/useGetSuppliers';
 import ScreenWrapper from '../../shared/screenWrapper';
 import {CustomDivider, MainTitle, Row, SectionBox} from '../../shared/styles';
-import {OrderListArticleType} from '../../types/graphql/articleTypes';
+import {OrderArticleType, OrderListArticleType} from '../../types/graphql/articleTypes';
 import {
   AmountInput,
   ButtonContentWrapper,
@@ -19,6 +19,7 @@ import {
 } from '../formOrder/styles';
 import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
 import {pdvOptions} from '../../constants';
+import {convertToCurrency} from '../../utils/stringUtils';
 
 type FormValues = {
   date_order: string;
@@ -214,7 +215,7 @@ export const Exceptions: React.FC = () => {
                 <Controller
                   name="supplier"
                   control={control}
-                  rules={{required: 'Izaberi dobavljača.'}}
+                  rules={{required: 'Ovo polje je obavezno.'}}
                   render={({field: {onChange, name, value}}) => {
                     return (
                       <Dropdown
@@ -235,6 +236,7 @@ export const Exceptions: React.FC = () => {
                   <WidthDiv>
                     <Controller
                       name="pro_forma_invoice_date"
+                      rules={{required: 'Ovo polje je obavezno.'}}
                       control={control}
                       render={({field: {onChange, name, value}}) => (
                         <Datepicker
@@ -249,7 +251,12 @@ export const Exceptions: React.FC = () => {
                     />
                   </WidthDiv>
 
-                  <Input {...register('pro_forma_invoice_number')} label="BROJ PREDRAČUNA:" style={{width: '250px'}} />
+                  <Input
+                    {...register('pro_forma_invoice_number', {required: 'Ovo polje je obavezno.'})}
+                    label="BROJ PREDRAČUNA:"
+                    style={{width: '250px'}}
+                    isRequired
+                  />
                 </>
               )}
             </Row>

@@ -24,6 +24,7 @@ import {
 import {FileResponseItem} from '../../types/fileUploadType';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import {useForm} from 'react-hook-form';
+import {convertToCurrency} from '../../utils/stringUtils';
 
 export const FormOrderDetailsPreview: React.FC = () => {
   const {
@@ -94,8 +95,8 @@ export const FormOrderDetailsPreview: React.FC = () => {
       title: 'Jedinična cijena',
       accessor: 'net_price',
       type: 'custom',
-      renderContents: (net_price: string) => {
-        return <Typography variant="bodyMedium" content={net_price} />;
+      renderContents: (net_price: number) => {
+        return <Typography variant="bodyMedium" content={convertToCurrency(net_price)} />;
       },
       shouldRender: orders[0]?.is_pro_forma_invoice,
     },
@@ -104,11 +105,44 @@ export const FormOrderDetailsPreview: React.FC = () => {
       accessor: 'vat_percentage',
       type: 'custom',
       renderContents: (vat_percentage: string) => {
-        return <Typography variant="bodyMedium" content={vat_percentage} />;
+        return <Typography variant="bodyMedium" content={`${vat_percentage} %` || ''} />;
+      },
+      shouldRender: orders[0]?.is_pro_forma_invoice,
+    },
+    {
+      title: 'Ukupna vrijednost (bez PDV-a)',
+      accessor: 'total',
+      type: 'custom',
+      renderContents: (_, row, index) => {
+        const total = calculateTotalPrice(row, index);
+        return <Typography variant="bodyMedium" content={total ? convertToCurrency(total) : ''} />;
+      },
+      shouldRender: orders[0]?.is_pro_forma_invoice,
+    },
+    {
+      title: 'Ukupna vrijednost (sa PDV-om)',
+      accessor: 'total_price',
+      type: 'custom',
+      renderContents: (_, row, index) => {
+        const total = calculateTotalPriceWithVat(row, index);
+        return <Typography variant="bodyMedium" content={total ? convertToCurrency(total) : ''} />;
       },
       shouldRender: orders[0]?.is_pro_forma_invoice,
     },
   ];
+
+  const calculateTotalPrice = (item: OrderArticleType, index: number) => {
+    const net_price = item.net_price;
+    return net_price * item.amount;
+  };
+
+  const calculateTotalPriceWithVat = (item: OrderArticleType, index: number) => {
+    const net_price = item.net_price;
+    const vat_percentage = item.vat_percentage;
+    const totalArticlePrice = net_price * (1 + vat_percentage / 100);
+    const totalPrice = totalArticlePrice * item.amount;
+    return totalPrice;
+  };
 
   const mappedOrder = useMemo(() => {
     if (orders) {
@@ -231,7 +265,11 @@ export const FormOrderDetailsPreview: React.FC = () => {
         <MainTitle
           variant="bodyMedium"
           content={
-            orders[0]?.is_pro_forma_invoice ? `PREDRAČUN - BROJ. N${orderId}` : `NARUDŽBENICA - BROJ. N${orderId}`
+            orders[0]?.invoice_date && orders[0]?.date_system
+              ? `RAČUN - BROJ. N${orderId}`
+              : orders[0]?.is_pro_forma_invoice
+              ? `PREDRAČUN - BROJ. N${orderId}`
+              : `NARUDŽBENICA - BROJ. N${orderId}`
           }
         />
         <CustomDivider />
@@ -264,12 +302,34 @@ export const FormOrderDetailsPreview: React.FC = () => {
               {orders[0]?.is_pro_forma_invoice && (
                 <>
                   <Row>
-                    <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM PREDRAČUNA:'} />
-                    <Typography variant="bodySmall" content={`${parseDate(orders[0].pro_forma_invoice_date) || ''} `} />
-                  </Row>
-                  <Row>
                     <Typography variant="bodySmall" style={{fontWeight: 600}} content={'BROJ PREDRAČUNA:'} />
                     <Typography variant="bodySmall" content={`${orders[0].pro_forma_invoice_number || ''} `} />
+
+                    {orders[0]?.invoice_date && orders[0]?.date_system && (
+                      <>
+                        <Typography
+                          variant="bodySmall"
+                          style={{fontWeight: 600, marginLeft: 30}}
+                          content={'BROJ RAČUNA:'}
+                        />
+                        <Typography variant="bodySmall" content={`${orders[0].invoice_number || ''} `} />
+                      </>
+                    )}
+                  </Row>
+                  <Row>
+                    <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM PREDRAČUNA:'} />
+                    <Typography variant="bodySmall" content={`${parseDate(orders[0].pro_forma_invoice_date) || ''} `} />
+
+                    {orders[0]?.invoice_date && orders[0]?.date_system && (
+                      <>
+                        <Typography
+                          variant="bodySmall"
+                          style={{fontWeight: 600, marginLeft: 30}}
+                          content={'DATUM RAČUNA:'}
+                        />
+                        <Typography variant="bodySmall" content={`${parseDate(orders[0].invoice_date) || ''} `} />
+                      </>
+                    )}
                   </Row>
                 </>
               )}
@@ -297,7 +357,11 @@ export const FormOrderDetailsPreview: React.FC = () => {
               )}
               {orderFile?.id !== 0 && (
                 <Row>
-                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'NARUDŽBENICA:'} />
+                  <Typography
+                    variant="bodySmall"
+                    style={{fontWeight: 600}}
+                    content={orders[0]?.is_pro_forma_invoice ? 'PREDRAČUN:' : 'NARUDŽBENICA:'}
+                  />
                   <FileList files={(orderFile && [orderFile]) ?? []} />
                 </Row>
               )}

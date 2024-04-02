@@ -148,7 +148,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       },
       shouldRender: isException,
     },
-
     {
       title: 'Ukupna vrijednost(sa PDV-om)',
       accessor: 'total_price',
@@ -208,6 +207,8 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       articles:
         isException && articles && articles?.length > 0
           ? articles?.map((item: any) => {
+              const matchedItem = data[0]?.articles.find((article: {id: any}) => article.id === item.id);
+
               return {
                 id: item.id,
                 net_price:
@@ -215,15 +216,15 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                     ? typeof item?.net_price === 'string'
                       ? parseFloat(item.net_price.replace(',', '.'))
                       : item.net_price
-                    : data[0]?.is_pro_forma_invoice
-                    ? data[0]?.net_price
+                    : data[0]?.is_pro_forma_invoice && matchedItem
+                    ? matchedItem.vat_percentage
                     : item.net_price,
-                vat_percentage: data[0]?.is_pro_forma_invoice ? data[0]?.vat_percentage : item?.vat_percentage?.id,
+                vat_percentage:
+                  data[0]?.is_pro_forma_invoice && matchedItem ? matchedItem.vat_percentage : item?.vat_percentage?.id,
               };
             })
           : [],
     };
-
     orderListReceive(
       payload,
       () => {
