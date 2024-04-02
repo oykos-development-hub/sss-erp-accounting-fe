@@ -1,4 +1,4 @@
-import {Button, Dropdown, PlusIcon, Table, TableHead, Theme, Typography} from 'client-library';
+import {Button, Dropdown, PlusIcon, Table, TableHead, Theme, Typography, Datepicker, Input} from 'client-library';
 import React, {useState} from 'react';
 import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import useAppContext from '../../context/useAppContext';
@@ -15,7 +15,10 @@ import {
   OrderInfo,
   RowWrapper,
   TextInput,
+  WidthDiv,
 } from '../formOrder/styles';
+import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
+import {pdvOptions} from '../../constants';
 
 type FormValues = {
   date_order: string;
@@ -24,18 +27,25 @@ type FormValues = {
   order_file: number;
   supplier: {id: 0; title: ''};
   group_of_articles_id: number;
+  pro_forma_invoice_date: Date | null;
+  pro_forma_invoice_number: string;
 };
 
 export const Exceptions: React.FC = () => {
-  const {alert, breadcrumbs, navigation} = useAppContext();
+  const {
+    alert,
+    breadcrumbs,
+    navigation: {navigate, location},
+  } = useAppContext();
   const [newArticles, setNewArticles] = useState<OrderListArticleType[]>([]);
-  const url = navigation.location.pathname;
+  const url = location.pathname;
   const exceptionID = Number(url?.split('/').at(-1));
   const breadcrumbItems = breadcrumbs?.get();
   const exceptionsTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name?.split('-').at(-1)?.trim();
   const {mutate: orderListInsert, loading: isSaving} = useOrderListInsert();
   const {suppliers} = useGetSuppliers({id: 0, search: null, page: 1, size: 100});
-  const countTitle = navigation.location.state?.count;
+  const count = location.state?.count;
+  const isProFormaInvoice = location.state?.isProFormaInvoice;
 
   const {
     handleSubmit,
@@ -51,10 +61,15 @@ export const Exceptions: React.FC = () => {
       articles: [],
       order_file: 0,
       group_of_articles_id: exceptionID,
+      pro_forma_invoice_date: null,
+      pro_forma_invoice_number: '',
     },
   });
 
   const supplierID = watch('supplier')?.id;
+
+  const proFormaInvoiceDate = watch('pro_forma_invoice_date');
+  const proFormaInvoiceNumber = watch('pro_forma_invoice_number');
 
   const {append} = useFieldArray({
     control,
@@ -88,6 +103,8 @@ export const Exceptions: React.FC = () => {
         amount: article?.amount,
         title: article?.title,
         description: article?.description,
+        net_price: isProFormaInvoice ? article?.net_price : null,
+        vat_percentage: isProFormaInvoice ? article?.vat_percentage.id : null,
       };
     });
 
@@ -97,17 +114,23 @@ export const Exceptions: React.FC = () => {
       articles: insertArticles,
       order_file: null,
       supplier_id: Number(supplierID),
-      group_of_articles_id: Number(exceptionID),
+      group_of_articles_id: isProFormaInvoice ? 0 : Number(exceptionID),
+      is_pro_forma_invoice: isProFormaInvoice ? true : false,
+      pro_forma_invoice_date: parseDateForBackend(proFormaInvoiceDate),
+      pro_forma_invoice_number: proFormaInvoiceNumber,
+      account_id: count?.id,
     };
 
     orderListInsert(
       payload as any,
       orderID => {
         alert.success('Uspješno sačuvano.');
-        navigation.navigate(`/accounting/${exceptionID}/order-form/${orderID}/order-details`, {state: {countTitle}});
+        navigate(`/accounting/${exceptionID}/order-form/${orderID}/order-details`, {state: {count, isProFormaInvoice}});
         breadcrumbs.remove(2);
         breadcrumbs.add({
-          name: `Detalji narudžbenice - ${exceptionsTitle}`,
+          name: isProFormaInvoice
+            ? `Detalji predračuna - ${exceptionsTitle}`
+            : `Detalji narudžbenice - ${exceptionsTitle}`,
         });
       },
       () => {
@@ -141,6 +164,32 @@ export const Exceptions: React.FC = () => {
         return <AmountInput {...register(`articles.${index}.amount`)} isRequired />;
       },
     },
+    {
+      title: 'Jedinična cijena',
+      accessor: 'net_price',
+      type: 'custom',
+      renderContents: (_, row, index) => {
+        return <AmountInput {...register(`articles.${index}.net_price`)} isRequired />;
+      },
+      shouldRender: isProFormaInvoice,
+    },
+    {
+      title: 'PDV',
+      accessor: 'vat_percentage',
+      type: 'custom',
+      renderContents: (_, row, index) => {
+        return (
+          <Controller
+            name={`articles.${index}.vat_percentage`}
+            control={control}
+            render={({field: {onChange, name, value}}) => {
+              return <Dropdown onChange={onChange} value={value as any} name={name} options={pdvOptions} />;
+            }}
+          />
+        );
+      },
+      shouldRender: isProFormaInvoice,
+    },
   ];
 
   return (
@@ -150,33 +199,59 @@ export const Exceptions: React.FC = () => {
         <CustomDivider />
         <OrderInfo>
           <RowWrapper>
-            <Row>
-              <Typography variant="bodySmall" style={{fontWeight: 600}} content={'GRUPA ARTIKALA:'} />
-              <Typography variant="bodySmall" content={`${exceptionsTitle}`} />
-            </Row>
+            {exceptionsTitle && (
+              <Row>
+                <Typography variant="bodySmall" style={{fontWeight: 600}} content={'GRUPA ARTIKALA:'} />
+                <Typography variant="bodySmall" content={`${exceptionsTitle}`} />
+              </Row>
+            )}
             <Row>
               <Typography variant="bodySmall" style={{fontWeight: 600}} content={'KONTO:'} />
-              <Typography variant="bodySmall" content={`${countTitle}`} />
+              <Typography variant="bodySmall" content={`${count?.title}`} />
             </Row>
             <Row>
-              <Controller
-                name="supplier"
-                control={control}
-                rules={{required: 'Izaberi dobavljača.'}}
-                render={({field: {onChange, name, value}}) => {
-                  return (
-                    <Dropdown
-                      onChange={onChange}
-                      value={value}
-                      name={name}
-                      label="DOBAVLJAČ:"
-                      options={suppliers as any}
-                      error={errors?.supplier?.message as string}
-                      isRequired
+              <WidthDiv>
+                <Controller
+                  name="supplier"
+                  control={control}
+                  rules={{required: 'Izaberi dobavljača.'}}
+                  render={({field: {onChange, name, value}}) => {
+                    return (
+                      <Dropdown
+                        onChange={onChange}
+                        value={value}
+                        name={name}
+                        label="DOBAVLJAČ:"
+                        options={suppliers as any}
+                        error={errors?.supplier?.message as string}
+                        isRequired
+                      />
+                    );
+                  }}
+                />
+              </WidthDiv>
+              {isProFormaInvoice && (
+                <>
+                  <WidthDiv>
+                    <Controller
+                      name="pro_forma_invoice_date"
+                      control={control}
+                      render={({field: {onChange, name, value}}) => (
+                        <Datepicker
+                          onChange={onChange}
+                          label="DATUM PREDRAČUNA:"
+                          name={name}
+                          value={value ? parseDate(value) : ''}
+                          error={errors.pro_forma_invoice_date?.message}
+                          isRequired
+                        />
+                      )}
                     />
-                  );
-                }}
-              />
+                  </WidthDiv>
+
+                  <Input {...register('pro_forma_invoice_number')} label="BROJ PREDRAČUNA:" style={{width: '250px'}} />
+                </>
+              )}
             </Row>
           </RowWrapper>
           <div>
@@ -200,7 +275,7 @@ export const Exceptions: React.FC = () => {
               content="Otkaži"
               variant="secondary"
               onClick={() => {
-                navigation.navigate('/accounting/order-form');
+                navigate('/accounting/order-form');
                 breadcrumbs.remove();
               }}
             />

@@ -36,13 +36,23 @@ export const tableHeads: TableHead[] = [
     title: 'Nabavka',
     accessor: 'public_procurement',
     type: 'custom',
-    renderContents: public_procurement => {
+    renderContents: (public_procurement, row) => {
       return (
-        <Typography variant="bodyMedium" content={public_procurement.title ? public_procurement.title : 'Izuzeće'} />
+        <Typography
+          variant="bodyMedium"
+          content={
+            row.is_pro_forma_invoice && row.invoice_number
+              ? 'Izuzeće - račun'
+              : row.is_pro_forma_invoice
+              ? 'Izuzeće - predračun'
+              : public_procurement.title
+              ? public_procurement.title
+              : 'Izuzeće'
+          }
+        />
       );
     },
   },
-
   {
     title: 'Dobavljač',
     accessor: 'supplier',
@@ -51,7 +61,6 @@ export const tableHeads: TableHead[] = [
       return <Typography variant="bodyMedium" content={supplier.title} />;
     },
   },
-
   {title: '', accessor: 'TABLE_ACTIONS', type: 'tableActions'},
 ];
 

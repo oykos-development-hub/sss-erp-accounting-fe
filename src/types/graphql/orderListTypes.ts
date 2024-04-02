@@ -40,6 +40,9 @@ export interface OrderListItem {
     type: string;
   };
   group_of_articles?: DropdownDataString;
+  is_pro_forma_invoice?: boolean;
+  pro_forma_invoice_date: string;
+  pro_forma_invoice_number: string;
 }
 
 export interface GetOrderListParams {
@@ -70,6 +73,10 @@ export interface OrderListInsertParams {
   articles: OrderListArticleInsert[];
   order_file?: number;
   group_of_articles_id?: number;
+  is_pro_forma_invoice: boolean;
+  pro_forma_invoice_date: Date;
+  pro_forma_invoice_number: string;
+  account_id: number;
 }
 
 export interface OrderListMovementParams {

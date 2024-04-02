@@ -29,7 +29,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const {
     alert,
     breadcrumbs,
-    navigation,
+    navigation: {location, navigate},
     reportService: {generatePdf},
     fileService: {uploadFile},
   } = useAppContext();
@@ -42,7 +42,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const [uploadedFile, setUploadedFile] = useState<FileList | null>(null);
 
   let date = '';
-  const url = navigation.location.pathname;
+  const url = location.pathname;
   const orderId = Number(url?.split('/').at(-2));
 
   const [form, setForm] = useState({
@@ -89,6 +89,24 @@ export const FormOrderDetailsPreview: React.FC = () => {
       renderContents: (amount: number) => {
         return <Typography variant="bodyMedium" content={amount ? parseFloat(amount?.toFixed(2)) : 0} />;
       },
+    },
+    {
+      title: 'Jedinična cijena',
+      accessor: 'net_price',
+      type: 'custom',
+      renderContents: (net_price: string) => {
+        return <Typography variant="bodyMedium" content={net_price} />;
+      },
+      shouldRender: orders[0]?.is_pro_forma_invoice,
+    },
+    {
+      title: 'PDV',
+      accessor: 'vat_percentage',
+      type: 'custom',
+      renderContents: (vat_percentage: string) => {
+        return <Typography variant="bodyMedium" content={vat_percentage} />;
+      },
+      shouldRender: orders[0]?.is_pro_forma_invoice,
     },
   ];
 
@@ -165,6 +183,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
           public_procurement_id: orders[0].public_procurement?.id,
           supplier_id: orders[0]?.supplier?.id,
           group_of_articles_id: orders[0]?.group_of_articles?.id,
+          is_pro_forma_invoice: orders[0]?.is_pro_forma_invoice,
         };
 
         orderListInsert(
@@ -209,7 +228,12 @@ export const FormOrderDetailsPreview: React.FC = () => {
   return (
     <ScreenWrapper>
       <SectionBox>
-        <MainTitle variant="bodyMedium" content={`NARUDŽBENICA - BROJ. N${orderId}`} />
+        <MainTitle
+          variant="bodyMedium"
+          content={
+            orders[0]?.is_pro_forma_invoice ? `PREDRAČUN - BROJ. N${orderId}` : `NARUDŽBENICA - BROJ. N${orderId}`
+          }
+        />
         <CustomDivider />
         <OrderInfo>
           <div>
@@ -231,10 +255,24 @@ export const FormOrderDetailsPreview: React.FC = () => {
               <Typography variant="bodySmall" content={`${supplier?.title || ''} `} />
             </Row>
             <>
-              <Row>
-                <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM:'} />
-                <Typography variant="bodySmall" content={`${date || ''}`} />
-              </Row>
+              {!orders[0]?.is_pro_forma_invoice && (
+                <Row>
+                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM:'} />
+                  <Typography variant="bodySmall" content={`${date || ''}`} />
+                </Row>
+              )}
+              {orders[0]?.is_pro_forma_invoice && (
+                <>
+                  <Row>
+                    <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM PREDRAČUNA:'} />
+                    <Typography variant="bodySmall" content={`${parseDate(orders[0].pro_forma_invoice_date) || ''} `} />
+                  </Row>
+                  <Row>
+                    <Typography variant="bodySmall" style={{fontWeight: 600}} content={'BROJ PREDRAČUNA:'} />
+                    <Typography variant="bodySmall" content={`${orders[0].pro_forma_invoice_number || ''} `} />
+                  </Row>
+                </>
+              )}
               {!orders[0]?.invoice_date && !orders[0]?.date_system && (
                 <Row>
                   <FileUploadWrapper>
@@ -243,8 +281,15 @@ export const FormOrderDetailsPreview: React.FC = () => {
                       files={uploadedFile}
                       variant="secondary"
                       onUpload={handleUpload}
-                      note={<Typography variant="bodySmall" content="Narudžbenica" />}
-                      hint="Fajlovi neće biti učitani dok ne sačuvate narudžbenicu."
+                      note={
+                        <Typography
+                          variant="bodySmall"
+                          content={orders[0]?.is_pro_forma_invoice ? 'Predračun' : 'Narudžbenica'}
+                        />
+                      }
+                      hint={`Fajlovi neće biti učitani dok ne sačuvate ${
+                        orders[0]?.is_pro_forma_invoice ? 'predračun' : 'narudžbenicu.'
+                      }`}
                       buttonText="Učitaj"
                     />
                   </FileUploadWrapper>
@@ -265,7 +310,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
             </>
           </div>
           <ButtonContainer>
-            {orders[0]?.invoice_date && orders[0]?.date_system && (
+            {orders[0]?.invoice_date && orders[0]?.date_system && !orders[0]?.is_pro_forma_invoice && (
               <Button
                 content="Proslijedi finansijama"
                 variant="secondary"
@@ -274,7 +319,12 @@ export const FormOrderDetailsPreview: React.FC = () => {
                 disabled={orders[0]?.passed_to_finance}
               />
             )}
-            <Button content="Štampaj narudžbenicu" size="sm" variant="secondary" onClick={printOrder} />
+            <Button
+              content={orders[0]?.is_pro_forma_invoice ? 'Štampaj predračun' : 'Štampaj narudžbenicu'}
+              size="sm"
+              variant="secondary"
+              onClick={printOrder}
+            />
             <Button
               content="Kreiraj prijemnicu"
               size="sm"
@@ -327,7 +377,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
               content="Nazad"
               variant="secondary"
               onClick={() => {
-                navigation.navigate('/accounting/order-form');
+                navigate('/accounting/order-form');
                 breadcrumbs.remove();
               }}
             />

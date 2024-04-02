@@ -89,7 +89,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       accessor: 'net_price',
       type: 'custom',
       renderContents: (net_price: number, _, index) => {
-        return data[0].status !== ReceiveItemStatus.RECEIVED ? (
+        return data[0].status !== ReceiveItemStatus.RECEIVED && !data[0]?.is_pro_forma_invoice ? (
           <Input
             leftContent={<Typography variant="bodyMedium" content="€" />}
             {...register(`articles.${index}.net_price`, {
@@ -115,7 +115,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       accessor: 'vat_percentage',
       type: 'custom',
       renderContents: (vat_percentage: any, _, index) => {
-        return data[0].status !== ReceiveItemStatus.RECEIVED ? (
+        return data[0].status !== ReceiveItemStatus.RECEIVED && !data[0]?.is_pro_forma_invoice ? (
           <Controller
             name={`articles.${index}.vat_percentage`}
             control={control}
@@ -213,8 +213,10 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                 net_price:
                   data[0].status !== ReceiveItemStatus.RECEIVED
                     ? parseFloat(item.net_price.replace(',', '.'))
+                    : data[0]?.is_pro_forma_invoice
+                    ? data[0]?.net_price
                     : item.net_price,
-                vat_percentage: item?.vat_percentage?.id,
+                vat_percentage: data[0]?.is_pro_forma_invoice ? data[0]?.vat_percentage : item?.vat_percentage?.id,
               };
             })
           : [],

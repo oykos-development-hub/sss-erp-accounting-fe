@@ -172,7 +172,9 @@ export const AccountingOrdersMainPage: React.FC = () => {
               } else if (Number(row?.public_procurement?.id) === 0) {
                 navigation.navigate(`/accounting/${row?.group_of_articles?.id}/order-form/${row?.id}/order-details`);
                 breadcrumbs.add({
-                  name: `Detalji narudžbenice - ${row?.group_of_articles?.title} `,
+                  name: row.is_pro_forma_invoice
+                    ? `Detalji predračuna - ${row?.group_of_articles?.title} `
+                    : `Detalji narudžbenice - ${row?.group_of_articles?.title} `,
                   to: `/accounting/${row?.group_of_articles?.id}/order-form/${row?.id}/order-details`,
                 });
               }

@@ -125,7 +125,7 @@ export const ErrorText = styled.span`
 `;
 
 export const RowWrapper = styled.div`
-  width: 300px;
+  width: 50%;
 `;
 
 export const TextInput = styled(Input)`
@@ -141,4 +141,8 @@ export const ButtonContainer = styled.div`
   display: flex;
   gap: 10px;
   align-items: baseline;
+`;
+
+export const WidthDiv = styled.div`
+  width: 300px;
 `;
