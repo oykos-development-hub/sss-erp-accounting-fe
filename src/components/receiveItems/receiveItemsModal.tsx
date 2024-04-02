@@ -212,7 +212,9 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                 id: item.id,
                 net_price:
                   data[0].status !== ReceiveItemStatus.RECEIVED
-                    ? parseFloat(item.net_price.replace(',', '.'))
+                    ? typeof item?.net_price === 'string'
+                      ? parseFloat(item.net_price.replace(',', '.'))
+                      : item.net_price
                     : data[0]?.is_pro_forma_invoice
                     ? data[0]?.net_price
                     : item.net_price,
