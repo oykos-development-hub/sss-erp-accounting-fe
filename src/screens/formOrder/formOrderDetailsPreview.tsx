@@ -191,7 +191,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
         },
         () => {
           setShowDeleteModal(false);
-          alert.success('Došlo je do greške pri brisanju');
+          alert.error('Došlo je do greške pri brisanju');
         },
       );
     }
