@@ -265,7 +265,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
         <MainTitle
           variant="bodyMedium"
           content={
-            orders[0]?.invoice_date && orders[0]?.date_system
+            !orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== ''
               ? `RAČUN - BROJ. N${orderId}`
               : orders[0]?.is_pro_forma_invoice
               ? `PREDRAČUN - BROJ. N${orderId}`
@@ -281,7 +281,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
                 <Typography variant="bodySmall" content={`${orders && orders[0]?.public_procurement?.title}`} />
               </Row>
             )}
-            {Number(orders[0]?.public_procurement?.id) === 0 && (
+            {Number(orders[0]?.public_procurement?.id) === 0 && orders[0]?.invoice_number === '' && (
               <Row>
                 <Typography variant="bodySmall" style={{fontWeight: 600}} content={'GRUPA ARTIKALA:'} />
                 <Typography variant="bodySmall" content={`${orders && orders[0]?.group_of_articles?.title}`} />
@@ -293,47 +293,52 @@ export const FormOrderDetailsPreview: React.FC = () => {
               <Typography variant="bodySmall" content={`${supplier?.title || ''} `} />
             </Row>
             <>
-              {!orders[0]?.is_pro_forma_invoice && (
+              {!orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== '' && (
                 <Row>
                   <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM:'} />
                   <Typography variant="bodySmall" content={`${date || ''}`} />
                 </Row>
               )}
-              {orders[0]?.is_pro_forma_invoice && (
-                <>
-                  <Row>
-                    <Typography variant="bodySmall" style={{fontWeight: 600}} content={'BROJ PREDRAČUNA:'} />
-                    <Typography variant="bodySmall" content={`${orders[0].pro_forma_invoice_number || ''} `} />
 
-                    {orders[0]?.invoice_date && orders[0]?.date_system && (
-                      <>
-                        <Typography
-                          variant="bodySmall"
-                          style={{fontWeight: 600, marginLeft: 30}}
-                          content={'BROJ RAČUNA:'}
-                        />
-                        <Typography variant="bodySmall" content={`${orders[0].invoice_number || ''} `} />
-                      </>
-                    )}
-                  </Row>
-                  <Row>
-                    <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM PREDRAČUNA:'} />
-                    <Typography variant="bodySmall" content={`${parseDate(orders[0].pro_forma_invoice_date) || ''} `} />
+              <>
+                <Row>
+                  {orders[0]?.is_pro_forma_invoice && (
+                    <>
+                      <Typography
+                        variant="bodySmall"
+                        style={{fontWeight: 600, marginRight: 30}}
+                        content={'BROJ PREDRAČUNA:'}
+                      />
+                      <Typography variant="bodySmall" content={`${orders[0].pro_forma_invoice_number || ''} `} />
+                    </>
+                  )}
 
-                    {orders[0]?.invoice_date && orders[0]?.date_system && (
-                      <>
-                        <Typography
-                          variant="bodySmall"
-                          style={{fontWeight: 600, marginLeft: 30}}
-                          content={'DATUM RAČUNA:'}
-                        />
-                        <Typography variant="bodySmall" content={`${parseDate(orders[0].invoice_date) || ''} `} />
-                      </>
-                    )}
-                  </Row>
-                </>
-              )}
-              {!orders[0]?.invoice_date && !orders[0]?.date_system && (
+                  {!orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== '' && (
+                    <>
+                      <Typography variant="bodySmall" style={{fontWeight: 600}} content={'BROJ RAČUNA:'} />
+                      <Typography variant="bodySmall" content={`${orders[0]?.invoice_number || ''} `} />
+                    </>
+                  )}
+                </Row>
+                <Row>
+                  {orders[0]?.is_pro_forma_invoice && (
+                    <>
+                      <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM PREDRAČUNA:'} />
+                      <Typography
+                        variant="bodySmall"
+                        content={`${parseDate(orders[0].pro_forma_invoice_date) || ''} `}
+                      />
+                    </>
+                  )}
+                  {orders[0]?.invoice_date && (
+                    <>
+                      <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM RAČUNA:'} />
+                      <Typography variant="bodySmall" content={`${parseDate(orders[0]?.invoice_date) || ''} `} />
+                    </>
+                  )}
+                </Row>
+              </>
+              {!orders[0]?.invoice_date && (
                 <Row>
                   <FileUploadWrapper>
                     <FileUpload
@@ -374,7 +379,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
             </>
           </div>
           <ButtonContainer>
-            {orders[0]?.invoice_date && orders[0]?.date_system && !orders[0]?.is_pro_forma_invoice && (
+            {orders[0]?.invoice_number !== '' && (
               <Button
                 content="Proslijedi finansijama"
                 variant="secondary"
@@ -384,7 +389,13 @@ export const FormOrderDetailsPreview: React.FC = () => {
               />
             )}
             <Button
-              content={orders[0]?.is_pro_forma_invoice ? 'Štampaj predračun' : 'Štampaj narudžbenicu'}
+              content={
+                orders[0]?.is_pro_forma_invoice
+                  ? 'Štampaj predračun'
+                  : orders[0]?.invoice_number !== ''
+                  ? 'Štampaj račun'
+                  : 'Štampaj narudžbenicu'
+              }
               size="sm"
               variant="secondary"
               onClick={printOrder}
@@ -393,7 +404,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
               content="Kreiraj prijemnicu"
               size="sm"
               variant="secondary"
-              disabled={!!orders[0]?.invoice_date}
+              disabled={orders[0]?.status === 'Receive'}
               onClick={handleAddReceiveItems}
             />
           </ButtonContainer>
@@ -401,7 +412,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
         <Table tableHeads={tableHeads} data={mappedOrder || []} isLoading={loading} />
 
-        {orders[0]?.invoice_date && orders[0]?.date_system && (
+        {orders[0]?.invoice_date && orders[0]?.date_order && (
           <AccordionWrapper>
             <Accordion
               style={{border: 0, padding: 0, marginBottom: 20, display: 'block'}}

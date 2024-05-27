@@ -11,7 +11,7 @@ const useDeleteOrderList = () => {
     setLoading(true);
     const response: OrderListType['delete'] = await fetch(GraphQL.deleteOrderList, {id});
 
-    if (response.orderList_Delete.status === REQUEST_STATUSES.success) {
+    if (response.orderList_Delete?.status === REQUEST_STATUSES.success) {
       onSuccess && onSuccess();
     } else {
       onError && onError();

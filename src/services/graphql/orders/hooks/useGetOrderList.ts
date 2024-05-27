@@ -40,7 +40,7 @@ const useGetOrderList = ({
 
   useEffect(() => {
     fetchOrders();
-  }, [page, size, id, supplier_id, status, search]);
+  }, [page, size, id, supplier_id, status, search, year, sort_by_date_order, sort_by_total_price]);
 
   return {orders, loading, total: totalNumOfOrders, fetch: fetchOrders};
 };

@@ -20,10 +20,10 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch
   const tableHeads: TableHead[] = [
     {
       title: 'Datum prijema robe',
-      accessor: 'date_system',
+      accessor: 'date_order',
       type: 'custom',
-      renderContents: (date_system: string) => {
-        return <Typography variant="bodySmall" content={date_system ? parseDate(date_system) : ''} />;
+      renderContents: (date_order: string) => {
+        return <Typography variant="bodySmall" content={date_order ? parseDate(date_order) : ''} />;
       },
     },
     {

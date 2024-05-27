@@ -93,7 +93,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
         },
         () => {
           setShowDeleteModal(false);
-          alert.success('Došlo je do greške pri brisanju.');
+          alert.error('Došlo je do greške pri brisanju.');
         },
       );
     }
@@ -124,6 +124,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
     fetch();
   }, [debouncedForm]);
 
+  console.log(orders);
   return (
     <ScreenWrapper>
       <Container>

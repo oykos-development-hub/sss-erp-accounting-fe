@@ -41,7 +41,7 @@ export const tableHeads: TableHead[] = [
         <Typography
           variant="bodyMedium"
           content={
-            row.is_pro_forma_invoice && row.invoice_number
+            !row.is_pro_forma_invoice && row?.invoice_number !== ''
               ? 'Izuzeće - račun'
               : row.is_pro_forma_invoice
               ? 'Izuzeće - predračun'

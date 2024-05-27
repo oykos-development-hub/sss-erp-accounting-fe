@@ -16,7 +16,7 @@ export interface OrderListItem {
   supplier?: DropdownDataString;
   status?: string;
   articles?: OrderArticleType[];
-  invoice_date?: string;
+  invoice_date: string | null;
   invoice_number?: string;
   date_system?: string;
   description?: string;
