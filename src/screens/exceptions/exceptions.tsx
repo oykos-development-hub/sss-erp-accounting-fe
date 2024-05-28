@@ -110,7 +110,6 @@ export const Exceptions: React.FC = () => {
     });
 
     const payload = {
-      date_order: new Date(),
       public_procurement_id: 0,
       articles: insertArticles,
       order_file: null,

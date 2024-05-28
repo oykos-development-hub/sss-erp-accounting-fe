@@ -218,6 +218,8 @@ export const FormOrderDetailsPreview: React.FC = () => {
           supplier_id: orders[0]?.supplier?.id,
           group_of_articles_id: orders[0]?.group_of_articles?.id,
           is_pro_forma_invoice: orders[0]?.is_pro_forma_invoice,
+          pro_forma_invoice_number: orders[0]?.pro_forma_invoice_number,
+          pro_forma_invoice_date: orders[0]?.pro_forma_invoice_date,
         };
 
         orderListInsert(
@@ -265,7 +267,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
         <MainTitle
           variant="bodyMedium"
           content={
-            !orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== ''
+            orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== ''
               ? `RAČUN - BROJ. N${orderId}`
               : orders[0]?.is_pro_forma_invoice
               ? `PREDRAČUN - BROJ. N${orderId}`
@@ -302,7 +304,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
               <>
                 <Row>
-                  {orders[0]?.is_pro_forma_invoice && (
+                  {orders[0]?.is_pro_forma_invoice && orders[0]?.pro_forma_invoice_number && (
                     <>
                       <Typography
                         variant="bodySmall"
@@ -313,7 +315,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
                     </>
                   )}
 
-                  {!orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== '' && (
+                  {orders[0]?.invoice_number !== '' && orders[0]?.invoice_number !== null && (
                     <>
                       <Typography variant="bodySmall" style={{fontWeight: 600}} content={'BROJ RAČUNA:'} />
                       <Typography variant="bodySmall" content={`${orders[0]?.invoice_number || ''} `} />
@@ -321,7 +323,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
                   )}
                 </Row>
                 <Row>
-                  {orders[0]?.is_pro_forma_invoice && (
+                  {orders[0]?.is_pro_forma_invoice && orders[0]?.pro_forma_invoice_date && (
                     <>
                       <Typography variant="bodySmall" style={{fontWeight: 600}} content={'DATUM PREDRAČUNA:'} />
                       <Typography
@@ -349,11 +351,21 @@ export const FormOrderDetailsPreview: React.FC = () => {
                       note={
                         <Typography
                           variant="bodySmall"
-                          content={orders[0]?.is_pro_forma_invoice ? 'Predračun' : 'Narudžbenica'}
+                          content={
+                            orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== ''
+                              ? 'Račun'
+                              : orders[0]?.is_pro_forma_invoice
+                              ? 'Predračun'
+                              : 'Narudžbenica'
+                          }
                         />
                       }
                       hint={`Fajlovi neće biti učitani dok ne sačuvate ${
-                        orders[0]?.is_pro_forma_invoice ? 'predračun' : 'narudžbenicu.'
+                        orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== ''
+                          ? 'račun'
+                          : orders[0]?.is_pro_forma_invoice
+                          ? 'predračun'
+                          : 'narudžbenicu.'
                       }`}
                       buttonText="Učitaj"
                     />
@@ -365,7 +377,13 @@ export const FormOrderDetailsPreview: React.FC = () => {
                   <Typography
                     variant="bodySmall"
                     style={{fontWeight: 600}}
-                    content={orders[0]?.is_pro_forma_invoice ? 'PREDRAČUN:' : 'NARUDŽBENICA:'}
+                    content={
+                      orders[0]?.is_pro_forma_invoice && orders[0]?.invoice_number !== ''
+                        ? 'RAČUN:'
+                        : orders[0]?.is_pro_forma_invoice
+                        ? 'PREDRAČUN:'
+                        : 'NARUDŽBENICA:'
+                    }
                   />
                   <FileList files={(orderFile && [orderFile]) ?? []} />
                 </Row>
@@ -379,7 +397,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
             </>
           </div>
           <ButtonContainer>
-            {orders[0]?.invoice_number !== '' && (
+            {orders[0]?.is_pro_forma_invoice && (
               <Button
                 content="Proslijedi finansijama"
                 variant="secondary"
@@ -412,7 +430,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
         <Table tableHeads={tableHeads} data={mappedOrder || []} isLoading={loading} />
 
-        {orders[0]?.invoice_date && orders[0]?.date_order && (
+        {orders[0]?.date_order && (
           <AccordionWrapper>
             <Accordion
               style={{border: 0, padding: 0, marginBottom: 20, display: 'block'}}

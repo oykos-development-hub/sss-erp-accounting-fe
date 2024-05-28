@@ -403,7 +403,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                       value={value ? parseDate(value) : ''}
                       error={errors.date_order?.message as string}
                       isRequired
-                      disabled={data[0]?.date_order}
                     />
                   )}
                 />

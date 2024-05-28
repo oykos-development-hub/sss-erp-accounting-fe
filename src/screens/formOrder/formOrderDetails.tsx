@@ -11,7 +11,6 @@ import {AmountInput, FormControls, FormFooter, OrderInfo} from './styles';
 import {OrderListArticleType} from '../../types/graphql/articleTypes';
 
 type formFields = {
-  date_order: string;
   public_procurement_id: number;
   order_file: number | null;
   articles: OrderListArticleType[];
@@ -41,7 +40,6 @@ export const FormOrderDetails: React.FC = () => {
     formState: {errors},
   } = useForm<formFields>({
     defaultValues: {
-      date_order: '',
       public_procurement_id: procurementID,
       articles: articles,
       order_file: null,
@@ -72,7 +70,6 @@ export const FormOrderDetails: React.FC = () => {
     });
 
     const payload = {
-      date_order: new Date(),
       public_procurement_id: Number(procurementID),
       articles: insertArticles || [],
       order_file: fileID || null,

@@ -41,6 +41,7 @@ export const AmountInput = styled(Input)`
 
 export const AccordionWrapper = styled.div`
   position: relative;
+  margin-top: 20px;
 `;
 
 export const AccordionHeader = styled.div`

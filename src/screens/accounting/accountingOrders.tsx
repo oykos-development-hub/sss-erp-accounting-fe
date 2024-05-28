@@ -124,7 +124,6 @@ export const AccountingOrdersMainPage: React.FC = () => {
     fetch();
   }, [debouncedForm]);
 
-  console.log(orders);
   return (
     <ScreenWrapper>
       <Container>
