@@ -15,7 +15,7 @@ import {convertToCurrency} from '../../utils/stringUtils';
 
 type ReceiveItemForm = {
   invoice_date: string;
-  date_order: string;
+  date_system: string;
   invoice_number: string;
   description: string;
   receive_file: FileItem[] | null;
@@ -24,7 +24,7 @@ type ReceiveItemForm = {
 
 const initialValues: ReceiveItemForm = {
   invoice_date: '',
-  date_order: '',
+  date_system: '',
   invoice_number: '',
   description: '',
   receive_file: null,
@@ -262,7 +262,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
             parseDateForBackend(values?.invoice_date),
             values?.invoice_number,
             values?.description,
-            parseDateForBackend(values?.date_order),
+            parseDateForBackend(values?.date_system),
             files.map((item: FileResponseItem) => item.id),
             values?.articles,
           );
@@ -278,7 +278,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         parseDateForBackend(values?.invoice_date),
         values?.invoice_number,
         values?.description,
-        parseDateForBackend(values?.date_order),
+        parseDateForBackend(values?.date_system),
         undefined,
         values?.articles,
       );
@@ -290,7 +290,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       reset({
         ...data[0],
         invoice_date: data[0]?.invoice_date || '',
-        date_order: data[0]?.date_order || '',
+        date_system: data[0]?.date_system || '',
         invoice_number: data[0]?.invoice_number || '',
         description: data[0]?.description || '',
         receive_file: data[0]?.receive_file || null,
@@ -376,7 +376,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                 />
 
                 <Controller
-                  name="date_order"
+                  name="date_system"
                   control={control}
                   rules={{
                     validate: {
@@ -401,7 +401,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                       label="DATUM PRIJEMA ROBE:"
                       name={name}
                       value={value ? parseDate(value) : ''}
-                      error={errors.date_order?.message as string}
+                      error={errors.date_system?.message as string}
                       isRequired
                     />
                   )}

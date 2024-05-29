@@ -430,7 +430,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
         <Table tableHeads={tableHeads} data={mappedOrder || []} isLoading={loading} />
 
-        {orders[0]?.date_order && (
+        {orders[0]?.date_system && (
           <AccordionWrapper>
             <Accordion
               style={{border: 0, padding: 0, marginBottom: 20, display: 'block'}}
