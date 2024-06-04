@@ -1,24 +1,27 @@
-import {Datepicker, Input, Modal, Table, TableHead, Typography, FileUpload, Dropdown, ValueType} from 'client-library';
+import {Datepicker, Dropdown, FileUpload, Input, Modal, Table, TableHead, Typography} from 'client-library';
 import React, {useEffect, useState} from 'react';
 import {Controller, useFieldArray, useForm} from 'react-hook-form';
-import useOrderListReceive from '../../services/graphql/orders/hooks/useOrderListReceive';
-import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
-import {DatepickersWrapper, FormWrapper, HeaderSection, StyledInput, TextareaWrapper, Title} from './styles';
-import {FileUploadWrapper} from '../../screens/formOrder/styles';
-import useAppContext from '../../context/useAppContext';
 import FileList from '../../components/fileList/fileList';
-import {FileItem, FileResponseItem} from '../../types/fileUploadType';
-import {OrderArticleType, OrderListArticleType} from '../../types/graphql/articleTypes';
 import {pdvOptions} from '../../constants';
+import useAppContext from '../../context/useAppContext';
+import {FileUploadWrapper} from '../../screens/formOrder/styles';
+import useOrderListReceive from '../../services/graphql/orders/hooks/useOrderListReceive';
+import {FileItem, FileResponseItem} from '../../types/fileUploadType';
+import {OrderArticleType} from '../../types/graphql/articleTypes';
 import {ReceiveItemStatus} from '../../types/graphql/orderListTypes';
+import {parseDate, parseDateForBackend} from '../../utils/dateUtils';
 import {convertToCurrency} from '../../utils/stringUtils';
+import {DatepickersWrapper, FormWrapper, HeaderSection, StyledInput, TextareaWrapper, Title} from './styles';
 
 type ReceiveItemForm = {
   invoice_date: string;
   date_system: string;
   invoice_number: string;
+  delivery_number: string;
+  delivery_date: string;
   description: string;
   receive_file: FileItem[] | null;
+  delivery_file: FileItem[] | null;
   articles?: OrderArticleType[];
 };
 
@@ -29,6 +32,9 @@ const initialValues: ReceiveItemForm = {
   description: '',
   receive_file: null,
   articles: [],
+  delivery_number: '',
+  delivery_date: '',
+  delivery_file: null,
 };
 
 interface ReceiveItemsModalProps {
@@ -40,7 +46,11 @@ interface ReceiveItemsModalProps {
 }
 
 export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open, onClose, alert, fetch}) => {
-  const [uploadedFiles, setUploadedFiles] = useState<FileList | null>();
+  const [uploadedFilesForReceive, setUploadedFilesForReceive] = useState<FileList | null>(null);
+  const [uploadedFilesForDelivery, setUploadedFilesForDelivery] = useState<FileList | null>(null);
+  const [receiveFileIds, setReceiveFileIds] = useState<number>();
+  const [deliveryFileIds, setDeliveryFileIds] = useState<number>();
+
   const {mutate: orderListReceive, loading: isSaving} = useOrderListReceive();
   const [filesToDelete, setFilesToDelete] = useState<number[]>();
   const isException = data[0]?.public_procurement?.id === 0;
@@ -62,6 +72,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
   });
 
   const receiveFile = watch('receive_file');
+  const deliveryFile = watch('delivery_file');
 
   const {
     fileService: {uploadFile, batchDeleteFiles},
@@ -165,10 +176,27 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     const totalArticlePrice = net_price && vat_percentage?.id ? net_price * (1 + vat_percentage?.id / 100) : net_price;
     return totalArticlePrice && totalArticlePrice * item.amount;
   };
+  const handleReceiveFileUpload = async (files: FileList) => {
+    setUploadedFilesForReceive(files);
 
-  const handleUpload = (files: FileList) => {
-    setUploadedFiles(files);
-    clearErrors('receive_file');
+    const formData = new FormData();
+    Array.from(files).forEach((file: File) => {
+      formData.append('file', file);
+    });
+
+    const response = await uploadFile(formData);
+    setReceiveFileIds(response[0]?.id);
+  };
+
+  const handleDeliveryFileUpload = async (files: FileList) => {
+    setUploadedFilesForDelivery(files);
+    const formData = new FormData();
+    Array.from(files).forEach((file: File) => {
+      formData.append('file', file);
+    });
+
+    const response = await uploadFile(formData);
+    setDeliveryFileIds(response[0]?.id);
   };
 
   const onDeleteFile = (id: number) => {
@@ -189,26 +217,31 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     return sum + price;
   }, 0);
 
-  const handleReceiveListInsert = (
-    invoiceDate: string | null,
-    invoiceNumber: string,
-    description: string,
-    dateSystem: string | null,
-    receiveFileIds?: number[],
-    articles?: OrderArticleType[],
-  ) => {
+  const onSubmit = async (values: any) => {
+    if (isSaving) return;
+
+    if (filesToDelete && filesToDelete.length > 0) {
+      await batchDeleteFiles(filesToDelete);
+    }
+
     const payload = {
       order_id: data[0]?.id,
-      invoice_date: invoiceDate,
-      invoice_number: invoiceNumber,
-      description: description,
-      date_system: dateSystem,
-      receive_file: receiveFileIds,
-      articles:
-        isException && articles && articles?.length > 0
-          ? articles?.map((item: any) => {
+      invoice_date: parseDateForBackend(values?.invoice_date),
+      invoice_number: values?.invoice_number,
+      description: values?.description,
+      date_system: parseDateForBackend(values?.date_system),
+      receive_file: data[0]?.file?.id ? data[0]?.file?.id : receiveFileIds ? receiveFileIds : null,
+      delivery_file_id: data[0]?.delivery_file?.id
+        ? data[0]?.delivery_file?.id
+        : deliveryFileIds
+        ? deliveryFileIds
+        : null,
+      delivery_number: values?.delivery_number,
+      delivery_date: parseDateForBackend(values?.delivery_date),
+      articles: !data[0]?.id
+        ? isException && values?.articles && values?.articles?.length > 0
+          ? values.articles?.map((item: any) => {
               const matchedItem = data[0]?.articles.find((article: {id: any}) => article.id === item.id);
-
               return {
                 id: item.id,
                 net_price:
@@ -223,8 +256,10 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                   data[0]?.is_pro_forma_invoice && matchedItem ? matchedItem.vat_percentage : item?.vat_percentage?.id,
               };
             })
-          : [],
+          : []
+        : undefined,
     };
+
     orderListReceive(
       payload,
       () => {
@@ -238,53 +273,6 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
     );
   };
 
-  const onSubmit = async (values: any) => {
-    if (isSaving) return;
-
-    if (filesToDelete && filesToDelete?.length > 0) {
-      await batchDeleteFiles(filesToDelete);
-    }
-
-    if (uploadedFiles) {
-      const filesToUpload = [...uploadedFiles];
-
-      const formData = new FormData();
-      filesToUpload.forEach((file: File) => {
-        formData.append('file', file);
-      });
-
-      await uploadFile(
-        formData,
-        (files: FileResponseItem[]) => {
-          setUploadedFiles(null);
-          setValue('receive_file', files);
-          handleReceiveListInsert(
-            parseDateForBackend(values?.invoice_date),
-            values?.invoice_number,
-            values?.description,
-            parseDateForBackend(values?.date_system),
-            files.map((item: FileResponseItem) => item.id),
-            values?.articles,
-          );
-        },
-        () => {
-          alert.error('Greška pri čuvanju! Fajlovi nisu učitani.');
-        },
-      );
-
-      return;
-    } else {
-      handleReceiveListInsert(
-        parseDateForBackend(values?.invoice_date),
-        values?.invoice_number,
-        values?.description,
-        parseDateForBackend(values?.date_system),
-        undefined,
-        values?.articles,
-      );
-    }
-  };
-
   useEffect(() => {
     if (data[0]) {
       reset({
@@ -294,6 +282,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         invoice_number: data[0]?.invoice_number || '',
         description: data[0]?.description || '',
         receive_file: data[0]?.receive_file || null,
+        delivery_file: data[0]?.delivery_file,
         articles: data[0]?.articles
           .filter((item: OrderArticleType) => item.amount !== 0)
           .map((item: OrderArticleType) => {
@@ -343,6 +332,67 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
           </div>
           <HeaderSection>
             <div>
+              <StyledInput {...register('delivery_number')} label="BROJ OTPREMNICE:" />
+              <DatepickersWrapper>
+                <Controller
+                  name="delivery_date"
+                  control={control}
+                  render={({field: {onChange, name, value}}) => (
+                    <Datepicker
+                      onChange={onChange as any}
+                      label="DATUM OTPREMNICE:"
+                      name={name}
+                      value={value ? parseDate(value) : ''}
+                      error={errors.delivery_date?.message as string}
+                    />
+                  )}
+                />
+                <Controller
+                  name="date_system"
+                  control={control}
+                  rules={{
+                    validate: {
+                      customDateValidation: value => {
+                        const dateSystem = new Date(value);
+                        dateSystem.setHours(0, 0, 0, 0);
+
+                        const orderDate = new Date(data[0].date_order);
+                        orderDate.setHours(0, 0, 0, 0);
+
+                        if (dateSystem < orderDate) {
+                          return 'Datum prijema robe ne može biti stariji od datuma narudžbenice';
+                        }
+                        return true;
+                      },
+                    },
+                    required: 'Ovo polje je obavezno.',
+                  }}
+                  render={({field: {onChange, name, value}}) => (
+                    <Datepicker
+                      onChange={onChange as any}
+                      label="DATUM PRIJEMA ROBE:"
+                      name={name}
+                      value={value ? parseDate(value) : ''}
+                      error={errors.date_system?.message as string}
+                      isRequired
+                    />
+                  )}
+                />
+              </DatepickersWrapper>
+              <FileUploadWrapper>
+                <FileUpload
+                  icon={null}
+                  files={uploadedFilesForDelivery}
+                  variant="secondary"
+                  onUpload={handleDeliveryFileUpload}
+                  note={<Typography variant="bodySmall" content="Otpremnica" />}
+                  hint="Fajlovi neće biti učitani dok ne sačuvate prijemnicu."
+                  buttonText="Učitaj"
+                />
+              </FileUploadWrapper>
+              {deliveryFile && deliveryFile.length !== 0 && <FileList files={[deliveryFile] as any} />}
+            </div>
+            <div>
               <StyledInput {...register('invoice_number')} label="BROJ FAKTURE:" />
               <DatepickersWrapper>
                 <Controller
@@ -365,55 +415,25 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                     },
                   }}
                   render={({field: {onChange, name, value}}) => (
-                    <Datepicker
-                      onChange={onChange as any}
-                      label="DATUM FAKTURE:"
-                      name={name}
-                      value={value ? parseDate(value) : ''}
-                      error={errors.invoice_date?.message as string}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="date_system"
-                  control={control}
-                  rules={{
-                    validate: {
-                      customDateValidation: value => {
-                        const dateSystem = new Date(value);
-                        dateSystem.setHours(0, 0, 0, 0);
-
-                        const orderDate = new Date(data[0].date_order);
-                        orderDate.setHours(0, 0, 0, 0);
-
-                        if (dateSystem < orderDate) {
-                          return 'Datum prijema robe ne može biti stariji od datuma narudžbenice';
-                        }
-                        return true;
-                      },
-                    },
-                    required: 'Ovo polje je obavezno',
-                  }}
-                  render={({field: {onChange, name, value}}) => (
-                    <Datepicker
-                      onChange={onChange as any}
-                      label="DATUM PRIJEMA ROBE:"
-                      name={name}
-                      value={value ? parseDate(value) : ''}
-                      error={errors.date_system?.message as string}
-                      isRequired
-                    />
+                    <div style={{width: '100%'}}>
+                      <Datepicker
+                        onChange={onChange as any}
+                        label="DATUM FAKTURE:"
+                        name={name}
+                        value={value ? parseDate(value) : ''}
+                        error={errors.invoice_date?.message as string}
+                      />
+                    </div>
                   )}
                 />
               </DatepickersWrapper>
               <FileUploadWrapper>
                 <FileUpload
                   icon={null}
-                  files={uploadedFiles}
+                  files={uploadedFilesForReceive}
                   variant="secondary"
-                  onUpload={handleUpload}
-                  note={<Typography variant="bodySmall" content="Dokument" />}
+                  onUpload={handleReceiveFileUpload}
+                  note={<Typography variant="bodySmall" content="Račun" />}
                   hint="Fajlovi neće biti učitani dok ne sačuvate prijemnicu."
                   buttonText="Učitaj"
                 />
@@ -422,31 +442,31 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
                 <FileList files={receiveFile} onDelete={onDeleteFile} isInModal={true} />
               )}
             </div>
-            <TextareaWrapper>
-              <Input {...register('description')} label="NAPOMENA:" textarea={true} />
-              {Number(data[0]?.public_procurement?.id) !== 0 && (
-                <>
-                  <Input
-                    label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):"
-                    value={totalNeto.toLocaleString('sr-RS', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    disabled={true}
-                    style={{marginBlock: 5}}
-                  />
-                  <Input
-                    label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):"
-                    value={totalPrice.toLocaleString('sr-RS', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    disabled={true}
-                  />
-                </>
-              )}
-            </TextareaWrapper>
           </HeaderSection>
+          <TextareaWrapper>
+            <Input {...register('description')} label="NAPOMENA:" textarea={true} />
+            {Number(data[0]?.public_procurement?.id) !== 0 && (
+              <>
+                <Input
+                  label="UKUPNA VRIJEDNOST NARUDŽBENICE (BEZ PDV-a):"
+                  value={totalNeto.toLocaleString('sr-RS', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  disabled={true}
+                  style={{marginBlock: 5}}
+                />
+                <Input
+                  label="UKUPNA VRIJEDNOST NARUDŽBENICE (SA PDV-om):"
+                  value={totalPrice.toLocaleString('sr-RS', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  disabled={true}
+                />
+              </>
+            )}
+          </TextareaWrapper>
 
           <Table tableHeads={tableHeads} data={fields} />
         </FormWrapper>

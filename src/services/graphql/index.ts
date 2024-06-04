@@ -11,6 +11,7 @@ import receiveOrderList from './orders/mutations/receiveOrderList';
 import getOrderList from './orders/queries/getOrderList';
 import getOrderProcurementAvailableArticles from './orders/queries/getOrderProcurementAvailableArticles';
 import getOverallSpendingReport from './overallSpendingReport/getOverallSpendingReport';
+import passOrderListToFinance from './passOrderListToFinance/passOrderListToFinance';
 import getPlans from './plans/queries/getPlans';
 import getRecipientUsers from './recipientUsersOverview/queries/getRecipientUsers';
 import getStockOverview from './stock/query/getStockOverview';
@@ -33,4 +34,5 @@ export const GraphQL = {
   getStockOverview: getStockOverview,
   getOverallSpendingReport: getOverallSpendingReport,
   getMovementArticles: getMovementArticles,
+  passOrderListToFinance: passOrderListToFinance,
 };

@@ -34,6 +34,11 @@ export interface OrderListItem {
     name: string;
     type: string;
   }[];
+  delivery_file: {
+    id: number;
+    name: string;
+    type: string;
+  };
   movement_file?: {
     id: number;
     name: string;
@@ -62,7 +67,7 @@ export interface OrderListReceiveParams {
   invoice_date: string | null;
   invoice_number: string | null;
   description: string;
-  receive_file?: number[] | null;
+  receive_file?: number | null;
 }
 
 export interface OrderListInsertParams {

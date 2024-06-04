@@ -49,7 +49,7 @@ const FileList = ({files, onDelete, isInModal}: FileListProps) => {
   return (
     <List>
       {files &&
-        files.map((file: FileItem) => (
+        files?.map((file: FileItem) => (
           <File
             key={file.id}
             onClick={() => {

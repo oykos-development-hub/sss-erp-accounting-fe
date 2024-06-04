@@ -25,6 +25,7 @@ import {FileResponseItem} from '../../types/fileUploadType';
 import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrderList';
 import {useForm} from 'react-hook-form';
 import {convertToCurrency} from '../../utils/stringUtils';
+import usePassOrderToFinance from '../../services/graphql/passOrderListToFinance/usePassOrderToFinance';
 
 export const FormOrderDetailsPreview: React.FC = () => {
   const {
@@ -57,6 +58,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
   const {orders, loading, fetch} = useGetOrderList(form);
   const {mutate: deleteOrderListReceive} = useDeleteOrderListReceive();
   const {mutate: orderListInsert} = useOrderListInsert();
+  const {passOrderToFinance} = usePassOrderToFinance();
 
   const supplier = orders[0]?.supplier;
   const dateOrder = orders[0]?.date_order || '';
@@ -240,15 +242,11 @@ export const FormOrderDetailsPreview: React.FC = () => {
 
   const orderFile = orders[0]?.order_file;
   const receiveFile = orders[0]?.receive_file;
+  const deliveryFile = orders[0]?.delivery_file;
 
   const sendToFinance = async () => {
-    const payload = {
-      id: orderId,
-      passed_to_finance: true,
-    };
-
-    orderListInsert(
-      payload as any,
+    passOrderToFinance(
+      orderId,
       () => {
         fetch();
         alert.success('Uspješno proslijedjeno finansijama.');
@@ -389,15 +387,22 @@ export const FormOrderDetailsPreview: React.FC = () => {
                 </Row>
               )}
               {receiveFile && receiveFile.length !== 0 && (
-                <div>
-                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'PRIJEMNICA/FAKTURA:'} />
+                <Row>
+                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'FAKTURA:'} />
                   <FileList files={(receiveFile && receiveFile) ?? []} />
-                </div>
+                </Row>
+              )}
+              {deliveryFile && deliveryFile.id !== 0 && (
+                <Row>
+                  <Typography variant="bodySmall" style={{fontWeight: 600}} content={'OTPREMNICA:'} />
+                  <FileList files={(deliveryFile && [deliveryFile]) ?? []} />
+                </Row>
               )}
             </>
           </div>
           <ButtonContainer>
-            {orders[0]?.is_pro_forma_invoice && (
+            {((orders[0]?.invoice_number && !!orders[0]?.receive_file?.length && orders[0]?.invoice_date) ||
+              (orders[0]?.is_pro_forma_invoice && orders[0]?.pro_forma_invoice_number)) && (
               <Button
                 content="Proslijedi finansijama"
                 variant="secondary"
