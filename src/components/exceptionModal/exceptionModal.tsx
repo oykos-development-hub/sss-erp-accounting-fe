@@ -38,7 +38,7 @@ export const ExceptionModal: React.FC<AccountingOrderModalProps> = ({open, onClo
 
   const dropdowncountsOptions = counts?.map(item => {
     return {
-      title: item.serial_number,
+      title: `${item.serial_number} - ${item.title}`,
       id: item.id,
     };
   });
