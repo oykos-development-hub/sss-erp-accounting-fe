@@ -12,14 +12,19 @@ import {Supplier} from '../../types/graphql/supplierTypes';
 import {useDebounce} from '../../utils/useDebounce';
 import {tableHeads} from './constants';
 import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, TableHeader} from './styles';
+import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 export const AccountingOrdersMainPage: React.FC = () => {
-  const {alert, breadcrumbs, navigation} = useAppContext();
+  const {alert, breadcrumbs, navigation, contextMain} = useAppContext();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showExceptionModal, setShowExceptionModal] = useState(false);
   const {suppliers} = useGetSuppliers({id: 0, search: null, page: 1, size: 100});
+  const deletePermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'delete');
+  const deletePermission = deletePermittedRoutes.includes('/accounting/order-form');
+  const createPermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'create');
+  const createPermission = createPermittedRoutes.includes('/accounting/order-form');
 
   const [form, setForm] = useState<any>({
     page: 1,
@@ -141,19 +146,21 @@ export const AccountingOrdersMainPage: React.FC = () => {
               isSearchable={true}
             />
           </FiltersWrapper>
-          <ButtonWrapper>
-            <Button
-              variant="secondary"
-              content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
-              onClick={handleAdd}
-              style={{marginRight: 10}}
-            />
-            <Button
-              variant="secondary"
-              content={<Typography variant="bodyMedium" content="Izuzeće od plana" />}
-              onClick={handleOpenModal}
-            />
-          </ButtonWrapper>
+          {createPermission && (
+            <ButtonWrapper>
+              <Button
+                variant="secondary"
+                content={<Typography variant="bodyMedium" content="Nova narudžbenica" />}
+                onClick={handleAdd}
+                style={{marginRight: 10}}
+              />
+              <Button
+                variant="secondary"
+                content={<Typography variant="bodyMedium" content="Izuzeće od plana" />}
+                onClick={handleOpenModal}
+              />
+            </ButtonWrapper>
+          )}
         </TableHeader>
 
         <div>
@@ -184,7 +191,7 @@ export const AccountingOrdersMainPage: React.FC = () => {
                 name: 'Obriši',
                 onClick: item => handleDeleteIconClick(item.id),
                 icon: <TrashIcon stroke={Theme?.palette?.gray800} />,
-                shouldRender: item => item.status !== 'Receive',
+                shouldRender: item => deletePermission && item.status !== 'Receive',
               },
             ]}
           />

@@ -11,6 +11,7 @@ import {NotificationsModal} from '../../shared/notifications/notificationsModal'
 import {tableHeadsMovement} from './constants';
 import {MovementListFilters} from './styles';
 import {MovementDetailsItems} from '../../types/graphql/movementTypes';
+import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 export const MovementList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -24,6 +25,10 @@ export const MovementList = () => {
     breadcrumbs,
     reportService: {generatePdf},
   } = useAppContext();
+  const updatePermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'update');
+  const updatePermission = updatePermittedRoutes.includes('/accounting/stock');
+  const deletePermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'delete');
+  const deletePermission = deletePermittedRoutes.includes('/accounting/stock');
   const {control, watch} = useForm();
   const office = watch('office')?.id;
   const recipient = watch('recipient')?.id;
@@ -161,11 +166,13 @@ export const MovementList = () => {
             name: 'Izmijeni',
             onClick: item => handleEditIconClick(item.id),
             icon: <EditIconTwo stroke={Theme?.palette?.gray800} />,
+            shouldRender: () => updatePermission,
           },
           {
             name: 'Obriši',
             onClick: item => handleDeleteIconClick(item.id),
             icon: <TrashIcon stroke={Theme?.palette?.gray800} />,
+            shouldRender: () => deletePermission,
           },
           {
             name: 'Štampaj',
@@ -175,13 +182,15 @@ export const MovementList = () => {
         ]}
       />
 
-      <NotificationsModal
-        open={!!showDeleteModal}
-        onClose={handleCloseDeleteModal}
-        handleLeftButtomClick={handleDelete}
-        subTitle={'Ovaj fajl ce biti trajno izbrisan iz sistema.'}
-      />
-      {showEditModal && (
+      {deletePermission && (
+        <NotificationsModal
+          open={!!showDeleteModal}
+          onClose={handleCloseDeleteModal}
+          handleLeftButtomClick={handleDelete}
+          subTitle={'Ovaj fajl ce biti trajno izbrisan iz sistema.'}
+        />
+      )}
+      {updatePermission && showEditModal && (
         <EditMovementModal
           open={showEditModal}
           onClose={refetch => {

@@ -21,6 +21,7 @@ import {parseDateForBackend} from '../../utils/dateUtils';
 import {tableHeadsStockReview} from './constants';
 import {ArticleTitleWrapper, Column, DropdownWrapper, Filter, FormControls, FormFooter, MainTitle} from './styles';
 import {StockItem} from '../../types/graphql/stockTypes';
+import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 interface Item extends StockItem {
   quantity: string;
@@ -39,6 +40,10 @@ export const StockReview = () => {
     reportService: {generatePdf},
     navigation,
   } = useAppContext();
+  const updatePermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'update');
+  const updatePermission = updatePermittedRoutes.includes('/accounting/stock');
+  const createPermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'create');
+  const createPermission = createPermittedRoutes.includes('/accounting/stock');
 
   const [selectedItems, setSelectedItems] = useState<any>([]);
   const [form, setForm] = useState({
@@ -254,6 +259,7 @@ export const StockReview = () => {
                 item.vat_percentage,
               ),
             icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
+            shouldRender: () => updatePermission,
             disabled: item => isItemAlreadySelected(item.id),
             tooltip: () => 'Dodajte artikal',
           },
@@ -267,7 +273,7 @@ export const StockReview = () => {
         pageCount={total ? total / 10 : 0}
       />
 
-      {fields.length > 0 && (
+      {createPermission && fields.length > 0 && (
         <>
           <ArticleTitleWrapper>
             <MainTitle content="ODABRANI ARTIKLI" variant="bodyMedium" />

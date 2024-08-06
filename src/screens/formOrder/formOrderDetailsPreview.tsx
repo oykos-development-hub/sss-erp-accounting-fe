@@ -26,6 +26,7 @@ import useOrderListInsert from '../../services/graphql/orders/hooks/useInsertOrd
 import {useForm} from 'react-hook-form';
 import {convertToCurrency} from '../../utils/stringUtils';
 import usePassOrderToFinance from '../../services/graphql/passOrderListToFinance/usePassOrderToFinance';
+import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 export const FormOrderDetailsPreview: React.FC = () => {
   const {
@@ -34,7 +35,11 @@ export const FormOrderDetailsPreview: React.FC = () => {
     navigation: {location, navigate},
     reportService: {generatePdf},
     fileService: {uploadFile},
+    contextMain,
   } = useAppContext();
+
+  const updatePermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'update');
+  const updatePermission = updatePermittedRoutes.includes('/accounting/order-form');
 
   const {handleSubmit} = useForm();
 
@@ -402,15 +407,16 @@ export const FormOrderDetailsPreview: React.FC = () => {
           </div>
           <ButtonContainer>
             {((orders[0]?.invoice_number && !!orders[0]?.receive_file?.length && orders[0]?.invoice_date) ||
-              (orders[0]?.is_pro_forma_invoice && orders[0]?.pro_forma_invoice_number)) && (
-              <Button
-                content="Proslijedi finansijama"
-                variant="secondary"
-                size="sm"
-                onClick={handleSubmit(sendToFinance)}
-                disabled={orders[0]?.passed_to_finance}
-              />
-            )}
+              (orders[0]?.is_pro_forma_invoice && orders[0]?.pro_forma_invoice_number)) &&
+              updatePermission && (
+                <Button
+                  content="Proslijedi finansijama"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleSubmit(sendToFinance)}
+                  disabled={orders[0]?.passed_to_finance}
+                />
+              )}
             <Button
               content={
                 orders[0]?.is_pro_forma_invoice
@@ -423,13 +429,15 @@ export const FormOrderDetailsPreview: React.FC = () => {
               variant="secondary"
               onClick={printOrder}
             />
-            <Button
-              content="Kreiraj prijemnicu"
-              size="sm"
-              variant="secondary"
-              disabled={orders[0]?.status === 'Receive'}
-              onClick={handleAddReceiveItems}
-            />
+            {updatePermission && (
+              <Button
+                content="Kreiraj prijemnicu"
+                size="sm"
+                variant="secondary"
+                disabled={orders[0]?.status === 'Receive'}
+                onClick={handleAddReceiveItems}
+              />
+            )}
           </ButtonContainer>
         </OrderInfo>
 
@@ -492,7 +500,7 @@ export const FormOrderDetailsPreview: React.FC = () => {
           )}
         </FormFooter>
 
-        {showModal && (
+        {showModal && updatePermission && (
           <ReceiveItemsModal open={showModal} onClose={closeModal} fetch={fetch} data={orders} alert={alert} />
         )}
 

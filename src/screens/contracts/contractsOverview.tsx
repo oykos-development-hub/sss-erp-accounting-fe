@@ -8,10 +8,13 @@ import {ProcurementContract} from '../../types/graphql/procurementContractsTypes
 import {tableHeads} from './constants';
 import {ContractsFilters} from './contractFilters/contractFilters';
 import {Container, CustomDivider, MainTitle, TableHeader} from './styles';
+import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 export const ContractsMainPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
-  const {breadcrumbs, navigation} = useAppContext();
+  const {breadcrumbs, navigation, contextMain} = useAppContext();
+  const createPermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'create');
+  const createPermission = createPermittedRoutes.includes('/accounting/order-form');
   const [selectedSupplier, setSelectedSupplier] = useState(0);
   const [selectedYear, setSelectedYear] = useState(undefined);
 
@@ -97,6 +100,7 @@ export const ContractsMainPage: React.FC = () => {
                 onClick: (item: any) => openModal(item),
                 icon: <PlusIcon stroke={Theme?.palette?.gray800} />,
                 tooltip: () => 'Dodaj narudžbenicu',
+                shouldRender: () => createPermission,
               },
             ]}
           />

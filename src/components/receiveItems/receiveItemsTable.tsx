@@ -4,6 +4,7 @@ import useAppContext from '../../context/useAppContext';
 import {SectionBox} from '../../shared/styles';
 import {parseDate} from '../../utils/dateUtils';
 import {ReceiveItemsModal} from './receiveItemsModal';
+import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 interface ReceiveItemsTableProps {
   data: any;
@@ -13,7 +14,9 @@ interface ReceiveItemsTableProps {
 }
 
 export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch, loading, isDisabled}) => {
-  const {alert} = useAppContext();
+  const {alert, contextMain} = useAppContext();
+  const updatePermittedRoutes = checkActionRoutePermissions(contextMain?.permissions, 'update');
+  const updatePermission = updatePermittedRoutes.includes('/accounting/order-form');
   const [showModal, setShowModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(0);
 
@@ -87,7 +90,7 @@ export const ReceiveItemsTable: React.FC<ReceiveItemsTableProps> = ({data, fetch
             name: 'Izmijeni',
             onClick: item => handleEdit(item.id),
             icon: <EditIconTwo stroke={Theme?.palette?.gray800} />,
-            shouldRender: () => !isDisabled,
+            shouldRender: () => updatePermission && !isDisabled,
           },
         ]}
       />
