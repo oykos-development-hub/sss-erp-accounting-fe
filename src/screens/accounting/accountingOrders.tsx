@@ -10,8 +10,8 @@ import {NotificationsModal} from '../../shared/notifications/notificationsModal'
 import ScreenWrapper from '../../shared/screenWrapper';
 import {Supplier} from '../../types/graphql/supplierTypes';
 import {useDebounce} from '../../utils/useDebounce';
-import {tableHeads} from './constants';
 import {ButtonWrapper, Container, CustomDivider, FiltersWrapper, MainTitle, TableHeader} from './styles';
+import {tableHeads} from './constants';
 import {checkActionRoutePermissions} from '../../services/checkRoutePermissions.ts';
 
 export const AccountingOrdersMainPage: React.FC = () => {
