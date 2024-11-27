@@ -123,15 +123,13 @@ export const FormOrderDetails: React.FC = () => {
             {...register(`articles.${index}.amount`, {
               valueAsNumber: true,
               required: 'Ovo polje je obavezno.',
-              onBlur: e => {
-                if (Number(e.target.value) > row.available) {
-                  setError(`articles.${index}.amount`, {
-                    type: 'custom',
-                    message: 'Unijeta količina ne može biti veća od dostupne.',
-                  });
-                } else {
-                  clearErrors(`articles.${index}.amount`);
-                }
+              validate: {
+                isWithinAvailable: (value) => {
+                  if (value > row.available) {
+                    return 'Unijeta količina ne može biti veća od dostupne.';
+                  }
+                  return true;
+                },
               },
             })}
             error={errors?.articles?.[index]?.amount?.message as string}

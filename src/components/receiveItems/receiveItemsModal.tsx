@@ -224,6 +224,47 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
       await batchDeleteFiles(filesToDelete);
     }
 
+    let articles;
+
+    if (data[0]?.id) {
+      if (isException && values?.articles && values?.articles.length > 0) {
+        // Map through the articles to transform them
+        articles = values.articles.map((item: any) => {
+          const matchedItem = data[0]?.articles.find(
+              (article: { id: any }) => article.id === item.id
+          );
+
+          const netPrice =
+              data[0].status !== ReceiveItemStatus.RECEIVED
+                  ? // Parse net_price if it's a string
+                  typeof item?.net_price === 'string'
+                      ? parseFloat(item.net_price.replace(',', '.'))
+                      : item.net_price
+                  : // Use matchedItem's vat_percentage if is_pro_forma_invoice
+                  data[0]?.is_pro_forma_invoice && matchedItem
+                      ? matchedItem.vat_percentage
+                      : item.net_price;
+
+          const vatPercentage =
+              data[0]?.is_pro_forma_invoice && matchedItem
+                  ? matchedItem.vat_percentage
+                  : item?.vat_percentage?.id;
+
+          return {
+            id: item.id,
+            net_price: netPrice,
+            vat_percentage: vatPercentage,
+          };
+        });
+      } else {
+        // No articles if conditions are not met
+        articles = [];
+      }
+    } else {
+      // If data[0]?.id does not exist, set articles to undefined
+      articles = undefined;
+    }
+
     const payload = {
       order_id: data[0]?.id,
       invoice_date: parseDateForBackend(values?.invoice_date),
@@ -238,26 +279,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({data, open,
         : null,
       delivery_number: values?.delivery_number,
       delivery_date: parseDateForBackend(values?.delivery_date),
-      articles: !data[0]?.id
-        ? isException && values?.articles && values?.articles?.length > 0
-          ? values.articles?.map((item: any) => {
-              const matchedItem = data[0]?.articles.find((article: {id: any}) => article.id === item.id);
-              return {
-                id: item.id,
-                net_price:
-                  data[0].status !== ReceiveItemStatus.RECEIVED
-                    ? typeof item?.net_price === 'string'
-                      ? parseFloat(item.net_price.replace(',', '.'))
-                      : item.net_price
-                    : data[0]?.is_pro_forma_invoice && matchedItem
-                    ? matchedItem.vat_percentage
-                    : item.net_price,
-                vat_percentage:
-                  data[0]?.is_pro_forma_invoice && matchedItem ? matchedItem.vat_percentage : item?.vat_percentage?.id,
-              };
-            })
-          : []
-        : undefined,
+      articles
     };
 
     orderListReceive(
